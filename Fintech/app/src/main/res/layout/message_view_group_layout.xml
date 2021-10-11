@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="com.baiganov.fintech.сustomview.MessageViewGroup">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatar_view"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_small"
+        app:shapeAppearance="@style/circleImageViewShape"
+        app:srcCompat="@drawable/ic_launcher_background" />
+
+    <LinearLayout
+        android:id="@+id/message_linear_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_small"
+        android:background="@drawable/bg_message_text_view"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_normal"
+        tools:layout_width="220dp">
+
+        <TextView
+            android:id="@+id/profile_name_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="@dimen/message_text_max_width"
+            android:textColor="@color/green"
+            android:textSize="@dimen/normal_size" />
+
+        <TextView
+            android:id="@+id/message_text_incoming"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="@dimen/message_text_max_width"
+            android:textAlignment="viewStart"
+            android:textColor="@color/white"
+            android:textSize="@dimen/normal_size" />
+
+    </LinearLayout>
+
+    <com.baiganov.fintech.сustomview.FlexBoxLayout
+        android:id="@+id/flex_box"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/add_reaction_button_incoming"
+            layout="@layout/add_emoji_button" />
+
+    </com.baiganov.fintech.сustomview.FlexBoxLayout>
+</merge>
