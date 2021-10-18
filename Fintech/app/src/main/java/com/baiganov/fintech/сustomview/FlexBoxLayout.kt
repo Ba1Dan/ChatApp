@@ -18,6 +18,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     private var layoutWidth = 0
 
     fun setReactions(reactions: List<Reaction>) {
+        removeViews(0, childCount - 1)
         reactions.forEach { reaction ->
             addEmojiViewByReaction(reaction)
         }

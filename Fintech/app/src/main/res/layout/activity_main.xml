@@ -1,18 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/black"
+    android:background="#121212"
     tools:context=".MainActivity">
 
-    <com.baiganov.fintech.сustomview.MessageViewGroup
-        android:id="@+id/message_viewgroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Привет! lorem ipsum test message dalshe zabil"
-        tools:author="Darrell Steward"
-        android:layout_marginVertical="@dimen/margin_medium"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_chat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/input_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:itemCount="4"
+        tools:listitem="@layout/incoming_message"
+        app:stackFromEnd="true" />
 
-</LinearLayout>
+    <EditText
+        android:id="@+id/input_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="66dp"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:background="@drawable/bg_message_edit_text"
+        android:hint="Написать..."
+        android:imeOptions="flagNoExtractUi"
+        android:maxLines="3"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="12dp"
+        android:textColorHint="#CCCCCC"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_send"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:src="@drawable/ic_send_24"
+        app:fabCustomSize="40dp"
+        app:layout_constraintBottom_toBottomOf="@+id/input_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/input_message"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>
