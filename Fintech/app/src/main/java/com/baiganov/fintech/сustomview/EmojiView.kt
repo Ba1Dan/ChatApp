@@ -134,6 +134,14 @@ class EmojiView @JvmOverloads constructor(
 //        return true
 //    }
 
+    fun updateEmojiViewOnClick() {
+        if (isSelected) {
+            reactionCount += 1
+        } else {
+            reactionCount -= 1
+        }
+    }
+
     companion object {
         private const val DEF_REACTION_COUNT = 0
         private const val EMOJI_LAYOUT_WIDTH = 50

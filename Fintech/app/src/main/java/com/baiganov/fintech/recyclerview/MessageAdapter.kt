@@ -88,7 +88,7 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
         notifyDataSetChanged()
     }
 
-    class InComingMessageViewHolder(itemView: View, val clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
+    class InComingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
 
         private val viewGroup: MessageViewGroup = itemView.findViewById(R.id.incoming_message)
         private val txt: TextView = viewGroup.findViewById(R.id.message_text_incoming)
@@ -109,7 +109,7 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
         }
     }
 
-    class OutGoingMessageViewHolder(itemView: View, clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
+    class OutGoingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
 
         private val txt: TextView = itemView.findViewById(R.id.message_text_outgoing)
         private val flexBoxLayout: FlexBoxLayout =
@@ -118,6 +118,11 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
         fun bind(content: Content) {
             txt.text = content.text
             flexBoxLayout.setReactions(content.reactions)
+
+            txt.setOnLongClickListener {
+                clickListener.itemClick(content.id)
+                return@setOnLongClickListener true
+            }
         }
     }
 

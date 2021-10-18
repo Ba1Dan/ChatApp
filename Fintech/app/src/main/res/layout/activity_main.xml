@@ -16,9 +16,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:stackFromEnd="true"
         tools:itemCount="4"
-        tools:listitem="@layout/incoming_message"
-        app:stackFromEnd="true" />
+        tools:listitem="@layout/incoming_message" />
 
     <EditText
         android:id="@+id/input_message"
@@ -28,12 +28,14 @@
         android:layout_marginEnd="66dp"
         android:layout_marginBottom="@dimen/margin_small"
         android:background="@drawable/bg_message_edit_text"
-        android:hint="Написать..."
+        android:hint="@string/hint_message"
         android:imeOptions="flagNoExtractUi"
+        android:inputType="text"
         android:maxLines="3"
         android:paddingHorizontal="12dp"
         android:paddingVertical="12dp"
-        android:textColorHint="#CCCCCC"
+        android:textColor="@color/white"
+        android:textColorHint="@color/color_hint"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -44,10 +46,24 @@
         android:layout_height="40dp"
         android:layout_marginEnd="@dimen/margin_medium"
         android:layout_marginBottom="@dimen/margin_small"
+        android:contentDescription="@string/desc_button_send_message"
         android:src="@drawable/ic_send_24"
         app:fabCustomSize="40dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/input_message"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/input_message"
-        tools:visibility="visible" />
+        app:layout_constraintTop_toTopOf="@id/input_message" />
+
+    <ImageButton
+        android:id="@+id/btn_add_file"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:background="@android:color/transparent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/input_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/input_message"
+        app:srcCompat="@drawable/ic_add" />
 </androidx.constraintlayout.widget.ConstraintLayout>

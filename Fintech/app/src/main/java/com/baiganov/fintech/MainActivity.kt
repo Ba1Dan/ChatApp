@@ -2,7 +2,12 @@ package com.baiganov.fintech
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.bottomsheet.EmojiBottomSheetDialog
@@ -14,6 +19,7 @@ import com.baiganov.fintech.model.Reaction
 import com.baiganov.fintech.recyclerview.ClickListener
 import com.baiganov.fintech.recyclerview.MessageAdapter
 import com.baiganov.fintech.сustomview.MessageViewGroup
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
 
@@ -23,10 +29,9 @@ class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
     override fun sendData(position: Int?, emoji: String) {
 
         if (position != null) {
-            val data = getData()
             data.forEach { item ->
                 if (item is Content && item.id == position) {
-                    item.reactions.add(Reaction(emoji, 1))
+                    item.reactions.add(Reaction(User.getId(), emoji, 1))
                 }
             }
 
@@ -52,29 +57,62 @@ class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
         adapter = MessageAdapter(this)
         rv.adapter = adapter
 
-        adapter.setData(getData())
+        val btnSend = findViewById<FloatingActionButton>(R.id.btn_send)
+        val inputMessage = findViewById<EditText>(R.id.input_message)
+        val btnAddFile = findViewById<ImageButton>(R.id.btn_add_file)
+
+        inputMessage.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                    if (s.toString().isEmpty()) {
+                        btnAddFile.visibility = View.VISIBLE
+                        btnSend.visibility = View.GONE
+                    } else {
+                        btnSend.visibility = View.VISIBLE
+                        btnAddFile.visibility = View.GONE
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
+
+        btnSend.setOnClickListener {
+            data.add(Content(
+                id++, User.getId(), "Данияр", inputMessage.text.toString(), mutableListOf()
+            ))
+            inputMessage.setText("")
+            adapter.setData(data)
+        }
+
+        adapter.setData(data)
     }
 
-    private fun getData(): MutableList<Item> {
-        val data = mutableListOf<Item>(
-            Date(
-                "17 Окт"
-            ),
-            Content(
-                0, 0, "Данияр", "Привет", mutableListOf(
-                    Reaction("\uD83D\uDE09", 2),
-                    Reaction("\uD83D\uDE09", 3),
-                    Reaction("\uD83D\uDE09", 10),
-                )
-            ),
-            Content(
-                1, 1, "Данияр", "Салам", mutableListOf(
-                    Reaction("\uD83D\uDE09", 2),
-                    Reaction("\uD83D\uDE09", 3),
-                    Reaction("\uD83D\uDE09", 10),
-                )
+
+    private var id: Int = 2
+    private val data = mutableListOf<Item>(
+        Date(
+            "17 Окт"
+        ),
+        Content(
+            0, 0, "Данияр", "Привет", mutableListOf(
+                Reaction(1, "\uD83D\uDE09", 2),
+                Reaction(1, "\uD83D\uDE09", 3),
+                Reaction(1, "\uD83D\uDE09", 10),
+            )
+        ),
+        Content(
+            1, 1, "Данияр", "Салам", mutableListOf(
+                Reaction(2, "\uD83D\uDE09", 2),
+                Reaction(2, "\uD83D\uDE09", 3),
+                Reaction(2, "\uD83D\uDE09", 10),
             )
         )
-        return data
-    }
+    )
 }

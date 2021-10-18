@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Fintech</string>
     <string name="description_add_emoji">add emoji</string>
+    <string name="hint_message">Написать...</string>
+    <string name="desc_button_send_message">button send message</string>
 </resources>

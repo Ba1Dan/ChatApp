@@ -2,10 +2,12 @@ package com.baiganov.fintech.сustomview
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.*
 import com.baiganov.fintech.R
+import com.baiganov.fintech.User
 import com.baiganov.fintech.model.Reaction
 
 class FlexBoxLayout @JvmOverloads constructor(
@@ -18,9 +20,14 @@ class FlexBoxLayout @JvmOverloads constructor(
     private var layoutWidth = 0
 
     fun setReactions(reactions: List<Reaction>) {
+        val idUser = User.getId()
         removeViews(0, childCount - 1)
+        isVisible = reactions.isNotEmpty()
         reactions.forEach { reaction ->
-            addEmojiViewByReaction(reaction)
+            addEmojiViewByReaction(
+                reaction,
+                reaction.userId == idUser
+            )
         }
     }
 
@@ -91,14 +98,19 @@ class FlexBoxLayout @JvmOverloads constructor(
         return MarginLayoutParams(p)
     }
 
-    private fun addEmojiViewByReaction(reaction: Reaction) {
+    private fun addEmojiViewByReaction(reaction: Reaction, isSelect: Boolean) {
         addView(
             (LayoutInflater.from(context).inflate(R.layout.emoji_view_item, this, false) as EmojiView).apply {
                 setEmoji(reaction.emoji)
+                isSelected = isSelect
                 reactionCount = reaction.count
-                isSelected = false
                 setOnClickListener{
                     it.isSelected = !it.isSelected
+                    updateEmojiViewOnClick()
+                    if (reactionCount == 0) {
+                        removeView(it)
+                        this@FlexBoxLayout.isVisible = childCount > 1
+                    }
                 }
             }, childCount - 1
         )
