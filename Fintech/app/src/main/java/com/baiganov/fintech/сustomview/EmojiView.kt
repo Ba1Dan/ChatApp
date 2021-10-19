@@ -8,6 +8,7 @@ import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.graphics.withTranslation
 import com.baiganov.fintech.R
 

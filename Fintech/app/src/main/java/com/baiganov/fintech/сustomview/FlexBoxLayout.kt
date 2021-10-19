@@ -2,13 +2,17 @@ package com.baiganov.fintech.сustomview
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.User
 import com.baiganov.fintech.model.Reaction
+import android.widget.LinearLayout
+
+
+
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,
@@ -39,8 +43,10 @@ class FlexBoxLayout @JvmOverloads constructor(
         var maxWidthUsed = 0
         measureChildren(widthMeasureSpec, heightMeasureSpec)
         children.forEach { child ->
-            val childWidth = if (child.isGone) 0 else child.measuredWidth + child.marginStart + child.marginEnd
-            val childHeight = if (child.isGone) 0 else child.measuredHeight + child.marginTop + child.marginBottom
+            val childWidth =
+                if (child.isGone) 0 else child.measuredWidth + child.marginStart + child.marginEnd
+            val childHeight =
+                if (child.isGone) 0 else child.measuredHeight + child.marginTop + child.marginBottom
             if (widthUsed + childWidth > layoutWidth) {
                 maxWidthUsed = maxOf(widthUsed, maxWidthUsed)
                 widthUsed = 0
@@ -98,21 +104,34 @@ class FlexBoxLayout @JvmOverloads constructor(
         return MarginLayoutParams(p)
     }
 
-    private fun addEmojiViewByReaction(reaction: Reaction, isSelect: Boolean) {
-        addView(
-            (LayoutInflater.from(context).inflate(R.layout.emoji_view_item, this, false) as EmojiView).apply {
-                setEmoji(reaction.emoji)
-                isSelected = isSelect
-                reactionCount = reaction.count
-                setOnClickListener{
-                    it.isSelected = !it.isSelected
-                    updateEmojiViewOnClick()
-                    if (reactionCount == 0) {
-                        removeView(it)
-                        this@FlexBoxLayout.isVisible = childCount > 1
-                    }
+    fun addEmojiViewByReaction(reaction: Reaction, isSelect: Boolean) {
+        val inflater = LayoutInflater.from(context)
+        val emojiView = EmojiView(context).apply {
+            setPadding(
+                context.resources.getDimensionPixelSize(R.dimen.padding_normal),
+                context.resources.getDimensionPixelSize(R.dimen.padding_small),
+                context.resources.getDimensionPixelSize(R.dimen.padding_normal),
+                context.resources.getDimensionPixelSize(R.dimen.padding_small)
+            )
+            background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view)
+
+            setEmoji(reaction.emoji)
+            isSelected = isSelect
+            reactionCount = reaction.count
+            setOnClickListener {
+                it.isSelected = !it.isSelected
+                updateEmojiViewOnClick()
+                if (reactionCount == 0) {
+                    removeView(it)
+                    this@FlexBoxLayout.isVisible = childCount > 1
                 }
-            }, childCount - 1
+            }
+        }
+        val params = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        params.setMargins(context.resources.getDimensionPixelSize(R.dimen.margin_small))
+        emojiView.layoutParams = params
+        addView(
+            emojiView, childCount - 1
         )
     }
 }

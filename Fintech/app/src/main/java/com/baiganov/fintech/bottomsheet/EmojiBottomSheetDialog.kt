@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlin.math.roundToInt
 
@@ -26,6 +25,11 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
     override fun emojiClick(emoji: String) {
         onResultListener.sendData(idMessage, emoji)
         dismiss()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -61,13 +65,12 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
                 "\uD83D\uDE37",
             )
         )
-//
-//        with(recyclerView) {
-//            val spanCount = (layoutManager as GridLayoutManager).spanCount
-//            val spacing = resources.getDimension(R.dimen.padding_medium).roundToInt()
-//            addItemDecoration(EmojiGridItemDecoration(spanCount, spacing))
-//        }
 
+        with(recyclerView) {
+            val spanCount = (layoutManager as GridLayoutManager).spanCount
+            val spacing = resources.getDimension(R.dimen.padding_normal).roundToInt()
+            addItemDecoration(EmojiGridItemDecoration(spanCount, spacing))
+        }
     }
 }
 

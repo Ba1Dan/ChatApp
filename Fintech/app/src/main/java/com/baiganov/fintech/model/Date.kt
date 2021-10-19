@@ -1,5 +1,5 @@
 package com.baiganov.fintech.model
 
-class Date(
+data class Date(
     val date: String
-) : Item
+)

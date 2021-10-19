@@ -78,6 +78,12 @@ class MessageViewGroup @JvmOverloads constructor(
         flexBox.setReactions(reactions)
     }
 
+//    fun addReactionByButton() {
+//        addReactionButton.setOnClickListener {
+//            flexBox.add
+//        }
+//    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         measureChildren(widthMeasureSpec, heightMeasureSpec)
         avatarSize =

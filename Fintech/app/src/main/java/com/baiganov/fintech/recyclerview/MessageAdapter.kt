@@ -1,23 +1,23 @@
 package com.baiganov.fintech.recyclerview
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.User
-import com.baiganov.fintech.model.Item
-import com.baiganov.fintech.model.Content
-import com.baiganov.fintech.model.Date
-import com.baiganov.fintech.сustomview.FlexBoxLayout
-import com.baiganov.fintech.сustomview.MessageViewGroup
+import com.baiganov.fintech.recyclerview.viewholders.DateDividerViewHolder
+import com.baiganov.fintech.recyclerview.viewholders.InComingMessageViewHolder
+import com.baiganov.fintech.recyclerview.viewholders.OutGoingMessageViewHolder
 
-class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Adapter<BaseViewHolder<Item>>() {
 
-    private var messages = mutableListOf<Item>()
+    private val differ = AsyncListDiffer(this, MessageDiffUtil());
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    var messages: List<Item>
+        set(value) = differ.submitList(value)
+        get() = differ.currentList
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<Item> {
         return when (viewType) {
             R.layout.incoming_message -> {
                 InComingMessageViewHolder(
@@ -27,10 +27,10 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
                 )
             }
 
-            R.layout.outcoming_message -> {
+            R.layout.outgoing_message -> {
                 OutGoingMessageViewHolder(
                     LayoutInflater.from(parent.context)
-                        .inflate(R.layout.outcoming_message, parent, false),
+                        .inflate(R.layout.outgoing_message, parent, false),
                     clickListener
                 )
             }
@@ -43,19 +43,19 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
             else -> {
                 throw Exception("Unknown ViewType ${parent.resources.getResourceName(viewType)}")
             }
-        }
+        } as BaseViewHolder<Item>
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseViewHolder<Item>, position: Int) {
         when(getItemViewType(position)) {
-            R.layout.outcoming_message -> {
-                (holder as OutGoingMessageViewHolder).bind(messages[position] as Content)
+            R.layout.outgoing_message -> {
+                (holder as OutGoingMessageViewHolder).bind(messages[position] as Message)
             }
             R.layout.incoming_message -> {
-                (holder as InComingMessageViewHolder).bind(messages[position] as Content)
+                (holder as InComingMessageViewHolder).bind(messages[position] as Message)
             }
             R.layout.date_divider -> {
-                (holder as DateDividerViewHolder).bind(messages[position] as Date)
+                (holder as DateDividerViewHolder).bind(messages[position] as DateDivider)
             }
         }
     }
@@ -65,73 +65,6 @@ class MessageAdapter(private val clickListener: ClickListener) : RecyclerView.Ad
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (messages[position]) {
-            is Content -> {
-                val content = messages[position] as Content
-                if (content.userId == User.getId()) {
-                    R.layout.outcoming_message
-                } else {
-                    R.layout.incoming_message
-                }
-            }
-            is Date -> {
-                R.layout.date_divider
-            }
-            else -> {
-                -1
-            }
-        }
-    }
-
-    fun setData(newData: MutableList<Item>) {
-        messages = newData
-        notifyDataSetChanged()
-    }
-
-    class InComingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
-
-        private val viewGroup: MessageViewGroup = itemView.findViewById(R.id.incoming_message)
-        private val txt: TextView = viewGroup.findViewById(R.id.message_text_incoming)
-
-        fun bind(content: Content) {
-            viewGroup.apply {
-                setReactions(
-                    content.reactions
-                )
-                text = content.text
-                author = content.name
-            }
-
-            txt.setOnLongClickListener {
-                clickListener.itemClick(content.id)
-                return@setOnLongClickListener true
-            }
-        }
-    }
-
-    class OutGoingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : RecyclerView.ViewHolder(itemView) {
-
-        private val txt: TextView = itemView.findViewById(R.id.message_text_outgoing)
-        private val flexBoxLayout: FlexBoxLayout =
-            itemView.findViewById(R.id.flexbox_reactions_outgoing)
-
-        fun bind(content: Content) {
-            txt.text = content.text
-            flexBoxLayout.setReactions(content.reactions)
-
-            txt.setOnLongClickListener {
-                clickListener.itemClick(content.id)
-                return@setOnLongClickListener true
-            }
-        }
-    }
-
-    class DateDividerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val txt: TextView = itemView.findViewById(R.id.txt_date_divider)
-
-        fun bind(date: Date) {
-            txt.text = date.date
-        }
+        return messages[position].viewType
     }
 }
