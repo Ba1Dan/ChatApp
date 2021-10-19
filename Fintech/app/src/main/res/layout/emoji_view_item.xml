@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.baiganov.fintech.сustomview.EmojiView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/margin_small"
+    android:background="@drawable/bg_emoji_view"
+    android:paddingStart="@dimen/padding_normal"
+    android:paddingTop="@dimen/padding_small"
+    android:paddingEnd="@dimen/padding_normal"
+    android:paddingBottom="@dimen/padding_small"
+    app:textColor="@color/white"
+    app:textSize="@dimen/small_size"
+    tools:reactionCount="9" />
