@@ -13,10 +13,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_outgoing_message_text_view"
         android:maxWidth="@dimen/message_text_max_width"
-        android:padding="12dp"
+        android:padding="@dimen/normal_margin"
         android:textColor="@color/white"
-        android:textColorLink="?attr/colorError"
-        android:textSize="16sp"
+        android:textSize="@dimen/normal_text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Hello it's me!" />

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
@@ -19,7 +20,6 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
         onResultListener = context as OnResultListener
-
     }
 
     override fun emojiClick(emoji: String) {
@@ -41,7 +41,7 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_emoji_bottom)
         val args = arguments
         if (args != null) {
-            idMessage = args.getInt("id_message")
+            idMessage = args.getInt(ARGUMENT_MESSAGE_ID)
         }
 
         val adapter = EmojiAdapter(this)
@@ -71,6 +71,16 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
             val spacing = resources.getDimension(R.dimen.padding_normal).roundToInt()
             addItemDecoration(EmojiGridItemDecoration(spanCount, spacing))
         }
+    }
+
+    companion object {
+        fun newInstance(messageId: Int) = EmojiBottomSheetDialog().apply {
+            val bundle = Bundle()
+            bundle.putInt(ARGUMENT_MESSAGE_ID, messageId)
+            arguments = bundle
+        }
+
+        private const val ARGUMENT_MESSAGE_ID = "message_id"
     }
 }
 

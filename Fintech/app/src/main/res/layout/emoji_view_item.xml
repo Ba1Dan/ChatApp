@@ -11,5 +11,5 @@
     android:paddingEnd="@dimen/padding_normal"
     android:paddingBottom="@dimen/padding_small"
     app:textColor="@color/white"
-    app:textSize="@dimen/small_size"
+    app:textSize="@dimen/small_text_size"
     tools:reactionCount="9" />

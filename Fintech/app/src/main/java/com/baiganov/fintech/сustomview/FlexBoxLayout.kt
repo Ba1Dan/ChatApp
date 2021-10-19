@@ -12,8 +12,6 @@ import com.baiganov.fintech.model.Reaction
 import android.widget.LinearLayout
 
 
-
-
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -105,7 +103,12 @@ class FlexBoxLayout @JvmOverloads constructor(
     }
 
     fun addEmojiViewByReaction(reaction: Reaction, isSelect: Boolean) {
-        val inflater = LayoutInflater.from(context)
+        addView(
+            createEmojiView(reaction, isSelect), childCount - 1
+        )
+    }
+
+    private fun createEmojiView(reaction: Reaction, isSelect: Boolean): EmojiView {
         val emojiView = EmojiView(context).apply {
             setPadding(
                 context.resources.getDimensionPixelSize(R.dimen.padding_normal),
@@ -130,8 +133,6 @@ class FlexBoxLayout @JvmOverloads constructor(
         val params = LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         params.setMargins(context.resources.getDimensionPixelSize(R.dimen.margin_small))
         emojiView.layoutParams = params
-        addView(
-            emojiView, childCount - 1
-        )
+        return emojiView
     }
 }

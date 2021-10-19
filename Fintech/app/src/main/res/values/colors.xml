@@ -12,4 +12,5 @@
     <color name="grey">#1C1C1C</color>
     <color name="green">#2A9D8F</color>
     <color name="color_hint">#CCCCCC</color>
+    <color name="light_grey_text_date">#999999</color>
 </resources>

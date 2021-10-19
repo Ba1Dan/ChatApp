@@ -91,13 +91,8 @@ class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
     }
 
     override fun itemClick(position: Int) {
-        val emojiBottomSheetDialog = EmojiBottomSheetDialog()
-        val bundle = Bundle()
-        bundle.putInt("id_message", position)
-        emojiBottomSheetDialog.arguments = bundle
-        emojiBottomSheetDialog.show(supportFragmentManager, emojiBottomSheetDialog.tag)
+        EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
     }
-
 
     private var id: Int = 2
     private var data = mutableListOf<Item>(
@@ -117,7 +112,7 @@ class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
         ),
         Message(
             Content(
-                1, 1, "Данияр", "Салам", mutableListOf(
+                1, 1, "Данияр", "Привет", mutableListOf(
                     Reaction(2, "\uD83D\uDE09", 2),
                     Reaction(2, "\uD83D\uDE09", 3),
                     Reaction(2, "\uD83D\uDE09", 10),
