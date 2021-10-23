@@ -9,7 +9,7 @@ import com.baiganov.fintech.recyclerview.Message
 import com.baiganov.fintech.сustomview.MessageViewGroup
 
 
-class InComingMessageViewHolder(private val itemView: View, private val clickListener: ClickListener) : BaseViewHolder<Message>(itemView) {
+class InComingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : BaseViewHolder<Message>(itemView) {
 
     private val viewGroup: MessageViewGroup = itemView.findViewById(R.id.incoming_message)
     private val txt: TextView = viewGroup.findViewById(R.id.message_text_incoming)

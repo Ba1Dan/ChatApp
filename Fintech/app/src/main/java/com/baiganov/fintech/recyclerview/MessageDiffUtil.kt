@@ -1,11 +1,8 @@
 package com.baiganov.fintech.recyclerview
 
-import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 
-class MessageDiffUtil: DiffUtil.ItemCallback<Item>() {
-
-
+class MessageDiffUtil : DiffUtil.ItemCallback<Item>() {
 
     override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
         return oldItem.id == newItem.id

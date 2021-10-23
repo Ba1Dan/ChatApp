@@ -4,66 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_chat"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/main_fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/input_message"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:stackFromEnd="true"
-        tools:itemCount="4"
-        tools:listitem="@layout/incoming_message" />
+        app:navGraph="@navigation/nav_graph" />
 
-    <EditText
-        android:id="@+id/input_message"
-        android:layout_width="0dp"
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_medium"
-        android:layout_marginEnd="66dp"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:background="@drawable/bg_message_edit_text"
-        android:hint="@string/hint_message"
-        android:imeOptions="flagNoExtractUi"
-        android:inputType="text"
-        android:maxLines="3"
-        android:paddingHorizontal="@dimen/normal_margin"
-        android:paddingVertical="@dimen/normal_margin"
-        android:textColor="@color/white"
-        android:textColorHint="@color/color_hint"
+        android:background="@color/grey"
+        android:theme="@style/BottomNavStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_send"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_marginEnd="@dimen/margin_medium"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:contentDescription="@string/desc_button_send_message"
-        android:src="@drawable/ic_send_24"
-        app:fabCustomSize="@dimen/btn_size"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/input_message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/input_message" />
-
-    <ImageButton
-        android:id="@+id/btn_add_file"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_marginEnd="@dimen/normal_margin"
-        android:layout_marginBottom="@dimen/margin_small"
-        android:background="@android:color/transparent"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/input_message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/input_message"
-        app:srcCompat="@drawable/ic_add" />
 </androidx.constraintlayout.widget.ConstraintLayout>

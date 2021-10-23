@@ -3,4 +3,6 @@
     <string name="description_add_emoji">add emoji</string>
     <string name="hint_message">Написать...</string>
     <string name="desc_button_send_message">button send message</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

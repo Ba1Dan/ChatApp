@@ -1,123 +1,30 @@
 package com.baiganov.fintech
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import com.baiganov.fintech.bottomsheet.EmojiBottomSheetDialog
-import com.baiganov.fintech.bottomsheet.OnResultListener
-import com.baiganov.fintech.model.Content
-import com.baiganov.fintech.model.Date
-import com.baiganov.fintech.model.Reaction
-import com.baiganov.fintech.recyclerview.*
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity(), ClickListener, OnResultListener {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var adapter: MessageAdapter
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val rv = findViewById<RecyclerView>(R.id.rv_chat)
-        adapter = MessageAdapter(this)
-        rv.adapter = adapter
+        val navHostFragment: NavHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_fragment_container) as NavHostFragment
 
-        val btnSend = findViewById<FloatingActionButton>(R.id.btn_send)
-        val inputMessage = findViewById<EditText>(R.id.input_message)
-        val btnAddFile = findViewById<ImageButton>(R.id.btn_add_file)
+        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        btnSend.setOnClickListener {
-            data = ArrayList(data)
-            data.add(
-                Message(
-                    Content(
-                        id++, User.getId(), "Данияр", inputMessage.text.toString(), mutableListOf()
-                    )
-                )
-            )
-            inputMessage.setText("")
-            adapter.messages = data
-        }
-
-        inputMessage.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null) {
-                    if (s.toString().isEmpty()) {
-                        btnAddFile.visibility = View.VISIBLE
-                        btnSend.visibility = View.GONE
-                    } else {
-                        btnSend.visibility = View.VISIBLE
-                        btnAddFile.visibility = View.GONE
-                    }
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
-
-        adapter.messages = data
-
+        navController = navHostFragment.navController
+        bottomNavigationView.setupWithNavController(navController)
     }
 
-    override fun sendData(position: Int?, emoji: String) {
-
-        position?.let {
-            data = ArrayList(data)
-            for (i in data.indices) {
-                val item = data[i]
-                if (item is Message && item.content.id == position) {
-                    val reactions = ArrayList(item.content.reactions.map { it.copy() })
-                    reactions.add(Reaction(User.getId(), emoji, 1))
-                    val content = item.content.copy(reactions = reactions)
-                    val message = Message(content)
-                    data[i] = message
-                }
-            }
-            adapter.messages = data
-        }
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
-
-    override fun itemClick(position: Int) {
-        EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
-    }
-
-    private var id: Int = 2
-    private var data = mutableListOf<Item>(
-        DateDivider(
-            Date(
-                "17 Окт"
-            )
-        ),
-        Message(
-            Content(
-                0, 0, "Данияр", "Привет", mutableListOf(
-                    Reaction(1, "\uD83D\uDE09", 2),
-                    Reaction(1, "\uD83D\uDE09", 3),
-                    Reaction(1, "\uD83D\uDE09", 10),
-                )
-            )
-        ),
-        Message(
-            Content(
-                1, 1, "Данияр", "Привет", mutableListOf(
-                    Reaction(2, "\uD83D\uDE09", 2),
-                    Reaction(2, "\uD83D\uDE09", 3),
-                    Reaction(2, "\uD83D\uDE09", 10),
-                )
-            )
-        )
-    )
 }

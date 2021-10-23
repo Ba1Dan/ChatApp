@@ -1,6 +1,7 @@
 package com.baiganov.fintech.bottomsheet
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +18,8 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
     private lateinit var onResultListener: OnResultListener
     private var idMessage: Int? = null
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         onResultListener = context as OnResultListener
     }
 
@@ -32,17 +33,19 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
         setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.emoji_bottom_sheet_dialog, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_emoji_bottom)
-        val args = arguments
-        if (args != null) {
-            idMessage = args.getInt(ARGUMENT_MESSAGE_ID)
-        }
+
+        idMessage = arguments?.getInt(ARGUMENT_MESSAGE_ID)
 
         val adapter = EmojiAdapter(this)
         recyclerView.adapter = adapter
