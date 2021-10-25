@@ -26,7 +26,7 @@ class EmojiView @JvmOverloads constructor(
     private val textCoordinate = PointF()
 
     private var textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = context.resources.getDimension(R.dimen.small_size)
+        textSize = context.resources.getDimension(R.dimen.small_text_size)
         color = Color.WHITE
     }
 
@@ -56,7 +56,7 @@ class EmojiView @JvmOverloads constructor(
         reactionCount = typedArray.getInt(R.styleable.EmojiView_reactionCount, DEF_REACTION_COUNT)
         contentSize = typedArray.getDimension(
             R.styleable.EmojiView_textSize,
-            context.resources.getDimension(R.dimen.small_size)
+            context.resources.getDimension(R.dimen.small_text_size)
         )
         textPaint.color = typedArray.getColor(R.styleable.EmojiView_textColor, Color.WHITE)
 
@@ -128,11 +128,13 @@ class EmojiView @JvmOverloads constructor(
         return drawableState
     }
 
-//    override fun performClick(): Boolean {
-//        super.performClick()
-//        isSelected = !isSelected
-//        return true
-//    }
+    fun updateEmojiViewOnClick() {
+        if (isSelected) {
+            reactionCount += 1
+        } else {
+            reactionCount -= 1
+        }
+    }
 
     companion object {
         private const val DEF_REACTION_COUNT = 0

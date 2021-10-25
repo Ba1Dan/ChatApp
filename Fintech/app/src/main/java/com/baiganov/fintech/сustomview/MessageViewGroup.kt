@@ -60,6 +60,7 @@ class MessageViewGroup @JvmOverloads constructor(
         }
         flexBox = findViewById(R.id.flex_box)
         addReactionButton = findViewById(R.id.add_reaction_button_incoming)
+
         val typedArray = context.obtainStyledAttributes(
             attrs,
             R.styleable.MessageViewGroup,
@@ -76,6 +77,12 @@ class MessageViewGroup @JvmOverloads constructor(
     fun setReactions(reactions: List<Reaction>) {
         flexBox.setReactions(reactions)
     }
+
+//    fun addReactionByButton() {
+//        addReactionButton.setOnClickListener {
+//            flexBox.add
+//        }
+//    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         measureChildren(widthMeasureSpec, heightMeasureSpec)
