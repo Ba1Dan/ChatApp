@@ -20,4 +20,8 @@
     <dimen name="avatar_size">38dp</dimen>
     <dimen name="btn_size">40dp</dimen>
     <dimen name="normal_margin">12dp</dimen>
+    <dimen name="size_avatar_image">185dp</dimen>
+    <dimen name="size_online_view">20dp</dimen>
+    <dimen name="size_avatar_item">64dp</dimen>
+    <dimen name="size_search_icon">27dp</dimen>
 </resources>

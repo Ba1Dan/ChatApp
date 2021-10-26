@@ -22,7 +22,7 @@ class PersonAdapter(private val clickListener: ItemClickListener) :
     ): PersonViewHolder {
         return PersonViewHolder(
             clickListener,
-            LayoutInflater.from(parent.context).inflate(R.layout.item_person, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_user, parent, false)
         )
     }
 

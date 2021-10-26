@@ -7,4 +7,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tab_title_subscribed_streams">Subscribed</string>
     <string name="tab_title_all_streams">All streams</string>
+    <string name="online">online</string>
+    <string name="in_a_meeting">In a meeting</string>
+    <string name="name_surname">Name Surname</string>
+    <string name="title_topic">Topic: #%1$s</string>
 </resources>

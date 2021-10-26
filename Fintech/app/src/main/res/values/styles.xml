@@ -18,9 +18,21 @@
         <item name="colorOnSurface">#919191</item>
     </style>
 
-    <style name="AppSearchView" parent="Widget.AppCompat.SearchView" >
-        <item name="android:textSize">24sp</item>
+    <style name="AppSearchView" parent="Widget.AppCompat.SearchView">
+        <item name="android:editTextColor">@color/white</item>
         <item name="android:textColorHint">@color/white</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:tint">@color/white</item>
+        <item name="android:backgroundTint">#323232</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="roundRectImageViewShape" >
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="MyCustomTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textSize">22sp</item>
     </style>
 </resources>

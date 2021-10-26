@@ -7,6 +7,6 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 class UserFingerPrint(
     val user: User
 ) : ItemFingerPrint {
-    override val viewType: Int =  R.layout.item_person
+    override val viewType: Int =  R.layout.item_user
     override val id: String = user.id.toString()
 }

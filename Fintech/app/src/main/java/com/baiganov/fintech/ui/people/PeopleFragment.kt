@@ -39,15 +39,4 @@ class PeopleFragment : Fragment(), ItemClickListener {
         rvUsers.adapter = adapterPerson
         adapterPerson.setData(dataManager.users)
     }
-
-    companion object {
-
-        fun newInstance(param1: String, param2: String) =
-            PeopleFragment().apply {
-                arguments = Bundle().apply {
-//                    putString(ARG_PARAM1, param1)
-//                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }

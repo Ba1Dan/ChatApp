@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
@@ -12,6 +13,7 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.Stream
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
+import com.google.android.material.button.MaterialButton
 
 class ExpandableAdapter(private val clickListener: ItemClickListener) :
     RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
@@ -32,7 +34,7 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
                     clickListener,
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.item_stream, parent, false),
-                    )
+                )
             }
 
             R.layout.item_topic -> {
@@ -76,11 +78,19 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
         BaseViewHolder<StreamFingerPrint>(itemView) {
 
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
+        private val btnOpen: MaterialButton = itemView.findViewById(R.id.btn_open)
 
         override fun bind(item: StreamFingerPrint) {
             tvTitle.text = item.stream.name
             itemView.setOnClickListener {
                 item.isExpanded = !item.isExpanded
+                btnOpen.icon = if (item.isExpanded) ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.ic_arrow_up
+                ) else ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.ic_arrow
+                )
                 clickListener.onItemClick(adapterPosition, item)
             }
         }

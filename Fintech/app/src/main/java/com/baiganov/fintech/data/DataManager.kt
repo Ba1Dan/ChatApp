@@ -14,10 +14,10 @@ class DataManager {
     private var id: Int = 2
 
     private var streams = mutableListOf<ItemFingerPrint>(
-        StreamFingerPrint(Stream(0, "general", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
-        StreamFingerPrint(Stream(0, "test", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
-        StreamFingerPrint(Stream(0, "test1", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
-        StreamFingerPrint(Stream(0, "test2", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
+        StreamFingerPrint(Stream(0, "#general", listOf(Topic(0, "Testing"), Topic(1, "Bruh")), true)),
+        StreamFingerPrint(Stream(0, "#Development", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
+        StreamFingerPrint(Stream(0, "#Design", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
+        StreamFingerPrint(Stream(0, "#PR", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
         StreamFingerPrint(Stream(0, "test3", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
     )
 

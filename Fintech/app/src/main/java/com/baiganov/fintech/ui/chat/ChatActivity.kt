@@ -42,7 +42,7 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         adapter = MessageAdapter(this)
         rvChat.adapter = adapter
         toolBarChat.title = titleStream
-        tvTopic.text = titleTopic
+        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
         adapter.messages = dataManager.messages
 
         setClickListener()
