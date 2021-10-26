@@ -22,6 +22,7 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: ItemC
             )
             text = content.text
             author = content.name
+            addReactionByButton(clickListener, content.id, item)
         }
 
         txt.setOnLongClickListener {

@@ -71,6 +71,7 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
     private fun setClickListener() {
         btnSend.setOnClickListener {
             adapter.messages = dataManager.addMessage(inputMessage.text.toString())
+            rvChat.smoothScrollToPosition(dataManager.messages.size - 1)
             inputMessage.setText("")
         }
 
