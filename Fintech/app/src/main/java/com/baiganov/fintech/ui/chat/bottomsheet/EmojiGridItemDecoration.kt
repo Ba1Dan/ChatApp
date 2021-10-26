@@ -1,4 +1,4 @@
-package com.baiganov.fintech.bottomsheet
+package com.baiganov.fintech.ui.chat.bottomsheet
 
 import android.graphics.Rect
 import android.view.View

@@ -1,4 +1,4 @@
-package com.baiganov.fintech.ui
+package com.baiganov.fintech.ui.people
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

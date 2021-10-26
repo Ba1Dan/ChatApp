@@ -1,20 +1,20 @@
-package com.baiganov.fintech.recyclerview.viewholders
+package com.baiganov.fintech.ui.chat.recyclerview.viewholders
 
 import android.view.View
 import android.widget.TextView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.recyclerview.BaseViewHolder
-import com.baiganov.fintech.recyclerview.ClickListener
-import com.baiganov.fintech.recyclerview.Message
+import com.baiganov.fintech.ui.chat.recyclerview.BaseViewHolder
+import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.MessageViewGroup
 
 
-class InComingMessageViewHolder(itemView: View, private val clickListener: ClickListener) : BaseViewHolder<Message>(itemView) {
+class InComingMessageViewHolder(itemView: View, private val clickListener: ItemClickListener) : BaseViewHolder<MessageFingerPrint>(itemView) {
 
     private val viewGroup: MessageViewGroup = itemView.findViewById(R.id.incoming_message)
     private val txt: TextView = viewGroup.findViewById(R.id.message_text_incoming)
 
-    override fun bind(item: Message) {
+    override fun bind(item: MessageFingerPrint) {
         val content = item.content
         viewGroup.apply {
             setReactions(
@@ -25,7 +25,7 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: Click
         }
 
         txt.setOnLongClickListener {
-            clickListener.itemClick(content.id)
+            clickListener.onItemClick(content.id, item)
             return@setOnLongClickListener true
         }
     }

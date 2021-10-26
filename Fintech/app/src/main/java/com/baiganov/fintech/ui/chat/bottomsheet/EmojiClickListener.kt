@@ -1,4 +1,4 @@
-package com.baiganov.fintech.bottomsheet
+package com.baiganov.fintech.ui.chat.bottomsheet
 
 interface EmojiClickListener {
 

@@ -7,17 +7,17 @@
 
     <fragment
         android:id="@+id/channelsFragment"
-        android:name="com.baiganov.fintech.ui.ChannelsFragment"
+        android:name="com.baiganov.fintech.ui.channels.ChannelsFragment"
         android:label="fragment_channels"
         tools:layout="@layout/fragment_channels" />
     <fragment
         android:id="@+id/peopleFragment"
-        android:name="com.baiganov.fintech.ui.PeopleFragment"
+        android:name="com.baiganov.fintech.ui.people.PeopleFragment"
         android:label="fragment_people"
         tools:layout="@layout/fragment_people" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.baiganov.fintech.ui.ProfileFragment"
+        android:name="com.baiganov.fintech.ui.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
 </navigation>

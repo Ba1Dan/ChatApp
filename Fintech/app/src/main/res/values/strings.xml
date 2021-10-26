@@ -5,4 +5,6 @@
     <string name="desc_button_send_message">button send message</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_title_subscribed_streams">Subscribed</string>
+    <string name="tab_title_all_streams">All streams</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.baiganov.fintech.ui
+package com.baiganov.fintech.ui.chat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,15 +10,16 @@ import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.User
-import com.baiganov.fintech.bottomsheet.EmojiBottomSheetDialog
-import com.baiganov.fintech.bottomsheet.OnResultListener
+import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
+import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.model.Content
 import com.baiganov.fintech.model.Date
 import com.baiganov.fintech.model.Reaction
-import com.baiganov.fintech.recyclerview.*
+import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.chat.recyclerview.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class ChatActivity : AppCompatActivity(), ClickListener, OnResultListener {
+class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
     private lateinit var adapter: MessageAdapter
 
@@ -37,7 +38,7 @@ class ChatActivity : AppCompatActivity(), ClickListener, OnResultListener {
         btnSend.setOnClickListener {
             data = ArrayList(data)
             data.add(
-                Message(
+                MessageFingerPrint(
                     Content(
                         id++, User.getId(), "Данияр", inputMessage.text.toString(), mutableListOf()
                     )
@@ -78,11 +79,11 @@ class ChatActivity : AppCompatActivity(), ClickListener, OnResultListener {
             data = ArrayList(data)
             for (i in data.indices) {
                 val item = data[i]
-                if (item is Message && item.content.id == position) {
+                if (item is MessageFingerPrint && item.content.id == position) {
                     val reactions = ArrayList(item.content.reactions.map { it.copy() })
                     reactions.add(Reaction(User.getId(), emoji, 1))
                     val content = item.content.copy(reactions = reactions)
-                    val message = Message(content)
+                    val message = MessageFingerPrint(content)
                     data[i] = message
                 }
             }
@@ -90,18 +91,18 @@ class ChatActivity : AppCompatActivity(), ClickListener, OnResultListener {
         }
     }
 
-    override fun itemClick(position: Int) {
+    override fun onItemClick(position: Int, item: ItemFingerPrint) {
         EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
     }
 
     private var id: Int = 2
-    private var data = mutableListOf<Item>(
-        DateDivider(
+    private var data = mutableListOf<ItemFingerPrint>(
+        DateDividerFingerPrint(
             Date(
                 "17 Окт"
             )
         ),
-        Message(
+        MessageFingerPrint(
             Content(
                 0, 0, "Данияр", "Привет", mutableListOf(
                     Reaction(1, "\uD83D\uDE09", 2),
@@ -110,7 +111,7 @@ class ChatActivity : AppCompatActivity(), ClickListener, OnResultListener {
                 )
             )
         ),
-        Message(
+        MessageFingerPrint(
             Content(
                 1, 1, "Данияр", "Привет", mutableListOf(
                     Reaction(2, "\uD83D\uDE09", 2),
