@@ -7,6 +7,27 @@
     android:background="#121212"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#2A9D8F"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        tools:title="#general" />
+
+    <TextView
+        android:id="@+id/tv_topic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="#CCCCCC"
+        android:textSize="20sp"
+        android:background="#1C1C1C"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
+        tools:text="Topic: #testing" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="0dp"
@@ -15,7 +36,7 @@
         app:layout_constraintBottom_toTopOf="@id/input_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_topic"
         app:stackFromEnd="true"
         tools:itemCount="4"
         tools:listitem="@layout/incoming_message" />
@@ -48,8 +69,8 @@
         android:layout_marginBottom="@dimen/margin_small"
         android:contentDescription="@string/desc_button_send_message"
         android:src="@drawable/ic_send_24"
-        app:fabCustomSize="@dimen/btn_size"
         android:visibility="gone"
+        app:fabCustomSize="@dimen/btn_size"
         app:layout_constraintBottom_toBottomOf="@+id/input_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/input_message" />

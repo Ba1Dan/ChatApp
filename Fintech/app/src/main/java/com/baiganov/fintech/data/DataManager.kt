@@ -1,33 +1,122 @@
 package com.baiganov.fintech.data
 
 
+import com.baiganov.fintech.model.*
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
-import com.baiganov.fintech.model.Stream
-import com.baiganov.fintech.model.Topic
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.ui.chat.recyclerview.DateDividerFingerPrint
+import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.ui.people.UserFingerPrint
 
 class DataManager {
 
-    var data = mutableListOf<ItemFingerPrint>(
-        StreamFingerPrint(Stream(0, "general", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
-        StreamFingerPrint(Stream(0, "test", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
+    private var id: Int = 2
+
+    private var streams = mutableListOf<ItemFingerPrint>(
+        StreamFingerPrint(Stream(0, "general", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
+        StreamFingerPrint(Stream(0, "test", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
         StreamFingerPrint(Stream(0, "test1", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
         StreamFingerPrint(Stream(0, "test2", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
         StreamFingerPrint(Stream(0, "test3", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
     )
 
-    fun add(position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
-        data = ArrayList(data)
-        data.addAll(position + 1, topics)
-        return data
+    var subscribedStreams: MutableList<ItemFingerPrint> = streams.filter { (it as StreamFingerPrint).stream.isSubscribed} as MutableList<ItemFingerPrint>
+
+    var messages = mutableListOf<ItemFingerPrint>(
+        DateDividerFingerPrint(
+            Date(
+                "17 Окт"
+            )
+        ),
+        MessageFingerPrint(
+            Content(
+                0, 0, "Данияр", "Привет", mutableListOf(
+                    Reaction(1, "\uD83D\uDE09", 2),
+                    Reaction(1, "\uD83D\uDE09", 3),
+                    Reaction(1, "\uD83D\uDE09", 10),
+                )
+            )
+        ),
+        MessageFingerPrint(
+            Content(
+                1, 1, "Данияр", "Привет", mutableListOf(
+                    Reaction(2, "\uD83D\uDE09", 2),
+                    Reaction(2, "\uD83D\uDE09", 3),
+                    Reaction(2, "\uD83D\uDE09", 10),
+                )
+            )
+        )
+    )
+
+    val users = mutableListOf<UserFingerPrint>(
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg"))
+    )
+
+    fun add(type: Int, position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
+        if (type == 1) {
+            streams = ArrayList(streams)
+            streams.addAll(position + 1, topics)
+            return streams
+        } else {
+            subscribedStreams = ArrayList(subscribedStreams)
+            subscribedStreams.addAll(position + 1, topics)
+            return subscribedStreams
+        }
     }
 
-    fun remove(position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
-        data = ArrayList(data)
-        data.removeAll(topics)
-        return data
+    fun remove(type: Int, position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
+        if (type == 1) {
+            streams = ArrayList(streams)
+            streams.removeAll(topics)
+            return streams
+        } else {
+            subscribedStreams = ArrayList(subscribedStreams)
+            subscribedStreams.removeAll(topics)
+            return subscribedStreams
+        }
+
     }
 
+
+    fun getStreams(tabPosition: Int): List<ItemFingerPrint> {
+        return if (tabPosition == 1) {
+            streams
+        } else {
+            subscribedStreams
+        }
+    }
+
+    fun addMessage(message: String): MutableList<ItemFingerPrint> {
+        messages = ArrayList(messages)
+        messages.add(
+            MessageFingerPrint(
+                Content(
+                    id++, com.baiganov.fintech.User.getId(), "Данияр", message, mutableListOf()
+                )
+            )
+        )
+        return messages
+    }
+
+    fun addEmoji(position: Int, emoji: String): MutableList<ItemFingerPrint> {
+        messages = ArrayList(messages)
+        for (i in messages.indices) {
+            val item = messages[i]
+            if (item is MessageFingerPrint && item.content.id == position) {
+                val reactions = ArrayList(item.content.reactions.map { it.copy() })
+                reactions.add(Reaction(com.baiganov.fintech.User.getId(), emoji, 1))
+                val content = item.content.copy(reactions = reactions)
+                val message = MessageFingerPrint(content)
+                messages[i] = message
+            }
+        }
+        return messages
+    }
 
 }

@@ -13,7 +13,7 @@ class ChannelsViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Life
     }
 
     override fun createFragment(position: Int): Fragment {
-        return StreamsFragment()
+        return StreamsFragment.newInstance(position)
     }
 }
 

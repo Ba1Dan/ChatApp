@@ -1,51 +1,77 @@
 package com.baiganov.fintech.ui.chat
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.User
+import com.baiganov.fintech.data.DataManager
+import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
-import com.baiganov.fintech.model.Content
-import com.baiganov.fintech.model.Date
-import com.baiganov.fintech.model.Reaction
-import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.ui.chat.recyclerview.*
+import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
     private lateinit var adapter: MessageAdapter
+    private lateinit var toolBarChat: Toolbar
+    private lateinit var tvTopic: TextView
+    private lateinit var dataManager: DataManager
+    private lateinit var btnSend: FloatingActionButton
+    private lateinit var inputMessage: EditText
+    private lateinit var btnAddFile: ImageButton
+    private lateinit var rvChat: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        val rv = findViewById<RecyclerView>(R.id.rv_chat)
+        initViews()
+
+        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: ""
+        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: ""
+        dataManager = DataManager()
         adapter = MessageAdapter(this)
-        rv.adapter = adapter
+        rvChat.adapter = adapter
+        toolBarChat.title = titleStream
+        tvTopic.text = titleTopic
+        adapter.messages = dataManager.messages
 
-        val btnSend = findViewById<FloatingActionButton>(R.id.btn_send)
-        val inputMessage = findViewById<EditText>(R.id.input_message)
-        val btnAddFile = findViewById<ImageButton>(R.id.btn_add_file)
+        setClickListener()
+    }
 
+    override fun sendData(position: Int?, emoji: String) {
+        position?.let {
+            adapter.messages = dataManager.addEmoji(position, emoji)
+        }
+    }
+
+    override fun onItemClick(position: Int, item: ItemFingerPrint) {
+        EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
+    }
+
+    private fun initViews() {
+        rvChat = findViewById(R.id.rv_chat)
+
+        btnSend = findViewById(R.id.btn_send)
+        inputMessage = findViewById(R.id.input_message)
+        btnAddFile = findViewById(R.id.btn_add_file)
+        toolBarChat = findViewById(R.id.toolbar_chat)
+        tvTopic = findViewById(R.id.tv_topic)
+    }
+
+    private fun setClickListener() {
         btnSend.setOnClickListener {
-            data = ArrayList(data)
-            data.add(
-                MessageFingerPrint(
-                    Content(
-                        id++, User.getId(), "Данияр", inputMessage.text.toString(), mutableListOf()
-                    )
-                )
-            )
+            adapter.messages = dataManager.addMessage(inputMessage.text.toString())
             inputMessage.setText("")
-            adapter.messages = data
         }
 
         inputMessage.addTextChangedListener(object : TextWatcher {
@@ -70,55 +96,12 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
             }
         })
 
-        adapter.messages = data
+        toolBarChat.setNavigationOnClickListener { finish() }
     }
 
-    override fun sendData(position: Int?, emoji: String) {
-
-        position?.let {
-            data = ArrayList(data)
-            for (i in data.indices) {
-                val item = data[i]
-                if (item is MessageFingerPrint && item.content.id == position) {
-                    val reactions = ArrayList(item.content.reactions.map { it.copy() })
-                    reactions.add(Reaction(User.getId(), emoji, 1))
-                    val content = item.content.copy(reactions = reactions)
-                    val message = MessageFingerPrint(content)
-                    data[i] = message
-                }
-            }
-            adapter.messages = data
-        }
+    companion object {
+        const val ARG_TITLE_STREAM = "title_stream"
+        const val ARG_TITLE_TOPIC = "title_topic"
+        const val ARG_ID_TOPIC = "id_topic"
     }
-
-    override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
-    }
-
-    private var id: Int = 2
-    private var data = mutableListOf<ItemFingerPrint>(
-        DateDividerFingerPrint(
-            Date(
-                "17 Окт"
-            )
-        ),
-        MessageFingerPrint(
-            Content(
-                0, 0, "Данияр", "Привет", mutableListOf(
-                    Reaction(1, "\uD83D\uDE09", 2),
-                    Reaction(1, "\uD83D\uDE09", 3),
-                    Reaction(1, "\uD83D\uDE09", 10),
-                )
-            )
-        ),
-        MessageFingerPrint(
-            Content(
-                1, 1, "Данияр", "Привет", mutableListOf(
-                    Reaction(2, "\uD83D\uDE09", 2),
-                    Reaction(2, "\uD83D\uDE09", 3),
-                    Reaction(2, "\uD83D\uDE09", 10),
-                )
-            )
-        )
-    )
 }

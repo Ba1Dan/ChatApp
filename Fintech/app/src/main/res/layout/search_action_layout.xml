@@ -6,6 +6,7 @@
     android:imeOptions="actionSearch|flagNoExtractUi"
     android:maxWidth="1000dp"
     app:goIcon="@null"
+    app:theme="@style/AppSearchView"
     app:iconifiedByDefault="false"
     app:queryBackground="@null"
     app:queryHint="Search..."

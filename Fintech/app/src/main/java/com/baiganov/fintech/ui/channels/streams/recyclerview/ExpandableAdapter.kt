@@ -50,7 +50,6 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<ItemFingerPrint>, position: Int) {
-
         when (dataOfList[position].viewType) {
             R.layout.item_stream -> {
                 (holder as StreamViewHolder).apply {
