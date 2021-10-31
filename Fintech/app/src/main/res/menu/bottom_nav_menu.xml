@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/channelsFragment"
-        android:title="Channels"
+    <item android:id="@+id/channels_menu_item"
+        android:title="@string/channels"
         android:icon="@drawable/ic_channel"/>
 
-    <item android:id="@+id/peopleFragment"
-        android:title="People"
+    <item android:id="@+id/people_menu_item"
+        android:title="@string/people"
         android:icon="@drawable/ic_people"/>
 
-    <item android:id="@+id/profileFragment"
-        android:title="Profile"
+    <item android:id="@+id/profile_menu_item"
+        android:title="@string/profile"
         android:icon="@drawable/ic_profile"/>
 </menu>

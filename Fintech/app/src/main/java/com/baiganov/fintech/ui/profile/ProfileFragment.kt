@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.baiganov.fintech.R
+import com.baiganov.fintech.ui.people.PeopleFragment
 
 
 class ProfileFragment : Fragment() {
@@ -19,11 +20,6 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
-
-        fun newInstance(param1: String, param2: String) =
-            ProfileFragment().apply {
-                arguments = Bundle().apply {
-                }
-            }
+        fun newInstance() = ProfileFragment()
     }
 }

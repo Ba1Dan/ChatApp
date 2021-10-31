@@ -1,5 +1,7 @@
 package com.baiganov.fintech.ui.chat
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.DataManager
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
@@ -36,8 +39,8 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
         initViews()
 
-        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: ""
-        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: ""
+        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
+        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
         dataManager = DataManager()
         adapter = MessageAdapter(this)
         rvChat.adapter = adapter
@@ -101,8 +104,18 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
     }
 
     companion object {
-        const val ARG_TITLE_STREAM = "title_stream"
-        const val ARG_TITLE_TOPIC = "title_topic"
-        const val ARG_ID_TOPIC = "id_topic"
+
+        private const val ARG_TITLE_STREAM = "title_stream"
+        private const val ARG_TITLE_TOPIC = "title_topic"
+        private const val ARG_ID_TOPIC = "id_topic"
+        private const val EMPTY_STRING = ""
+
+        fun createIntent(context: Context, item: TopicFingerPrint): Intent {
+            return Intent(context, ChatActivity::class.java)
+                .putExtra(ARG_TITLE_STREAM, item.streamTitle)
+                .putExtra(ARG_ID_TOPIC, item.topic.id)
+                .putExtra(ARG_TITLE_TOPIC, item.topic.title)
+
+        }
     }
 }

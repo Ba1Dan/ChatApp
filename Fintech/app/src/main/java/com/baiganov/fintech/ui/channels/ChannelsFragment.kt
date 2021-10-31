@@ -13,6 +13,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class ChannelsFragment : Fragment() {
 
+    private lateinit var viewPagerChannels: ViewPager2
+    private lateinit var tabLayoutChannels: TabLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -20,14 +22,18 @@ class ChannelsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_channels, container, false)
-        val viewPagerChannels: ViewPager2 = view.findViewById(R.id.view_pager_channels)
+        viewPagerChannels = view.findViewById(R.id.view_pager_channels)
+        tabLayoutChannels = view.findViewById(R.id.tab_layout_channels)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewPagerChannels.apply {
             adapter = ChannelsViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             offscreenPageLimit = ChannelsPages.values().size - 1
         }
-        val tabLayoutChannels: TabLayout = view.findViewById(R.id.tab_layout_channels)
 
-        val titles = arrayListOf<String>("Subscribed", "All stream")
         TabLayoutMediator(tabLayoutChannels, viewPagerChannels) { tab, position ->
             tab.text = getString(
                 when (position) {
@@ -37,16 +43,9 @@ class ChannelsFragment : Fragment() {
                 }
             )
         }.attach()
-        return view
     }
 
     companion object {
-
-        fun newInstance(param1: String) =
-            ChannelsFragment().apply {
-                arguments = Bundle().apply {
-//                    putString(ARG_PARAM1, param1)
-                }
-            }
+        fun newInstance() = ChannelsFragment()
     }
 }

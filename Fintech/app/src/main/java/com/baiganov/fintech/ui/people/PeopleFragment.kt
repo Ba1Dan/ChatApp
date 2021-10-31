@@ -37,6 +37,10 @@ class PeopleFragment : Fragment(), ItemClickListener {
         dataManager = DataManager()
         adapterPerson = PersonAdapter(this)
         rvUsers.adapter = adapterPerson
-        adapterPerson.setData(dataManager.users)
+        adapterPerson.listOfUser = dataManager.users
+    }
+
+    companion object {
+        fun newInstance() = PeopleFragment()
     }
 }

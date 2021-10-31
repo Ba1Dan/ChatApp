@@ -53,13 +53,7 @@ class StreamsFragment : Fragment(), ItemClickListener {
                 }
             }
             is TopicFingerPrint -> {
-                val intent = Intent(requireContext(), ChatActivity::class.java).apply {
-                    putExtra(ChatActivity.ARG_TITLE_STREAM, item.streamTitle)
-                    putExtra(ChatActivity.ARG_ID_TOPIC, item.topic.id)
-                    putExtra(ChatActivity.ARG_TITLE_TOPIC, item.topic.title)
-                }
-                startActivity(intent)
-
+                startActivity(ChatActivity.createIntent(requireContext(), item))
             }
         }
     }

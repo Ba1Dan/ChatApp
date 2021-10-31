@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/channelsFragment">
+    app:startDestination="@id/channels_menu_item">
 
     <fragment
-        android:id="@+id/channelsFragment"
+        android:id="@+id/channels_menu_item"
         android:name="com.baiganov.fintech.ui.channels.ChannelsFragment"
         android:label="fragment_channels"
         tools:layout="@layout/fragment_channels" />
