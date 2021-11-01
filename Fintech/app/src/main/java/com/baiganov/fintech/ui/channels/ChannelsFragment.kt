@@ -1,10 +1,13 @@
 package com.baiganov.fintech.ui.channels
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.baiganov.fintech.R
 import com.google.android.material.tabs.TabLayout
@@ -15,6 +18,8 @@ class ChannelsFragment : Fragment() {
 
     private lateinit var viewPagerChannels: ViewPager2
     private lateinit var tabLayoutChannels: TabLayout
+    private lateinit var searchView: SearchView
+    private val viewModel: ChannelsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,6 +29,7 @@ class ChannelsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_channels, container, false)
         viewPagerChannels = view.findViewById(R.id.view_pager_channels)
         tabLayoutChannels = view.findViewById(R.id.tab_layout_channels)
+        searchView = view.findViewById(R.id.search)
         return view
     }
 
@@ -43,6 +49,19 @@ class ChannelsFragment : Fragment() {
                 }
             )
         }.attach()
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                viewModel.searchTopics(p0.orEmpty(), tabLayoutChannels.selectedTabPosition)
+                return true
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                viewModel.searchTopics(p0.orEmpty(), tabLayoutChannels.selectedTabPosition)
+                return true
+            }
+        })
     }
 
     companion object {
