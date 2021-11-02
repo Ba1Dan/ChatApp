@@ -13,21 +13,21 @@
         android:orientation="horizontal">
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/btn_size"
+            android:layout_height="@dimen/btn_size"
             android:background="@color/light_grey_text_date"
             app:shapeAppearance="@style/circleImageViewShape" />
 
         <View
             android:layout_width="250dp"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/btn_size"
             android:layout_marginStart="@dimen/normal_margin"
             android:background="@color/light_grey_text_date" />
     </LinearLayout>
 
     <View
         android:layout_width="250dp"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/btn_size"
         android:layout_gravity="end"
         android:layout_marginTop="@dimen/normal_margin"
         android:layout_marginEnd="@dimen/margin_small"
