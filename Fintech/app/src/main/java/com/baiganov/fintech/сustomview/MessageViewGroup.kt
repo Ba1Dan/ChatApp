@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.Reaction
+import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.google.android.material.imageview.ShapeableImageView
 
 class MessageViewGroup @JvmOverloads constructor(
@@ -78,11 +80,11 @@ class MessageViewGroup @JvmOverloads constructor(
         flexBox.setReactions(reactions)
     }
 
-//    fun addReactionByButton() {
-//        addReactionButton.setOnClickListener {
-//            flexBox.add
-//        }
-//    }
+    fun addReactionByButton(clickListener: ItemClickListener, position: Int, item: ItemFingerPrint) {
+        addReactionButton.setOnClickListener {
+            clickListener.onItemClick(position, item)
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         measureChildren(widthMeasureSpec, heightMeasureSpec)

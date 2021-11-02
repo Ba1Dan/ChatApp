@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/channels_menu_item">
+
+    <fragment
+        android:id="@+id/channels_menu_item"
+        android:name="com.baiganov.fintech.ui.channels.ChannelsFragment"
+        android:label="fragment_channels"
+        tools:layout="@layout/fragment_channels" />
+    <fragment
+        android:id="@+id/peopleFragment"
+        android:name="com.baiganov.fintech.ui.people.PeopleFragment"
+        android:label="fragment_people"
+        tools:layout="@layout/fragment_people" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.baiganov.fintech.ui.profile.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+</navigation>

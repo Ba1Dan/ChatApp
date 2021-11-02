@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">Fintech</string>
     <string name="description_add_emoji">add emoji</string>
-    <string name="hint_message">Написать...</string>
+    <string name="hint_message">Написать…</string>
     <string name="desc_button_send_message">button send message</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_title_subscribed_streams">Subscribed</string>
+    <string name="tab_title_all_streams">All streams</string>
+    <string name="online">online</string>
+    <string name="in_a_meeting">In a meeting</string>
+    <string name="name_surname">Name Surname</string>
+    <string name="title_topic">Topic: #%1$s</string>
+    <string name="channels">Channels</string>
+    <string name="people">People</string>
+    <string name="profile">Profile</string>
 </resources>

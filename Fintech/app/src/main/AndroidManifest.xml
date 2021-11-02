@@ -10,7 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fintech">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.chat.ChatActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
