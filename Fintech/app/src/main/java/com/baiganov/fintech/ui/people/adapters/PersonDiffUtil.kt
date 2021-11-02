@@ -1,6 +1,7 @@
-package com.baiganov.fintech.ui.people
+package com.baiganov.fintech.ui.people.adapters
 
 import androidx.recyclerview.widget.DiffUtil
+import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 
 class PersonDiffUtil : DiffUtil.ItemCallback<UserFingerPrint>() {
 

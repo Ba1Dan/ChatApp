@@ -13,9 +13,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.DataManager
 import com.baiganov.fintech.ui.MainScreenState
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
@@ -24,17 +22,18 @@ import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.todkars.shimmer.ShimmerRecyclerView
+
 
 class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
     private lateinit var adapter: MessageAdapter
     private lateinit var toolBarChat: Toolbar
     private lateinit var tvTopic: TextView
-    private lateinit var dataManager: DataManager
     private lateinit var btnSend: FloatingActionButton
     private lateinit var inputMessage: EditText
     private lateinit var btnAddFile: ImageButton
-    private lateinit var rvChat: RecyclerView
+    private lateinit var rvChat: ShimmerRecyclerView
 
     private val viewModel: ChatViewModel by viewModels()
 
@@ -43,14 +42,9 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         setContentView(R.layout.activity_chat)
 
         initViews()
+        setupText()
+        setupRecyclerView()
 
-        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
-        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
-        dataManager = DataManager()
-        adapter = MessageAdapter(this)
-        rvChat.adapter = adapter
-        toolBarChat.title = titleStream
-        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
         viewModel.messages.observe(this) { processMainScreenState(it) }
         viewModel.loadMessage()
         setClickListener()
@@ -74,6 +68,18 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         btnAddFile = findViewById(R.id.btn_add_file)
         toolBarChat = findViewById(R.id.toolbar_chat)
         tvTopic = findViewById(R.id.tv_topic)
+    }
+
+    private fun setupText() {
+        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
+        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
+        toolBarChat.title = titleStream
+        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
+    }
+
+    private fun setupRecyclerView() {
+        adapter = MessageAdapter(this)
+        rvChat.adapter = adapter
     }
 
     private fun setClickListener() {
@@ -112,14 +118,14 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
             is MainScreenState.Result -> {
                 adapter.messages = it.items
                 rvChat.smoothScrollToPosition( it.items.size - 1)
-//                rvStreams.hideShimmer()
+                rvChat.hideShimmer()
             }
             MainScreenState.Loading -> {
-//                rvStreams.showShimmer()
+                rvChat.showShimmer()
             }
             is MainScreenState.Error -> {
                 Toast.makeText(this, it.error.message, Toast.LENGTH_SHORT).show()
-//                rvStreams.hideShimmer()
+                rvChat.hideShimmer()
             }
         }
     }

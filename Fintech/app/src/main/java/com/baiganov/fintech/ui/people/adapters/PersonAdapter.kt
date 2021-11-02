@@ -1,4 +1,4 @@
-package com.baiganov.fintech.ui.people
+package com.baiganov.fintech.ui.people.adapters
 
 import android.view.LayoutInflater
 import android.view.View

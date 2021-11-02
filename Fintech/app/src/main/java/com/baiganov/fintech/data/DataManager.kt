@@ -7,7 +7,7 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
-import com.baiganov.fintech.ui.people.UserFingerPrint
+import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 
 class DataManager {
 
@@ -49,7 +49,7 @@ class DataManager {
         )
     )
 
-    val users = mutableListOf<UserFingerPrint>(
+    val users = listOf<UserFingerPrint>(
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
@@ -57,6 +57,8 @@ class DataManager {
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg"))
     )
+
+    val profile = Profile("Данияр Байганов", "avatar.png", "working", true)
 
     fun add(type: Int, position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
         if (type == 1) {

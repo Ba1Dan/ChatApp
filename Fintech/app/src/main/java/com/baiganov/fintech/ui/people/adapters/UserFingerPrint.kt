@@ -1,4 +1,4 @@
-package com.baiganov.fintech.ui.people
+package com.baiganov.fintech.ui.people.adapters
 
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.User
