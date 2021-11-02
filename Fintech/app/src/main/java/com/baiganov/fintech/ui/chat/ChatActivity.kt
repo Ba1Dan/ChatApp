@@ -14,7 +14,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.baiganov.fintech.R
-import com.baiganov.fintech.ui.MainScreenState
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -45,7 +45,7 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         setupText()
         setupRecyclerView()
 
-        viewModel.messages.observe(this) { processMainScreenState(it) }
+        viewModel.messages.observe(this) { handleState(it) }
         viewModel.loadMessage()
         setClickListener()
     }
@@ -113,18 +113,18 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         toolBarChat.setNavigationOnClickListener { finish() }
     }
 
-    private fun processMainScreenState(it: MainScreenState?) {
+    private fun handleState(it: State<List<ItemFingerPrint>>) {
         when (it) {
-            is MainScreenState.Result -> {
-                adapter.messages = it.items
-                rvChat.smoothScrollToPosition( it.items.size - 1)
+            is State.Result -> {
+                adapter.messages = it.data
+                rvChat.smoothScrollToPosition( it.data.size - 1)
                 rvChat.hideShimmer()
             }
-            MainScreenState.Loading -> {
+            is State.Loading -> {
                 rvChat.showShimmer()
             }
-            is MainScreenState.Error -> {
-                Toast.makeText(this, it.error.message, Toast.LENGTH_SHORT).show()
+            is State.Error -> {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
                 rvChat.hideShimmer()
             }
         }

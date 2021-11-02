@@ -1,18 +1,16 @@
 package com.baiganov.fintech.ui.channels.streams
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
-import com.baiganov.fintech.ui.MainScreenState
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.ChannelsViewModel
 import com.baiganov.fintech.ui.channels.streams.recyclerview.ExpandableAdapter
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
@@ -68,30 +66,30 @@ class StreamsFragment : Fragment(), ItemClickListener {
     private fun initUi() {
         if (tabPosition == 0) {
             viewModel.subscribeStreams.observe(viewLifecycleOwner) {
-                processMainScreenState(it)
+                handleState(it)
             }
         } else {
             viewModel.mainScreenState.observe(viewLifecycleOwner) {
-                processMainScreenState(it)
+                handleState(it)
             }
         }
     }
 
-    private fun processMainScreenState(it: MainScreenState?) {
+    private fun handleState(it: State<List<ItemFingerPrint>>) {
         when (it) {
-            is MainScreenState.Result -> {
-                if (it.items.isEmpty()) {
+            is State.Result -> {
+                adapterStreams.dataOfList = it.data
+                if (it.data.isEmpty()) {
                     frameNotResult.isVisible = true
                 }
-                adapterStreams.dataOfList = it.items
                 rvStreams.hideShimmer()
             }
-            MainScreenState.Loading -> {
+            is State.Loading -> {
                 frameNotResult.isVisible = false
                 rvStreams.showShimmer()
             }
-            is MainScreenState.Error -> {
-                Toast.makeText(requireContext(), it.error.message, Toast.LENGTH_SHORT).show()
+            is State.Error -> {
+                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 frameNotResult.isVisible = false
                 rvStreams.hideShimmer()
             }

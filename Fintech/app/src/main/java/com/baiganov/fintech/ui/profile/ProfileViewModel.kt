@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.ProfileRepository
 import com.baiganov.fintech.model.Profile
-import com.baiganov.fintech.ui.State
+import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo

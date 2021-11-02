@@ -12,7 +12,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.Profile
-import com.baiganov.fintech.ui.State
+import com.baiganov.fintech.util.State
 
 
 class ProfileFragment : Fragment() {
@@ -43,20 +43,16 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.profile.observe(viewLifecycleOwner, {
-            processMainScreenState(it)
+            handleState(it)
         })
         viewModel.loadProfile()
     }
 
-    private fun processMainScreenState(it: State<Profile>) {
+    private fun handleState(it: State<Profile>) {
         when (it) {
             is State.Result -> {
                 progressBar.isVisible = false
-                val profile = it.data
-                tvName.text = profile.name
-                tvStatus.text = profile.status
-                tvIsOnline.text = if (profile.isOnline) "online" else "offline"
-
+                setData(it.data)
             }
             is State.Loading -> {
                 progressBar.isVisible = true
@@ -66,6 +62,14 @@ class ProfileFragment : Fragment() {
                 progressBar.isVisible = false
             }
         }
+    }
+
+    private fun setData(profile: Profile) {
+        tvName.text = profile.name
+        tvStatus.text = profile.status
+        tvIsOnline.text =
+            if (profile.isOnline) requireContext().getString(R.string.status_online)
+            else requireContext().getString(R.string.status_offline)
     }
 
     companion object {

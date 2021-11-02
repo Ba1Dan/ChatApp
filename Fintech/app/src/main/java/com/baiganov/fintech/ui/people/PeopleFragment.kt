@@ -6,12 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.DataManager
-import com.baiganov.fintech.ui.MainScreenState
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.people.adapters.PersonAdapter
@@ -46,29 +44,23 @@ class PeopleFragment : Fragment(), ItemClickListener {
             processMainScreenState(it)
         })
         viewModel.loadUsers()
-//        adapterPerson.listOfUser = dataManager.users
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        TODO("Not yet implemented")
+
     }
 
-    private fun processMainScreenState(it: MainScreenState?) {
+    private fun processMainScreenState(it: State<List<UserFingerPrint>>) {
         when (it) {
-            is MainScreenState.Result -> {
-//                if (it.items.isEmpty()) {
-//                    frameNotResult.isVisible = true
-//                }
-                adapterPerson.listOfUser = it.items as List<UserFingerPrint>
+            is State.Result -> {
+                adapterPerson.listOfUser = it.data
                 rvUsers.hideShimmer()
             }
-            MainScreenState.Loading -> {
-//                frameNotResult.isVisible = false
+            is State.Loading -> {
                 rvUsers.showShimmer()
             }
-            is MainScreenState.Error -> {
-                Toast.makeText(requireContext(), it.error.message, Toast.LENGTH_SHORT).show()
-//                frameNotResult.isVisible = false
+            is State.Error -> {
+                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
                 rvUsers.hideShimmer()
             }
         }
