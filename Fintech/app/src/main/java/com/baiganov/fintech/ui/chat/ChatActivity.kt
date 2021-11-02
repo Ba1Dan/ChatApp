@@ -9,11 +9,14 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.DataManager
+import com.baiganov.fintech.ui.MainScreenState
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -33,6 +36,8 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
     private lateinit var btnAddFile: ImageButton
     private lateinit var rvChat: RecyclerView
 
+    private val viewModel: ChatViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
@@ -46,14 +51,14 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         rvChat.adapter = adapter
         toolBarChat.title = titleStream
         tvTopic.text = this.getString(R.string.title_topic, titleTopic)
-        adapter.messages = dataManager.messages
-
+        viewModel.messages.observe(this) { processMainScreenState(it) }
+        viewModel.loadMessage()
         setClickListener()
     }
 
     override fun sendData(position: Int?, emoji: String) {
         position?.let {
-            adapter.messages = dataManager.addEmoji(position, emoji)
+            viewModel.addEmoji(position, emoji)
         }
     }
 
@@ -73,9 +78,8 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
     private fun setClickListener() {
         btnSend.setOnClickListener {
-            adapter.messages = dataManager.addMessage(inputMessage.text.toString())
-            rvChat.smoothScrollToPosition(dataManager.messages.size - 1)
-            inputMessage.setText("")
+            viewModel.addMessage(inputMessage.text.toString())
+            inputMessage.setText(EMPTY_STRING)
         }
 
         inputMessage.addTextChangedListener(object : TextWatcher {
@@ -101,6 +105,23 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         })
 
         toolBarChat.setNavigationOnClickListener { finish() }
+    }
+
+    private fun processMainScreenState(it: MainScreenState?) {
+        when (it) {
+            is MainScreenState.Result -> {
+                adapter.messages = it.items
+                rvChat.smoothScrollToPosition( it.items.size - 1)
+//                rvStreams.hideShimmer()
+            }
+            MainScreenState.Loading -> {
+//                rvStreams.showShimmer()
+            }
+            is MainScreenState.Error -> {
+                Toast.makeText(this, it.error.message, Toast.LENGTH_SHORT).show()
+//                rvStreams.hideShimmer()
+            }
+        }
     }
 
     companion object {

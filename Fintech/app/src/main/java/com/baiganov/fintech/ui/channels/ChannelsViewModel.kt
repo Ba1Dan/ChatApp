@@ -3,7 +3,7 @@ package com.baiganov.fintech.ui.channels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.data.Repository
+import com.baiganov.fintech.data.StreamRepository
 import com.baiganov.fintech.ui.MainScreenState
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 
 class ChannelsViewModel : ViewModel() {
 
-    private val repository: Repository = Repository()
+    private val streamRepository: StreamRepository = StreamRepository()
     private var _allStreams: MutableLiveData<MainScreenState> = MutableLiveData()
     val mainScreenState: LiveData<MainScreenState>
         get() = _allStreams
@@ -47,7 +47,7 @@ class ChannelsViewModel : ViewModel() {
 
     fun openStream(type: Int, position: Int, topics: List<TopicFingerPrint>) {
         if (type == 0) {
-            repository.add(type, position, topics)
+            streamRepository.openStream(type, position, topics)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -56,7 +56,7 @@ class ChannelsViewModel : ViewModel() {
                 )
                 .addTo(compositeDisposable)
         } else {
-            repository.add(type, position, topics)
+            streamRepository.openStream(type, position, topics)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -70,7 +70,7 @@ class ChannelsViewModel : ViewModel() {
 
     fun closeStream(type: Int, topics: List<TopicFingerPrint>) {
         if (type == 0) {
-            repository.remove(type, topics)
+            streamRepository.closeStream(type, topics)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -79,7 +79,7 @@ class ChannelsViewModel : ViewModel() {
                 )
                 .addTo(compositeDisposable)
         } else {
-            repository.remove(type, topics)
+            streamRepository.closeStream(type, topics)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -96,7 +96,7 @@ class ChannelsViewModel : ViewModel() {
             .distinctUntilChanged()
             .doOnNext { _subscribeStreams.postValue(MainScreenState.Loading) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { searchQuery -> repository.loadSubscribedStreams(searchQuery) }
+            .switchMap { searchQuery -> streamRepository.loadSubscribedStreams(searchQuery) }
 //            .map(topicToItemMapper)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -112,7 +112,7 @@ class ChannelsViewModel : ViewModel() {
             .distinctUntilChanged()
             .doOnNext { _allStreams.postValue(MainScreenState.Loading) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { searchQuery -> repository.loadAllStreams(searchQuery) }
+            .switchMap { searchQuery -> streamRepository.loadAllStreams(searchQuery) }
 //            .map(topicToItemMapper)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
