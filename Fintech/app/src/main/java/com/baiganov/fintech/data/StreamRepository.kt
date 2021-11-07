@@ -14,23 +14,23 @@ class StreamRepository {
     private val dataManager = DataManager()
 
     fun loadAllStreams(searchQuery: String): Observable<List<ItemFingerPrint>> {
-        Log.d("xxx", "load all")
         return Observable.fromCallable { dataManager.streams }
             .delay(1000L, TimeUnit.MILLISECONDS)
             .map { streams ->
                 streams.filter {
-                    (it as StreamFingerPrint).stream.name.contains(searchQuery, ignoreCase = true)
+                    it is StreamFingerPrint &&
+                    it.stream.name.contains(searchQuery, ignoreCase = true)
                 }
             }
     }
 
     fun loadSubscribedStreams(searchQuery: String): Observable<List<ItemFingerPrint>> {
-        Log.d("xxx", "load subscribe")
         return Observable.fromCallable { dataManager.subscribedStreams as List<ItemFingerPrint> }
             .delay(1000L, TimeUnit.MILLISECONDS)
             .map { streams ->
             streams.filter {
-                (it as StreamFingerPrint).stream.name.contains(searchQuery, ignoreCase = true)
+                it is StreamFingerPrint &&
+                it.stream.name.contains(searchQuery, ignoreCase = true)
             }
         }
     }
