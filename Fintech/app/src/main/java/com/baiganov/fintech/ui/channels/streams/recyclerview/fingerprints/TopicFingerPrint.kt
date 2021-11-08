@@ -6,7 +6,7 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 
 class TopicFingerPrint(
     val topic: Topic,
-    val streamTitle: String,
+//    val streamTitle: String,
     val streamId: Int
 ) : ItemFingerPrint {
 

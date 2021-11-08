@@ -139,7 +139,7 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
         fun createIntent(context: Context, item: TopicFingerPrint): Intent {
             return Intent(context, ChatActivity::class.java)
-                .putExtra(ARG_TITLE_STREAM, item.streamTitle)
+//                .putExtra(ARG_TITLE_STREAM, item.streamTitle)
                 .putExtra(ARG_ID_TOPIC, item.topic.id)
                 .putExtra(ARG_TITLE_TOPIC, item.topic.title)
 

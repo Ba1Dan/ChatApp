@@ -53,7 +53,7 @@ class StreamsFragment : Fragment(), ItemClickListener {
         when (item) {
             is StreamFingerPrint -> {
                 if (item.isExpanded) {
-                    viewModel.openStream(tabPosition, position, item.childTopics)
+                    viewModel.openStream(tabPosition, position, item.childTopics, item)
                 } else {
                     viewModel.closeStream(tabPosition, item.childTopics)
                 }
