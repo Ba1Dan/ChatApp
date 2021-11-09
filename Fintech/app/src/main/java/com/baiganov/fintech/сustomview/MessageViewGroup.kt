@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.*
 import com.baiganov.fintech.R
-import com.baiganov.fintech.model.Reaction
+import com.baiganov.fintech.model.response.Reaction
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.google.android.material.imageview.ShapeableImageView
@@ -76,11 +76,11 @@ class MessageViewGroup @JvmOverloads constructor(
         typedArray.recycle()
     }
 
-    fun setReactions(reactions: List<Reaction>) {
-        flexBox.setReactions(reactions)
+    fun setReactions(reactions: List<Reaction>, clickListener: OnClickMessage, idMessage: Int) {
+        flexBox.setReactions(reactions, clickListener, idMessage)
     }
 
-    fun addReactionByButton(clickListener: ItemClickListener, position: Int, item: ItemFingerPrint) {
+    fun addReactionByButton(clickListener: OnClickMessage, position: Int, item: ItemFingerPrint) {
         addReactionButton.setOnClickListener {
             clickListener.onItemClick(position, item)
         }

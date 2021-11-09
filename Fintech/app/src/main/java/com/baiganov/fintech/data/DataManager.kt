@@ -5,7 +5,6 @@ import com.baiganov.fintech.model.*
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
-import com.baiganov.fintech.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 
@@ -24,29 +23,29 @@ class DataManager {
     var subscribedStreams: MutableList<ItemFingerPrint> = streams.filter { (it as StreamFingerPrint).stream.isSubscribed} as MutableList<ItemFingerPrint>
 
     var messages = mutableListOf<ItemFingerPrint>(
-        DateDividerFingerPrint(
-            Date(
-                "17 Окт"
-            )
-        ),
-        MessageFingerPrint(
-            Content(
-                0, 0, "Данияр", "Привет", mutableListOf(
-                    Reaction(1, "\uD83D\uDE09", 2),
-                    Reaction(1, "\uD83D\uDE09", 3),
-                    Reaction(1, "\uD83D\uDE09", 10),
-                )
-            )
-        ),
-        MessageFingerPrint(
-            Content(
-                1, 1, "Данияр", "Привет", mutableListOf(
-                    Reaction(2, "\uD83D\uDE09", 2),
-                    Reaction(2, "\uD83D\uDE09", 3),
-                    Reaction(2, "\uD83D\uDE09", 10),
-                )
-            )
-        )
+//        DateDividerFingerPrint(
+//            Date(
+//                "17 Окт"
+//            )
+//        ),
+//        MessageFingerPrint(
+//            Content(
+//                0, 0, "Данияр", "Привет", mutableListOf(
+//                    Reaction(1, "\uD83D\uDE09", 2),
+//                    Reaction(1, "\uD83D\uDE09", 3),
+//                    Reaction(1, "\uD83D\uDE09", 10),
+//                )
+//            )
+//        ),
+//        MessageFingerPrint(
+//            Content(
+//                1, 1, "Данияр", "Привет", mutableListOf(
+//                    Reaction(2, "\uD83D\uDE09", 2),
+//                    Reaction(2, "\uD83D\uDE09", 3),
+//                    Reaction(2, "\uD83D\uDE09", 10),
+//                )
+//            )
+//        )
     )
 
     val users = listOf<UserFingerPrint>(
@@ -87,13 +86,13 @@ class DataManager {
 
     fun addMessage(message: String): List<ItemFingerPrint> {
         messages = ArrayList(messages)
-        messages.add(
-            MessageFingerPrint(
-                Content(
-                    id++, com.baiganov.fintech.User.getId(), "Данияр", message, mutableListOf()
-                )
-            )
-        )
+//        messages.add(
+//            MessageFingerPrint(
+////                Content(
+////                    id++, com.baiganov.fintech.User.getId(), "Данияр", message, mutableListOf()
+////                )
+//            )
+//        )
         return messages
     }
 
@@ -101,10 +100,10 @@ class DataManager {
         messages = ArrayList(messages)
         for (i in messages.indices) {
             val item = messages[i]
-            if (item is MessageFingerPrint && item.content.id == position) {
-                val reactions = ArrayList(item.content.reactions.map { it.copy() })
-                reactions.add(Reaction(com.baiganov.fintech.User.getId(), emoji, 1))
-                val content = item.content.copy(reactions = reactions)
+            if (item is MessageFingerPrint && item.message.id == position) {
+                val reactions = ArrayList(item.message.reactions.map { it.copy() })
+//                reactions.add(Reaction(com.baiganov.fintech.User.getId(), emoji, 1))
+                val content = item.message.copy(reactions = reactions)
                 val message = MessageFingerPrint(content)
                 messages[i] = message
             }

@@ -26,4 +26,5 @@ ext {
     kotlinx_serialization_version = '1.1.0'
     rxandroid_version = '3.0.0'
     rxrelay_version = '3.0.0'
+    jsoup_version = '1.13.1'
 }

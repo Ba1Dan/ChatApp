@@ -6,10 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
+import com.baiganov.fintech.model.Emoji
 
 class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : RecyclerView.Adapter<EmojiAdapter.EmojiViewHolder>() {
 
-    private var emojis = emptyList<String>()
+    private var emojis = emptyList<Emoji>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmojiViewHolder {
         return EmojiViewHolder(
@@ -25,7 +26,7 @@ class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : Recycle
         return emojis.size
     }
 
-    fun setData(newData: List<String>) {
+    fun setData(newData: List<Emoji>) {
         emojis = newData
         notifyDataSetChanged()
     }
@@ -34,10 +35,10 @@ class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : Recycle
 
         private val tvEmoji: TextView = itemView.findViewById(R.id.emoji_item)
 
-        fun bind(emoji: String, emojiClickListener: EmojiClickListener) {
-            tvEmoji.text = emoji
+        fun bind(emoji: Emoji, emojiClickListener: EmojiClickListener) {
+            tvEmoji.text = String(Character.toChars(emoji.code))
             tvEmoji.setOnClickListener {
-                emojiClickListener.emojiClick(emoji)
+                emojiClickListener.emojiClick(emoji.name)
             }
         }
     }

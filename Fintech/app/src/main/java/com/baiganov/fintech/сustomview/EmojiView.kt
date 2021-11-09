@@ -64,7 +64,7 @@ class EmojiView @JvmOverloads constructor(
     }
 
     fun setEmoji(newEmoji: String) {
-        emoji = newEmoji
+        emoji = String(Character.toChars(newEmoji.toInt(16)))
         emojiLayout = StaticLayout.Builder
             .obtain(emoji, 0, emoji.length, textPaint, EMOJI_LAYOUT_WIDTH)
             .setAlignment(Layout.Alignment.ALIGN_CENTER)
@@ -128,11 +128,13 @@ class EmojiView @JvmOverloads constructor(
         return drawableState
     }
 
-    fun updateEmojiViewOnClick() {
+    fun updateEmojiViewOnClick(onClickMessage: OnClickMessage, emojiName: String, idMessage: Int) {
         if (isSelected) {
             reactionCount += 1
+            onClickMessage.addReaction(idMessage, emojiName)
         } else {
             reactionCount -= 1
+            onClickMessage.deleteReaction(idMessage, emojiName)
         }
     }
 

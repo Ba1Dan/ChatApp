@@ -1,10 +1,7 @@
 package com.baiganov.fintech.data
 
-import android.util.Log
-import com.baiganov.fintech.model.Stream
 import com.baiganov.fintech.model.StreamsResponse
-import com.baiganov.fintech.model.Topic
-import com.baiganov.fintech.model.TopicsResponse
+import com.baiganov.fintech.model.response.TopicsResponse
 import com.baiganov.fintech.network.NetworkModule
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint

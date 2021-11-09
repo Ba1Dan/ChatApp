@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.StreamRepository
 import com.baiganov.fintech.model.Stream
+import com.baiganov.fintech.model.response.Narrow
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
@@ -18,6 +19,8 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 import java.util.concurrent.TimeUnit
 
@@ -75,7 +78,7 @@ class ChannelsViewModel : ViewModel() {
                         StreamFingerPrint(stream)
                     }
                     itemsOfRecycler.addAll(list)
-                    _allStreams.value = State.Result(list)
+                    _allStreams.value = State.Result(itemsOfRecycler)
                     Log.d("xxx", "size ${list[0].childTopics.size}")
                 },
                 onError = { Log.d("xxx", it.message.toString()) }
@@ -97,7 +100,7 @@ class ChannelsViewModel : ViewModel() {
                 .subscribeBy(
                     onSuccess = {
                         val list = it.topics.map { topic ->
-                            TopicFingerPrint(topic, stream.stream.id)
+                            TopicFingerPrint(topic, stream.stream.name, stream.stream.id)
                         }
 
                         _allStreams.value = State.Result(list)
@@ -167,5 +170,7 @@ class ChannelsViewModel : ViewModel() {
 
     companion object {
         const val INITIAL_QUERY: String = ""
+        private const val INITIAL_PAGE_SIZE = 50
+        private const val NEWEST_ANCHOR_MESSAGE = 10000000000000000
     }
 }
