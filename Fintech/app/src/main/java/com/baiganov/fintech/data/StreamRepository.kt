@@ -1,6 +1,7 @@
 package com.baiganov.fintech.data
 
-import com.baiganov.fintech.model.StreamsResponse
+import com.baiganov.fintech.model.response.AllStreamsResponse
+import com.baiganov.fintech.model.response.SubscribedStreamsResponse
 import com.baiganov.fintech.model.response.TopicsResponse
 import com.baiganov.fintech.network.NetworkModule
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
@@ -16,19 +17,12 @@ class StreamRepository {
     private val networkModule = NetworkModule()
     private val service = networkModule.create()
 
-    fun loadAllStreams(searchQuery: String): Observable<List<ItemFingerPrint>> {
-        return Observable.fromCallable { dataManager.streams }
-            .delay(1000L, TimeUnit.MILLISECONDS)
-            .map { streams ->
-                streams.filter {
-                    it is StreamFingerPrint &&
-                    it.stream.name.contains(searchQuery, ignoreCase = true)
-                }
-            }
+    fun getStreams(): Single<AllStreamsResponse> {
+        return service.getStreams()
     }
 
-    fun getStreams(): Single<StreamsResponse> {
-        return service.getStreams()
+    fun getSubscribedStreams(): Single<SubscribedStreamsResponse> {
+        return service.getSubscribedStreams()
     }
 
     fun getTopics(streamId: Int): Single<TopicsResponse> {

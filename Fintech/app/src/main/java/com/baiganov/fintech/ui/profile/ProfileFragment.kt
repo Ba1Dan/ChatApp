@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.Profile
+import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.util.State
 
 
@@ -48,7 +49,7 @@ class ProfileFragment : Fragment() {
         viewModel.loadProfile()
     }
 
-    private fun handleState(it: State<Profile>) {
+    private fun handleState(it: State<User>) {
         when (it) {
             is State.Result -> {
                 progressBar.isVisible = false
@@ -64,11 +65,11 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun setData(profile: Profile) {
-        tvName.text = profile.name
-        tvStatus.text = profile.status
+    private fun setData(profile: User) {
+        tvName.text = profile.fullName
+//        tvStatus.text = profile.status
         tvIsOnline.text =
-            if (profile.isOnline) requireContext().getString(R.string.status_online)
+            if (profile.isActive) requireContext().getString(R.string.status_online)
             else requireContext().getString(R.string.status_offline)
     }
 

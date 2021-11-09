@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.*
 import com.baiganov.fintech.R
-import com.baiganov.fintech.User
+import com.baiganov.fintech.MyUser
 import android.widget.LinearLayout
 import com.baiganov.fintech.model.response.Reaction
 
@@ -21,7 +21,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     private var layoutWidth = 0
 
     fun setReactions(reactions: List<Reaction>, clickMessage: OnClickMessage, idMessage: Int) {
-        val idUser = User.getId()
+        val idUser = MyUser.getId()
         removeViews(0, childCount - 1)
         isVisible = reactions.isNotEmpty()
         reactions.distinctBy { it.emojiCode }.forEach { reaction ->

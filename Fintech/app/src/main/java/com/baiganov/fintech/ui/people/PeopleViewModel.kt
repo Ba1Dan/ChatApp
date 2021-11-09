@@ -1,5 +1,6 @@
 package com.baiganov.fintech.ui.people
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,15 +23,34 @@ class PeopleViewModel : ViewModel() {
         get() = _users
 
     fun loadUsers() {
-        peopleRepository.loadUsers()
+//        peopleRepository.loadUsers()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .doOnSubscribe { _users.postValue(State.Loading()) }
+//            .subscribeBy(
+//                onNext = { _users.value = State.Result(it) },
+//                onError = { _users.value = State.Error(it.message) }
+//            )
+//            .addTo(compositeDisposable)
+    }
+
+    fun getUsers() {
+        peopleRepository.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _users.postValue(State.Loading()) }
             .subscribeBy(
-                onNext = { _users.value = State.Result(it) },
+                onSuccess = {
+                    val users = it.users.map { user ->
+                        UserFingerPrint(user)
+                    }
+                    Log.d("xxx", "get users ${users.size}")
+                    _users.value = State.Result(users)
+                },
                 onError = { _users.value = State.Error(it.message) }
             )
             .addTo(compositeDisposable)
+
     }
 
     override fun onCleared() {

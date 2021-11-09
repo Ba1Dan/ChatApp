@@ -2,6 +2,7 @@ package com.baiganov.fintech.data
 
 
 import com.baiganov.fintech.model.*
+import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
@@ -49,12 +50,12 @@ class DataManager {
     )
 
     val users = listOf<UserFingerPrint>(
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
-        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg"))
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
+//        UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg"))
     )
 
     val profile = Profile("Данияр Байганов", "avatar.png", "working", true)
@@ -89,7 +90,7 @@ class DataManager {
 //        messages.add(
 //            MessageFingerPrint(
 ////                Content(
-////                    id++, com.baiganov.fintech.User.getId(), "Данияр", message, mutableListOf()
+////                    id++, com.baiganov.fintech.MyUser.getId(), "Данияр", message, mutableListOf()
 ////                )
 //            )
 //        )
@@ -102,7 +103,7 @@ class DataManager {
             val item = messages[i]
             if (item is MessageFingerPrint && item.message.id == position) {
                 val reactions = ArrayList(item.message.reactions.map { it.copy() })
-//                reactions.add(Reaction(com.baiganov.fintech.User.getId(), emoji, 1))
+//                reactions.add(Reaction(com.baiganov.fintech.MyUser.getId(), emoji, 1))
                 val content = item.message.copy(reactions = reactions)
                 val message = MessageFingerPrint(content)
                 messages[i] = message

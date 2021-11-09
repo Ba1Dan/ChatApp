@@ -1,17 +1,10 @@
 package com.baiganov.fintech.model.response
 
-import com.baiganov.fintech.model.Topic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class TopicsResponse(
-    @SerialName("topics") val topics: List<Topic>
+class MessagesResponse(
+    @SerialName("messages") val messages: List<Message>,
+    @SerialName("found_oldest") val foundOldest: Boolean
 )
-
-
-
-
-
-
-

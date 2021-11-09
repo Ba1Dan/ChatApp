@@ -43,7 +43,7 @@ class PeopleFragment : Fragment(), ItemClickListener {
         viewModel.users.observe(viewLifecycleOwner, {
             processMainScreenState(it)
         })
-        viewModel.loadUsers()
+        viewModel.getUsers()
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {

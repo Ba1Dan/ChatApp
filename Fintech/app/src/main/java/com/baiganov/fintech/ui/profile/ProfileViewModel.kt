@@ -1,10 +1,12 @@
 package com.baiganov.fintech.ui.profile
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.ProfileRepository
 import com.baiganov.fintech.model.Profile
+import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -17,18 +19,20 @@ class ProfileViewModel : ViewModel() {
     private val profileRepository = ProfileRepository()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    private var _profile: MutableLiveData<State<Profile>> = MutableLiveData()
-    val profile: LiveData<State<Profile>>
+    private var _profile: MutableLiveData<State<User>> = MutableLiveData()
+    val profile: LiveData<State<User>>
         get() = _profile
 
     fun loadProfile() {
         profileRepository.loadProfile()
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _profile.postValue(State.Loading()) }
             .subscribeBy(
-                onNext = { _profile.value = State.Result(it) },
-                onError = { _profile.value = State.Error(message = it.message) }
+                onSuccess = { _profile.value = State.Result(it) },
+                onError = {
+                    _profile.value = State.Error(message = it.message)
+                }
             )
             .addTo(compositeDisposable)
     }

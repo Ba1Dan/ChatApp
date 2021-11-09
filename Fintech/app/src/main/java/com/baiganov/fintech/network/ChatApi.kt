@@ -1,19 +1,17 @@
 package com.baiganov.fintech.network
 
-import com.baiganov.fintech.model.StreamsResponse
-import com.baiganov.fintech.model.response.MessagesResponse
-import com.baiganov.fintech.model.response.Narrow
-import com.baiganov.fintech.model.response.TopicsResponse
+import com.baiganov.fintech.model.response.*
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import retrofit2.http.*
 
 interface ChatApi {
 
     @GET("streams")
-    fun getStreams(): Single<StreamsResponse>
+    fun getStreams(): Single<AllStreamsResponse>
+
+    @GET("users/me/subscriptions")
+    fun getSubscribedStreams(): Single<SubscribedStreamsResponse>
 
     @GET("users/me/{stream_id}/topics")
     fun getTopics(@Path("stream_id") streamId: Int): Single<TopicsResponse>
@@ -26,6 +24,12 @@ interface ChatApi {
         @Query("narrow") narrow: String,
         @Query("apply_markdown") applyMarkdown: Boolean = true
     ): Single<MessagesResponse>
+
+    @GET("users")
+    fun getUsers(): Single<UsersResponse>
+
+    @GET("users/me")
+    fun getOwnUser(): Single<User>
 
     @POST("messages")
     fun sendMessage(
