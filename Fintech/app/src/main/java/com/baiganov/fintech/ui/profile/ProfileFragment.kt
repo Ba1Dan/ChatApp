@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
-import com.baiganov.fintech.model.Profile
 import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.util.State
 
@@ -33,7 +32,6 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         tvName = view.findViewById(R.id.profile_name)
-        tvStatus = view.findViewById(R.id.profile_status)
         tvIsOnline = view.findViewById(R.id.profile_online_status)
         progressBar = view.findViewById(R.id.pb_profile)
 
@@ -67,9 +65,8 @@ class ProfileFragment : Fragment() {
 
     private fun setData(profile: User) {
         tvName.text = profile.fullName
-//        tvStatus.text = profile.status
         tvIsOnline.text =
-            if (profile.isActive) requireContext().getString(R.string.status_online)
+            if (profile.isActive) requireContext().getString(R.string.status_active)
             else requireContext().getString(R.string.status_offline)
     }
 

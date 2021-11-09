@@ -30,7 +30,6 @@ class ChatViewModel : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    Log.d("xxx", "отправлено")
                     updateMessages(stream, topic)
                 },
                 onError = { Log.d("xxx", "ошибка ${it.message}") }
@@ -44,14 +43,12 @@ class ChatViewModel : ViewModel() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    Log.d("xxx", "messages ${it.messages.size}")
                     val list = it.messages.map { message ->
                         MessageFingerPrint(message)
                     }
                     _messages.value = State.Result(list)
                 },
                 onError = {
-                    Log.d("xxx", "error  ${it.message}")
                     _messages.value = State.Error(it.message)
                 }
             )
@@ -65,14 +62,12 @@ class ChatViewModel : ViewModel() {
             .doOnSubscribe { _messages.postValue(State.Loading()) }
             .subscribeBy(
                 onSuccess = {
-                    Log.d("xxx", "messages ${it.messages.size}")
                     val list = it.messages.map { message ->
                         MessageFingerPrint(message)
                     }
                     _messages.value = State.Result(list)
                 },
                 onError = {
-                    Log.d("xxx", "error  ${it.message}")
                     _messages.value = State.Error(it.message)
                 }
             )
@@ -80,13 +75,11 @@ class ChatViewModel : ViewModel() {
     }
 
     fun addReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
-        Log.d("xxx", "emoji $emojiName")
         messageRepository.addReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    Log.d("xxx", "добавлен эмодзи")
                     updateMessages(streamTitle, topicTitle)
                 },
                 onError = { Log.d("xxx", "ошибка ${it.message}") }
