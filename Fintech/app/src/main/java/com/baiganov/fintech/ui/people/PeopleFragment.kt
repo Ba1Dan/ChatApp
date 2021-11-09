@@ -5,21 +5,24 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.DataManager
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.ui.people.adapters.PersonAdapter
+import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
+import com.todkars.shimmer.ShimmerRecyclerView
 
 
 class PeopleFragment : Fragment(), ItemClickListener {
 
-    override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        TODO("Not yet implemented")
-    }
+    private val viewModel: PeopleViewModel by activityViewModels()
 
     private lateinit var adapterPerson: PersonAdapter
-    private lateinit var rvUsers: RecyclerView
+    private lateinit var rvUsers: ShimmerRecyclerView
     private lateinit var dataManager: DataManager
 
     override fun onCreateView(
@@ -37,7 +40,30 @@ class PeopleFragment : Fragment(), ItemClickListener {
         dataManager = DataManager()
         adapterPerson = PersonAdapter(this)
         rvUsers.adapter = adapterPerson
-        adapterPerson.listOfUser = dataManager.users
+        viewModel.users.observe(viewLifecycleOwner, {
+            processMainScreenState(it)
+        })
+        viewModel.loadUsers()
+    }
+
+    override fun onItemClick(position: Int, item: ItemFingerPrint) {
+
+    }
+
+    private fun processMainScreenState(it: State<List<UserFingerPrint>>) {
+        when (it) {
+            is State.Result -> {
+                adapterPerson.listOfUser = it.data
+                rvUsers.hideShimmer()
+            }
+            is State.Loading -> {
+                rvUsers.showShimmer()
+            }
+            is State.Error -> {
+                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                rvUsers.hideShimmer()
+            }
+        }
     }
 
     companion object {

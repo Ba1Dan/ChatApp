@@ -9,11 +9,12 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.DataManager
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -21,39 +22,37 @@ import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.todkars.shimmer.ShimmerRecyclerView
+
 
 class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
 
     private lateinit var adapter: MessageAdapter
     private lateinit var toolBarChat: Toolbar
     private lateinit var tvTopic: TextView
-    private lateinit var dataManager: DataManager
     private lateinit var btnSend: FloatingActionButton
     private lateinit var inputMessage: EditText
     private lateinit var btnAddFile: ImageButton
-    private lateinit var rvChat: RecyclerView
+    private lateinit var rvChat: ShimmerRecyclerView
+
+    private val viewModel: ChatViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
         initViews()
+        setupText()
+        setupRecyclerView()
 
-        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
-        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
-        dataManager = DataManager()
-        adapter = MessageAdapter(this)
-        rvChat.adapter = adapter
-        toolBarChat.title = titleStream
-        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
-        adapter.messages = dataManager.messages
-
+        viewModel.messages.observe(this) { handleState(it) }
+        viewModel.loadMessage()
         setClickListener()
     }
 
     override fun sendData(position: Int?, emoji: String) {
         position?.let {
-            adapter.messages = dataManager.addEmoji(position, emoji)
+            viewModel.addEmoji(position, emoji)
         }
     }
 
@@ -71,11 +70,22 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         tvTopic = findViewById(R.id.tv_topic)
     }
 
+    private fun setupText() {
+        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
+        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
+        toolBarChat.title = titleStream
+        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
+    }
+
+    private fun setupRecyclerView() {
+        adapter = MessageAdapter(this)
+        rvChat.adapter = adapter
+    }
+
     private fun setClickListener() {
         btnSend.setOnClickListener {
-            adapter.messages = dataManager.addMessage(inputMessage.text.toString())
-            rvChat.smoothScrollToPosition(dataManager.messages.size - 1)
-            inputMessage.setText("")
+            viewModel.addMessage(inputMessage.text.toString())
+            inputMessage.setText(EMPTY_STRING)
         }
 
         inputMessage.addTextChangedListener(object : TextWatcher {
@@ -101,6 +111,23 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         })
 
         toolBarChat.setNavigationOnClickListener { finish() }
+    }
+
+    private fun handleState(it: State<List<ItemFingerPrint>>) {
+        when (it) {
+            is State.Result -> {
+                adapter.messages = it.data
+                rvChat.smoothScrollToPosition( it.data.size - 1)
+                rvChat.hideShimmer()
+            }
+            is State.Loading -> {
+                rvChat.showShimmer()
+            }
+            is State.Error -> {
+                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                rvChat.hideShimmer()
+            }
+        }
     }
 
     companion object {

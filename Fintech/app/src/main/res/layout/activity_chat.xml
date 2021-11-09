@@ -28,10 +28,12 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
         tools:text="Topic: #testing" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.todkars.shimmer.ShimmerRecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:shimmer_recycler_item_count="7"
+        app:shimmer_recycler_layout="@layout/placeholder_message"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/input_message"
         app:layout_constraintEnd_toEndOf="parent"

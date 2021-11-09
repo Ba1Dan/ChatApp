@@ -35,20 +35,22 @@
                 android:id="@+id/search_icon"
                 android:layout_width="27dp"
                 android:layout_height="27dp"
-                android:layout_marginEnd="28dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="28dp"
                 android:src="@drawable/ic_search_27"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="@id/search"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/search" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.todkars.shimmer.ShimmerRecyclerView
         android:id="@+id/rv_users"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:shimmer_recycler_item_count="7"
+        app:shimmer_recycler_layout="@layout/placeholder_user"
         tools:itemCount="3"
         tools:listitem="@layout/item_user" />
 </LinearLayout>

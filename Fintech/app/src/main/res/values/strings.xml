@@ -14,4 +14,7 @@
     <string name="channels">Channels</string>
     <string name="people">People</string>
     <string name="profile">Profile</string>
+    <string name="status_online">online</string>
+    <string name="status_offline">offline</string>
+    <string name="no_result_found">No result found</string>
 </resources>

@@ -7,13 +7,13 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
-import com.baiganov.fintech.ui.people.UserFingerPrint
+import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 
 class DataManager {
 
     private var id: Int = 2
 
-    private var streams = mutableListOf<ItemFingerPrint>(
+    var streams = mutableListOf<ItemFingerPrint>(
         StreamFingerPrint(Stream(0, "#general", listOf(Topic(0, "Testing"), Topic(1, "Bruh")), true)),
         StreamFingerPrint(Stream(0, "#Development", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")), true)),
         StreamFingerPrint(Stream(0, "#Design", listOf(Topic(0, "dsff"), Topic(1, "sdfdsff")))),
@@ -49,7 +49,7 @@ class DataManager {
         )
     )
 
-    val users = mutableListOf<UserFingerPrint>(
+    val users = listOf<UserFingerPrint>(
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
@@ -57,6 +57,8 @@ class DataManager {
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg")),
         UserFingerPrint(User(0, "John", "xxx@gmail.com", "fdsgfgfg"))
     )
+
+    val profile = Profile("Данияр Байганов", "avatar.png", "working", true)
 
     fun add(type: Int, position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
         if (type == 1) {
@@ -70,7 +72,7 @@ class DataManager {
         }
     }
 
-    fun remove(type: Int, position: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
+    fun remove(type: Int, topics: List<TopicFingerPrint>): List<ItemFingerPrint> {
         if (type == 1) {
             streams = ArrayList(streams)
             streams.removeAll(topics)
@@ -83,16 +85,7 @@ class DataManager {
 
     }
 
-
-    fun getStreams(tabPosition: Int): List<ItemFingerPrint> {
-        return if (tabPosition == 1) {
-            streams
-        } else {
-            subscribedStreams
-        }
-    }
-
-    fun addMessage(message: String): MutableList<ItemFingerPrint> {
+    fun addMessage(message: String): List<ItemFingerPrint> {
         messages = ArrayList(messages)
         messages.add(
             MessageFingerPrint(
