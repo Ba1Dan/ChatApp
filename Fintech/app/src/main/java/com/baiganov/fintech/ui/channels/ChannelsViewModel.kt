@@ -51,48 +51,10 @@ class ChannelsViewModel : ViewModel() {
         }
     }
 
-    private fun subscribeToSearchAllStreams() {
-        searchSubjectAll
-            .subscribeOn(Schedulers.io())
-            .distinctUntilChanged()
-            .doOnNext { _allStreams.postValue(State.Loading()) }
-            .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { searchQuery ->
-                streamRepository.getSubscribedStreams()
-                    .flattenAsObservable { streamResponse ->
-                        streamResponse.streams.filter {
-                            it.name.contains(searchQuery, ignoreCase = true)
-                        }
-                    }
-                    .flatMapSingle { stream ->
-                        streamRepository.getTopics(stream.id)
-                            .zipWith(Single.just(stream)) { topicsResponse, _ ->
-                                stream.apply {
-                                    topics = topicsResponse.topics
-                                }
-                            }
-                    }
-                    .toList()
-                    .toObservable()
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    val list = it.map { stream ->
-                        StreamFingerPrint(stream)
-                    }
-                    itemsOfRecycler.addAll(list)
-                    _allStreams.value = State.Result(itemsOfRecycler) },
-                onError = { _allStreams.value = State.Error(it.message) }
-            )
-            .addTo(compositeDisposable)
-    }
-
     fun openStream(
         type: Int,
         position: Int,
         topics: List<TopicFingerPrint>,
-        stream: StreamFingerPrint
     ) {
         if (type == 0) {
             //Subscibed
@@ -114,15 +76,15 @@ class ChannelsViewModel : ViewModel() {
         }
     }
 
-    private fun subscribeToSearchSubscribeStreams() {
-
-        searchSubject
+    private fun subscribeToSearchAllStreams() {
+        searchSubjectAll
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
-            .doOnNext { _subscribeStreams.postValue(State.Loading()) }
+            .doOnNext { _allStreams.postValue(State.Loading()) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
-                streamRepository.getStreams()
+                streamRepository.getSubscribedStreams()
+                    .subscribeOn(Schedulers.io())
                     .flattenAsObservable { streamResponse ->
                         streamResponse.streams.filter {
                             it.name.contains(searchQuery, ignoreCase = true)
@@ -145,8 +107,49 @@ class ChannelsViewModel : ViewModel() {
                     val list = it.map { stream ->
                         StreamFingerPrint(stream)
                     }
+                    itemsOfRecycler.clear()
+                    itemsOfRecycler.addAll(list)
+                    _allStreams.value = State.Result(list) },
+                onError = { _allStreams.value = State.Error(it.message) }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun subscribeToSearchSubscribeStreams() {
+
+        searchSubject
+            .subscribeOn(Schedulers.io())
+            .distinctUntilChanged()
+            .doOnNext { _subscribeStreams.postValue(State.Loading()) }
+            .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
+            .switchMap { searchQuery ->
+                streamRepository.getStreams()
+                    .subscribeOn(Schedulers.io())
+                    .flattenAsObservable { streamResponse ->
+                        streamResponse.streams.filter {
+                            it.name.contains(searchQuery, ignoreCase = true)
+                        }
+                    }
+                    .flatMapSingle { stream ->
+                        streamRepository.getTopics(stream.id)
+                            .zipWith(Single.just(stream)) { topicsResponse, _ ->
+                                stream.apply {
+                                    topics = topicsResponse.topics
+                                }
+                            }
+                    }
+                    .toList()
+                    .toObservable()
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    val list = it.map { stream ->
+                        StreamFingerPrint(stream)
+                    }
+                    subscribedItemsOfRecycler.clear()
                     subscribedItemsOfRecycler.addAll(list)
-                    _subscribeStreams.value = State.Result(subscribedItemsOfRecycler)
+                    _subscribeStreams.value = State.Result(list)
                 },
                 onError = { _subscribeStreams.value = State.Error(it.message) }
             )

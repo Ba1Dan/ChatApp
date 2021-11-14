@@ -24,7 +24,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         val idUser = MyUser.getId()
         removeViews(0, childCount - 1)
         isVisible = reactions.isNotEmpty()
-        reactions.distinctBy { it.emojiCode }.forEach { reaction ->
+        reactions.sortedBy { it.emojiName }.distinctBy { it.emojiCode }.forEach { reaction ->
             addEmojiViewByReaction(
                 reaction,
                 reactions.count { it.emojiCode == reaction.emojiCode },
@@ -104,13 +104,25 @@ class FlexBoxLayout @JvmOverloads constructor(
         return MarginLayoutParams(p)
     }
 
-    fun addEmojiViewByReaction(reaction: Reaction, count: Int, isSelect: Boolean, onClickMessage: OnClickMessage, idMessage: Int) {
+    fun addEmojiViewByReaction(
+        reaction: Reaction,
+        count: Int,
+        isSelect: Boolean,
+        onClickMessage: OnClickMessage,
+        idMessage: Int
+    ) {
         addView(
             createEmojiView(reaction, isSelect, count, onClickMessage, idMessage), childCount - 1
         )
     }
 
-    private fun createEmojiView(reaction: Reaction, isSelect: Boolean, count: Int, onClickMessage: OnClickMessage, idMessage: Int): EmojiView {
+    private fun createEmojiView(
+        reaction: Reaction,
+        isSelect: Boolean,
+        count: Int,
+        onClickMessage: OnClickMessage,
+        idMessage: Int
+    ): EmojiView {
         val emojiView = EmojiView(context).apply {
             setPadding(
                 context.resources.getDimensionPixelSize(R.dimen.padding_normal),

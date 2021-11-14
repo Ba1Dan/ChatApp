@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit
 
 class StreamRepository {
 
-    private val dataManager = DataManager()
     private val networkModule = NetworkModule()
     private val service = networkModule.create()
 
@@ -27,24 +26,5 @@ class StreamRepository {
 
     fun getTopics(streamId: Int): Single<TopicsResponse> {
         return service.getTopics(streamId)
-    }
-
-    fun loadSubscribedStreams(searchQuery: String): Observable<List<ItemFingerPrint>> {
-        return Observable.fromCallable { dataManager.subscribedStreams as List<ItemFingerPrint> }
-            .delay(1000L, TimeUnit.MILLISECONDS)
-            .map { streams ->
-            streams.filter {
-                it is StreamFingerPrint &&
-                it.stream.name.contains(searchQuery, ignoreCase = true)
-            }
-        }
-    }
-
-    fun openStream(type: Int, position: Int, topics: List<TopicFingerPrint>): Observable<List<ItemFingerPrint>> {
-        return Observable.fromCallable { dataManager.add(type, position, topics) }
-    }
-
-    fun closeStream(type: Int, topics: List<TopicFingerPrint>): Observable<List<ItemFingerPrint>> {
-        return Observable.fromCallable { dataManager.remove(type, topics) }
     }
 }

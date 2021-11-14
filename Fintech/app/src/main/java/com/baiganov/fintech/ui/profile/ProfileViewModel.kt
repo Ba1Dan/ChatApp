@@ -1,11 +1,9 @@
 package com.baiganov.fintech.ui.profile
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.ProfileRepository
-import com.baiganov.fintech.model.Profile
 import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers

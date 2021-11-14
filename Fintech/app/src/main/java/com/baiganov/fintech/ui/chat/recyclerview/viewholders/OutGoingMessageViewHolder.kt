@@ -5,7 +5,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.ui.chat.recyclerview.BaseViewHolder
-import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.FlexBoxLayout
 import com.baiganov.fintech.сustomview.OnClickMessage

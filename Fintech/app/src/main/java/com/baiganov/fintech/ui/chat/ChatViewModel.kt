@@ -13,6 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class ChatViewModel : ViewModel() {
 
@@ -22,7 +23,6 @@ class ChatViewModel : ViewModel() {
     private var _messages: MutableLiveData<State<List<ItemFingerPrint>>> = MutableLiveData()
     val messages: LiveData<State<List<ItemFingerPrint>>>
         get() = _messages
-
 
     fun sendMessage(stream: String, streamId: Int, topic: String, message: String) {
         messageRepository.sendMessage(streamId, message, topic)
@@ -87,13 +87,13 @@ class ChatViewModel : ViewModel() {
             .addTo(compositeDisposable)
     }
 
-    fun deleteReaction(messageId: Int, emojiName: String) {
+    fun deleteReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
         messageRepository.deleteReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    Log.d("xxx", "удален эмодзи")
+                    updateMessages(streamTitle, topicTitle)
                 },
                 onError = { Log.d("xxx", "ошибка ${it.message}") }
             )

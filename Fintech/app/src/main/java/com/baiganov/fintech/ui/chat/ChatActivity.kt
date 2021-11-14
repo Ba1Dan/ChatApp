@@ -67,12 +67,10 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
 
     override fun addReaction(idMessage: Int, nameEmoji: String) {
         viewModel.addReaction(idMessage, nameEmoji, streamTitle, topicTitle)
-        Log.d("xxx", "added reaction $nameEmoji")
     }
 
     override fun deleteReaction(idMessage: Int, nameEmoji: String) {
-        viewModel.deleteReaction(idMessage, nameEmoji)
-        Log.d("xxx", "deleted reaction $nameEmoji")
+        viewModel.deleteReaction(idMessage, nameEmoji, streamTitle, topicTitle)
     }
 
     private fun initViews() {

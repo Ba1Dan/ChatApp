@@ -18,11 +18,11 @@ interface ChatApi {
 
     @GET("messages")
     fun getMessages(
-        @Query("anchor") anchor: String = "first_unread",
-        @Query("num_before") numBefore: Int = 50,
+        @Query("anchor") anchor: Long = 10000000000000000,
+        @Query("num_before") numBefore: Int = 100,
         @Query("num_after") numAfter: Int = 0,
         @Query("narrow") narrow: String,
-        @Query("apply_markdown") applyMarkdown: Boolean = true
+        @Query("apply_markdown") applyMarkdown: Boolean = false
     ): Single<MessagesResponse>
 
     @GET("users")

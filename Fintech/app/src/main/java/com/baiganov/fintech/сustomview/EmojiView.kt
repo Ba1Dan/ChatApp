@@ -7,6 +7,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.core.graphics.withTranslation
 import com.baiganov.fintech.R
@@ -64,14 +65,16 @@ class EmojiView @JvmOverloads constructor(
     }
 
     fun setEmoji(newEmoji: String) {
-        emoji = String(Character.toChars(newEmoji.toInt(16)))
-        emojiLayout = StaticLayout.Builder
-            .obtain(emoji, 0, emoji.length, textPaint, EMOJI_LAYOUT_WIDTH)
-            .setAlignment(Layout.Alignment.ALIGN_CENTER)
-            .setLineSpacing(0f, 1f)
-            .setIncludePad(false)
-            .build()
-        invalidate()
+        if (newEmoji != ZULIP_STR) {
+            emoji = String(Character.toChars(newEmoji.split(DELIMITER_MINUS)[0].toInt(16)))
+            emojiLayout = StaticLayout.Builder
+                .obtain(emoji, 0, emoji.length, textPaint, EMOJI_LAYOUT_WIDTH)
+                .setAlignment(Layout.Alignment.ALIGN_CENTER)
+                .setLineSpacing(0f, 1f)
+                .setIncludePad(false)
+                .build()
+            invalidate()
+        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -139,6 +142,8 @@ class EmojiView @JvmOverloads constructor(
     }
 
     companion object {
+        private const val ZULIP_STR = "zulip"
+        private const val DELIMITER_MINUS = "-"
         private const val DEF_REACTION_COUNT = 0
         private const val EMOJI_LAYOUT_WIDTH = 50
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)

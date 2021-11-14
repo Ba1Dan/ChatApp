@@ -2,10 +2,8 @@ package com.baiganov.fintech.ui.chat.recyclerview.viewholders
 
 import android.view.View
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import com.baiganov.fintech.R
 import com.baiganov.fintech.ui.chat.recyclerview.BaseViewHolder
-import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.MessageViewGroup
 import com.baiganov.fintech.сustomview.OnClickMessage

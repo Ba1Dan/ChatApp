@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
-import androidx.navigation.NavController
 import com.baiganov.fintech.R
 import com.baiganov.fintech.ui.channels.ChannelsFragment
 import com.baiganov.fintech.ui.people.PeopleFragment

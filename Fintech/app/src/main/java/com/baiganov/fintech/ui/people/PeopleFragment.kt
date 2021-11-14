@@ -1,19 +1,18 @@
 package com.baiganov.fintech.ui.people
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.DataManager
-import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.people.adapters.PersonAdapter
 import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
+import com.baiganov.fintech.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
 
 
@@ -23,7 +22,6 @@ class PeopleFragment : Fragment(), ItemClickListener {
 
     private lateinit var adapterPerson: PersonAdapter
     private lateinit var rvUsers: ShimmerRecyclerView
-    private lateinit var dataManager: DataManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,7 +35,6 @@ class PeopleFragment : Fragment(), ItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dataManager = DataManager()
         adapterPerson = PersonAdapter(this)
         rvUsers.adapter = adapterPerson
         viewModel.users.observe(viewLifecycleOwner, {
