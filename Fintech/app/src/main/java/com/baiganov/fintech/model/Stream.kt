@@ -1,5 +1,6 @@
 package com.baiganov.fintech.model
 
+import androidx.room.Entity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

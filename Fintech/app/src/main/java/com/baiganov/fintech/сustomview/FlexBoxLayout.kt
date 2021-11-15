@@ -2,6 +2,7 @@ package com.baiganov.fintech.сustomview
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.*
@@ -24,6 +25,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         val idUser = MyUser.getId()
         removeViews(0, childCount - 1)
         isVisible = reactions.isNotEmpty()
+
         reactions.sortedBy { it.emojiName }.distinctBy { it.emojiCode }.forEach { reaction ->
             addEmojiViewByReaction(
                 reaction,

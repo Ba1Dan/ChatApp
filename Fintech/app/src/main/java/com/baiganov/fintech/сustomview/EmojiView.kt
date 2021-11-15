@@ -133,10 +133,10 @@ class EmojiView @JvmOverloads constructor(
 
     fun updateEmojiViewOnClick(onClickMessage: OnClickMessage, emojiName: String, idMessage: Int) {
         if (isSelected) {
-            reactionCount += 1
+//            reactionCount += 1
             onClickMessage.addReaction(idMessage, emojiName)
         } else {
-            reactionCount -= 1
+//            reactionCount -= 1
             onClickMessage.deleteReaction(idMessage, emojiName)
         }
     }

@@ -2,7 +2,7 @@ package com.baiganov.fintech.data
 
 import com.baiganov.fintech.model.response.MessagesResponse
 import com.baiganov.fintech.model.response.Narrow
-import com.baiganov.fintech.network.NetworkModule
+import com.baiganov.fintech.data.network.NetworkModule
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.serialization.encodeToString

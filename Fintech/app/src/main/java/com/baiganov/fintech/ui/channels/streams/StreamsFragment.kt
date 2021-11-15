@@ -53,6 +53,7 @@ class StreamsFragment : Fragment(), ItemClickListener {
         when (item) {
             is StreamFingerPrint -> {
                 if (item.isExpanded) {
+//                    adapterStreams.notifyItemRangeInserted(position, item.childTopics)
                     viewModel.openStream(tabPosition, position, item.childTopics)
                 } else {
                     viewModel.closeStream(tabPosition, item.childTopics)
@@ -83,11 +84,15 @@ class StreamsFragment : Fragment(), ItemClickListener {
                 if (it.data.isEmpty()) {
                     frameNotResult.isVisible = true
                 }
+                frameNotResult.isVisible = false
                 rvStreams.hideShimmer()
             }
             is State.Loading -> {
                 frameNotResult.isVisible = false
-                rvStreams.showShimmer()
+                if (adapterStreams.itemCount == 0) {
+                    rvStreams.showShimmer()
+                }
+
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()

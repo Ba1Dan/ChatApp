@@ -1,4 +1,4 @@
-package com.baiganov.fintech.network
+package com.baiganov.fintech.data.network
 
 import com.baiganov.fintech.model.response.*
 import io.reactivex.Completable
