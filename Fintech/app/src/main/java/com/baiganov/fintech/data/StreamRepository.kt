@@ -53,6 +53,16 @@ class StreamRepository(
             }
     }
 
+    fun searchSubscribedStreams(): Single<SubscribedStreamsResponse> {
+        return service.getSubscribedStreams()
+    }
+
+    fun searchStreams(): Single<AllStreamsResponse> {
+        return service.getStreams()
+    }
+
+
+
     fun getSubscribedStreams(): Completable {
         return service.getSubscribedStreams().subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
@@ -88,5 +98,5 @@ class StreamRepository(
 
     fun getStreamsFromDb(): Flowable<List<StreamEntity>> = streamsDao.getStreams()
 
-    fun getSubscribedStreamsFromDb(): Flowable<List<StreamEntity>> = streamsDao.getStreams()
+    fun getSubscribedStreamsFromDb(): Flowable<List<StreamEntity>> = streamsDao.getSubscribedStreams()
 }

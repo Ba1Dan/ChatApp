@@ -11,8 +11,12 @@ class MessageDiffUtil : DiffUtil.ItemCallback<ItemFingerPrint>() {
 
     override fun areContentsTheSame(oldItem: ItemFingerPrint, newItem: ItemFingerPrint): Boolean {
         return when {
-            oldItem is MessageFingerPrint && newItem is MessageFingerPrint -> oldItem.message == newItem.message
-            oldItem is DateDividerFingerPrint && newItem is DateDividerFingerPrint -> oldItem.date == newItem.date
+            oldItem is MessageFingerPrint && newItem is MessageFingerPrint -> {
+                oldItem.message == newItem.message
+            }
+            oldItem is DateDividerFingerPrint && newItem is DateDividerFingerPrint -> {
+                oldItem.date == newItem.date
+            }
             else -> true
         }
     }
