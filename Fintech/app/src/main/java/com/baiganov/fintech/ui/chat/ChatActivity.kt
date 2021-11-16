@@ -40,7 +40,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     private lateinit var btnSend: FloatingActionButton
     private lateinit var inputMessage: EditText
     private lateinit var btnAddFile: ImageButton
-    private lateinit var rvChat: ShimmerRecyclerView
+    private lateinit var rvChat: RecyclerView
     private lateinit var viewModel: ChatViewModel
 
     private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
@@ -169,19 +169,19 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                     (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = false
                 }
 
-                rvChat.hideShimmer()
+//                rvChat.hideShimmer()
 
                 isLoadNewPage = true
             }
             is State.Loading -> {
                 if (adapter.itemCount == 0) {
-                    rvChat.showShimmer()
+//                    rvChat.showShimmer()
                 }
-                rvChat.showShimmer()
+//                rvChat.showShimmer()
             }
             is State.Error -> {
                 Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-                rvChat.hideShimmer()
+//                rvChat.hideShimmer()
             }
         }
     }

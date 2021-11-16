@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
         tools:text="Topic: #testing" />
 
-    <com.todkars.shimmer.ShimmerRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
