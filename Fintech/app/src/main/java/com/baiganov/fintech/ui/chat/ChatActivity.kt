@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -19,13 +20,13 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
-import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
+import com.baiganov.fintech.сustomview.OnClickMessage
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.todkars.shimmer.ShimmerRecyclerView
 
 
-class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
+class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
 
     private lateinit var adapter: MessageAdapter
     private lateinit var toolBarChat: Toolbar
@@ -36,28 +37,40 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
     private lateinit var rvChat: ShimmerRecyclerView
 
     private val viewModel: ChatViewModel by viewModels()
+    private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
+    private val topicTitle: String by lazy { intent.extras?.getString(ARG_TITLE_TOPIC)!! }
+    private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
         initViews()
-        setupText()
+        setupText(streamTitle, topicTitle)
         setupRecyclerView()
 
         viewModel.messages.observe(this) { handleState(it) }
-        viewModel.loadMessage()
-        setClickListener()
+        viewModel.loadMessage(streamTitle, topicTitle)
+
+        setClickListener(streamId, topicTitle, streamTitle)
     }
 
-    override fun sendData(position: Int?, emoji: String) {
-        position?.let {
-            viewModel.addEmoji(position, emoji)
+    override fun sendData(messageId: Int?, emoji: String) {
+        messageId?.let {
+            viewModel.addReaction(messageId, emoji, streamTitle, topicTitle)
         }
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
         EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
+    }
+
+    override fun addReaction(idMessage: Int, nameEmoji: String) {
+        viewModel.addReaction(idMessage, nameEmoji, streamTitle, topicTitle)
+    }
+
+    override fun deleteReaction(idMessage: Int, nameEmoji: String) {
+        viewModel.deleteReaction(idMessage, nameEmoji, streamTitle, topicTitle)
     }
 
     private fun initViews() {
@@ -70,9 +83,7 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         tvTopic = findViewById(R.id.tv_topic)
     }
 
-    private fun setupText() {
-        val titleStream = intent.extras?.getString(ARG_TITLE_STREAM) ?: EMPTY_STRING
-        val titleTopic = intent.extras?.getString(ARG_TITLE_TOPIC) ?: EMPTY_STRING
+    private fun setupText(titleStream: String, titleTopic: String) {
         toolBarChat.title = titleStream
         tvTopic.text = this.getString(R.string.title_topic, titleTopic)
     }
@@ -82,9 +93,9 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         rvChat.adapter = adapter
     }
 
-    private fun setClickListener() {
+    private fun setClickListener(streamId: Int, titleTopic: String, titleStream: String) {
         btnSend.setOnClickListener {
-            viewModel.addMessage(inputMessage.text.toString())
+            viewModel.sendMessage(titleStream, streamId, titleTopic, inputMessage.text.toString())
             inputMessage.setText(EMPTY_STRING)
         }
 
@@ -135,12 +146,14 @@ class ChatActivity : AppCompatActivity(), ItemClickListener, OnResultListener {
         private const val ARG_TITLE_STREAM = "title_stream"
         private const val ARG_TITLE_TOPIC = "title_topic"
         private const val ARG_ID_TOPIC = "id_topic"
+        private const val ARG_STREAM_ID = "id_stream"
         private const val EMPTY_STRING = ""
 
         fun createIntent(context: Context, item: TopicFingerPrint): Intent {
             return Intent(context, ChatActivity::class.java)
                 .putExtra(ARG_TITLE_STREAM, item.streamTitle)
                 .putExtra(ARG_ID_TOPIC, item.topic.id)
+                .putExtra(ARG_STREAM_ID, item.streamId)
                 .putExtra(ARG_TITLE_TOPIC, item.topic.title)
 
         }

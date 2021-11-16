@@ -47,7 +47,7 @@ class PersonAdapter(private val clickListener: ItemClickListener) :
         private val ivAvatar: ShapeableImageView = itemView.findViewById(R.id.user_avatar)
 
         override fun bind(item: UserFingerPrint) {
-            tvName.text = item.user.name
+            tvName.text = item.user.fullName
             tvEmail.text = item.user.email
         }
     }

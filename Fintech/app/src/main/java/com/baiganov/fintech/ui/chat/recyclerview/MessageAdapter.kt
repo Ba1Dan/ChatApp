@@ -9,8 +9,9 @@ import com.baiganov.fintech.ui.chat.recyclerview.viewholders.DateDividerViewHold
 import com.baiganov.fintech.ui.chat.recyclerview.viewholders.InComingMessageViewHolder
 import com.baiganov.fintech.ui.chat.recyclerview.viewholders.OutGoingMessageViewHolder
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.сustomview.OnClickMessage
 
-class MessageAdapter(private val clickListener: ItemClickListener) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
+class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
 
     private val differ = AsyncListDiffer(this, MessageDiffUtil());
 

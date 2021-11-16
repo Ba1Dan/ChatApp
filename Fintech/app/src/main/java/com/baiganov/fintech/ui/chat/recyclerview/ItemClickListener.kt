@@ -5,4 +5,5 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 interface ItemClickListener {
 
     fun onItemClick(position: Int, item: ItemFingerPrint)
+
 }

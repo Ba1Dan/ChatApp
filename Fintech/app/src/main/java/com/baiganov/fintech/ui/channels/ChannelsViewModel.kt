@@ -4,9 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.StreamRepository
-import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.util.State
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -17,10 +19,13 @@ import java.util.concurrent.TimeUnit
 
 class ChannelsViewModel : ViewModel() {
 
+    private var itemsOfRecycler: MutableList<ItemFingerPrint> = mutableListOf()
+    private var subscribedItemsOfRecycler: MutableList<ItemFingerPrint> = mutableListOf()
+
     private val streamRepository: StreamRepository = StreamRepository()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
-    private val searchSubject1: PublishSubject<String> = PublishSubject.create()
+    private val searchSubjectAll: PublishSubject<String> = PublishSubject.create()
     private var tabPosition = 0
 
     private var _allStreams: MutableLiveData<State<List<ItemFingerPrint>>> = MutableLiveData()
@@ -38,86 +43,115 @@ class ChannelsViewModel : ViewModel() {
 
     fun searchTopics(searchQuery: String, position: Int) {
         tabPosition = position
+
         if (tabPosition == 0) {
             searchSubject.onNext(searchQuery)
         } else {
-            searchSubject1.onNext(searchQuery)
+            searchSubjectAll.onNext(searchQuery)
         }
     }
 
-    fun openStream(type: Int, position: Int, topics: List<TopicFingerPrint>) {
+    fun openStream(
+        type: Int,
+        position: Int,
+        topics: List<TopicFingerPrint>,
+    ) {
         if (type == 0) {
-            streamRepository.openStream(type, position, topics)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { _subscribeStreams.value = State.Result(it) },
-                    onError = { _subscribeStreams.value = State.Error(it.message) }
-                )
-                .addTo(compositeDisposable)
+            //Subscibed
+            subscribedItemsOfRecycler.addAll(position + 1, topics)
+            _subscribeStreams.value = State.Result(subscribedItemsOfRecycler)
         } else {
-            streamRepository.openStream(type, position, topics)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { _allStreams.value = State.Result(it) },
-                    onError = { _allStreams.value = State.Error(it.message) }
-                )
-                .addTo(compositeDisposable)
+            itemsOfRecycler.addAll(position + 1, topics)
+            _allStreams.value = State.Result(itemsOfRecycler)
         }
-
     }
 
     fun closeStream(type: Int, topics: List<TopicFingerPrint>) {
         if (type == 0) {
-            streamRepository.closeStream(type, topics)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { _subscribeStreams.value = State.Result(it) },
-                    onError = { _subscribeStreams.value = State.Error(it.message) }
-                )
-                .addTo(compositeDisposable)
+            subscribedItemsOfRecycler.removeAll(topics)
+            _subscribeStreams.value = State.Result(subscribedItemsOfRecycler)
         } else {
-            streamRepository.closeStream(type, topics)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { _allStreams.value = State.Result(it) },
-                    onError = { _allStreams.value = State.Error(it.message) }
-                )
-                .addTo(compositeDisposable)
+            itemsOfRecycler.removeAll(topics)
+            _allStreams.value = State.Result(itemsOfRecycler)
         }
     }
 
+    private fun subscribeToSearchAllStreams() {
+        searchSubjectAll
+            .subscribeOn(Schedulers.io())
+            .distinctUntilChanged()
+            .doOnNext { _allStreams.postValue(State.Loading()) }
+            .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
+            .switchMap { searchQuery ->
+                streamRepository.getSubscribedStreams()
+                    .subscribeOn(Schedulers.io())
+                    .flattenAsObservable { streamResponse ->
+                        streamResponse.streams.filter {
+                            it.name.contains(searchQuery, ignoreCase = true)
+                        }
+                    }
+                    .flatMapSingle { stream ->
+                        streamRepository.getTopics(stream.id)
+                            .zipWith(Single.just(stream)) { topicsResponse, _ ->
+                                stream.apply {
+                                    topics = topicsResponse.topics
+                                }
+                            }
+                    }
+                    .toList()
+                    .toObservable()
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    val list = it.map { stream ->
+                        StreamFingerPrint(stream)
+                    }
+                    itemsOfRecycler.clear()
+                    itemsOfRecycler.addAll(list)
+                    _allStreams.value = State.Result(list) },
+                onError = { _allStreams.value = State.Error(it.message) }
+            )
+            .addTo(compositeDisposable)
+    }
+
     private fun subscribeToSearchSubscribeStreams() {
+
         searchSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
             .doOnNext { _subscribeStreams.postValue(State.Loading()) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { searchQuery -> streamRepository.loadSubscribedStreams(searchQuery) }
-//            .map(topicToItemMapper)
+            .switchMap { searchQuery ->
+                streamRepository.getStreams()
+                    .subscribeOn(Schedulers.io())
+                    .flattenAsObservable { streamResponse ->
+                        streamResponse.streams.filter {
+                            it.name.contains(searchQuery, ignoreCase = true)
+                        }
+                    }
+                    .flatMapSingle { stream ->
+                        streamRepository.getTopics(stream.id)
+                            .zipWith(Single.just(stream)) { topicsResponse, _ ->
+                                stream.apply {
+                                    topics = topicsResponse.topics
+                                }
+                            }
+                    }
+                    .toList()
+                    .toObservable()
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { _subscribeStreams.value = State.Result(it) },
+                onNext = {
+                    val list = it.map { stream ->
+                        StreamFingerPrint(stream)
+                    }
+                    subscribedItemsOfRecycler.clear()
+                    subscribedItemsOfRecycler.addAll(list)
+                    _subscribeStreams.value = State.Result(list)
+                },
                 onError = { _subscribeStreams.value = State.Error(it.message) }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    private fun subscribeToSearchAllStreams() {
-        searchSubject1
-            .subscribeOn(Schedulers.io())
-            .distinctUntilChanged()
-            .doOnNext { _allStreams.postValue(State.Loading()) }
-            .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
-            .switchMap { searchQuery -> streamRepository.loadAllStreams(searchQuery) }
-//            .map(topicToItemMapper)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { _allStreams.value = State.Result(it) },
-                onError = { _allStreams.value = State.Error(it.message) }
             )
             .addTo(compositeDisposable)
     }
@@ -129,5 +163,7 @@ class ChannelsViewModel : ViewModel() {
 
     companion object {
         const val INITIAL_QUERY: String = ""
+        private const val INITIAL_PAGE_SIZE = 50
+        private const val NEWEST_ANCHOR_MESSAGE = 10000000000000000
     }
 }

@@ -1,16 +1,19 @@
 package com.baiganov.fintech.ui.chat
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.MessageRepository
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class ChatViewModel : ViewModel() {
 
@@ -21,40 +24,81 @@ class ChatViewModel : ViewModel() {
     val messages: LiveData<State<List<ItemFingerPrint>>>
         get() = _messages
 
-    fun loadMessage() {
-        messageRepository.loadMessages()
+    fun sendMessage(stream: String, streamId: Int, topic: String, message: String) {
+        messageRepository.sendMessage(streamId, message, topic)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    updateMessages(stream, topic)
+                },
+                onError = { Log.d("xxx", "ошибка ${it.message}") }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun updateMessages(stream: String, topic: String) {
+        messageRepository.loadMessages(stream, topic)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    val list = it.messages.map { message ->
+                        MessageFingerPrint(message)
+                    }
+                    _messages.value = State.Result(list)
+                },
+                onError = {
+                    _messages.value = State.Error(it.message)
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    fun loadMessage(stream: String, topic: String) {
+        messageRepository.loadMessages(stream, topic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _messages.postValue(State.Loading()) }
             .subscribeBy(
-                onNext = { _messages.value = State.Result(it) },
-                onError = { _messages.value = State.Error(it.message) }
+                onSuccess = {
+                    val list = it.messages.map { message ->
+                        MessageFingerPrint(message)
+                    }
+                    _messages.value = State.Result(list)
+                },
+                onError = {
+                    _messages.value = State.Error(it.message)
+                }
             )
             .addTo(compositeDisposable)
     }
 
-    fun addMessage(message: String) {
-        messageRepository.addMessage(message)
+    fun addReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
+        messageRepository.addReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { _messages.value = State.Result(it) },
-                onError = { _messages.value = State.Error(it.message) }
+                onComplete = {
+                    updateMessages(streamTitle, topicTitle)
+                },
+                onError = { Log.d("xxx", "ошибка ${it.message}") }
             )
             .addTo(compositeDisposable)
     }
 
-    fun addEmoji(position: Int, emoji: String) {
-        messageRepository.addEmoji(position, emoji)
+    fun deleteReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
+        messageRepository.deleteReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { _messages.value = State.Result(it) },
-                onError = { _messages.value = State.Error(it.message) }
+                onComplete = {
+                    updateMessages(streamTitle, topicTitle)
+                },
+                onError = { Log.d("xxx", "ошибка ${it.message}") }
             )
             .addTo(compositeDisposable)
     }
-
 
     override fun onCleared() {
         super.onCleared()
