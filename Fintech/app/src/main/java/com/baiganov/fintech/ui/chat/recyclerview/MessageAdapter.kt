@@ -11,9 +11,9 @@ import com.baiganov.fintech.ui.chat.recyclerview.viewholders.OutGoingMessageView
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.сustomview.OnClickMessage
 
-class MessageAdapter(private val clickListener: OnClickMessage, messageDiffUtil: MessageDiffUtil) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
+class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
 
-    private val differ = AsyncListDiffer(this, messageDiffUtil);
+    private val differ = AsyncListDiffer(this, MessageDiffUtil());
 
     var messages: List<ItemFingerPrint>
         set(value) = differ.submitList(value)

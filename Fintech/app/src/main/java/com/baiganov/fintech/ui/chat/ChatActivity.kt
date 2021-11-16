@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
-import android.view.View
+import android.text.TextWatcher import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -102,7 +100,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     }
 
     private fun setupRecyclerView() {
-        adapter = MessageAdapter(this, MessageDiffUtil())
+        adapter = MessageAdapter(this)
         rvChat.adapter = adapter
 
         rvChat.addOnScrollListener( object : RecyclerView.OnScrollListener() {
@@ -129,7 +127,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     private fun setClickListener(streamId: Int, titleTopic: String, titleStream: String) {
         btnSend.setOnClickListener {
             viewModel.sendMessage(titleStream, streamId, titleTopic, inputMessage.text.toString())
-            //на enum сделать
+
             positionRecyclerView = TypeScroll.DOWN
             inputMessage.setText(EMPTY_STRING)
         }
