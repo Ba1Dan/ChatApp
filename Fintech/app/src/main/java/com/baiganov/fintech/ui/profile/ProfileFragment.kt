@@ -10,14 +10,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
+import com.baiganov.fintech.data.ProfileRepository
+import com.baiganov.fintech.data.StreamRepository
+import com.baiganov.fintech.data.db.DatabaseModule
+import com.baiganov.fintech.data.db.StreamsDao
+import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.model.response.User
+import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.ui.channels.ChannelsViewModel
+import com.baiganov.fintech.ui.channels.ChannelsViewModelFactory
 import com.baiganov.fintech.util.State
-
 
 class ProfileFragment : Fragment() {
 
-    private val viewModel: ProfileViewModel by activityViewModels()
+    private lateinit var viewModel: ProfileViewModel
 
     private lateinit var tvName: TextView
     private lateinit var tvStatus: TextView
@@ -34,7 +42,7 @@ class ProfileFragment : Fragment() {
         tvName = view.findViewById(R.id.profile_name)
         tvIsOnline = view.findViewById(R.id.profile_online_status)
         progressBar = view.findViewById(R.id.pb_profile)
-
+        setupViewModel()
         return view
 
     }
@@ -44,7 +52,7 @@ class ProfileFragment : Fragment() {
         viewModel.profile.observe(viewLifecycleOwner, {
             handleState(it)
         })
-        viewModel.loadProfile()
+        viewModel.obtainEvent(Event.EventProfile.LoadProfile)
     }
 
     private fun handleState(it: State<User>) {
@@ -68,6 +76,17 @@ class ProfileFragment : Fragment() {
         tvIsOnline.text =
             if (profile.isActive) requireContext().getString(R.string.status_active)
             else requireContext().getString(R.string.status_offline)
+    }
+
+    private fun setupViewModel() {
+        val networkModule = NetworkModule()
+        val service = networkModule.create()
+
+        val viewModelFactory =
+            ProfileViewModelFactory(ProfileRepository(service = service))
+
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(ProfileViewModel::class.java)
     }
 
     companion object {

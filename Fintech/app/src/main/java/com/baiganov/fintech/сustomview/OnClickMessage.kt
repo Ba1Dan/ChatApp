@@ -6,7 +6,7 @@ interface OnClickMessage {
 
     fun onItemClick(position: Int, item: ItemFingerPrint)
 
-    fun addReaction(idMessage: Int, nameEmoji: String, position: Int)
+    fun addReaction(messageId: Int, emojiName: String, position: Int)
 
-    fun deleteReaction(idMessage: Int, nameEmoji: String, position: Int)
+    fun deleteReaction(messageId: Int, emojiName: String, position: Int)
 }

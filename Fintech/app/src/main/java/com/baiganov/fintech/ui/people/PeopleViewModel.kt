@@ -1,40 +1,35 @@
 package com.baiganov.fintech.ui.people
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.PeopleRepository
-import com.baiganov.fintech.util.State
+import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
+import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-class PeopleViewModel : ViewModel() {
+class PeopleViewModel(private val peopleRepository: PeopleRepository) : ViewModel() {
 
-    private val peopleRepository = PeopleRepository()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private var _users: MutableLiveData<State<List<UserFingerPrint>>> = MutableLiveData()
     val users: LiveData<State<List<UserFingerPrint>>>
         get() = _users
 
-    fun loadUsers() {
-//        peopleRepository.loadUsers()
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .doOnSubscribe { _users.postValue(State.Loading()) }
-//            .subscribeBy(
-//                onNext = { _users.value = State.Result(it) },
-//                onError = { _users.value = State.Error(it.message) }
-//            )
-//            .addTo(compositeDisposable)
+    fun obtainEvent(event: Event.EventPeople) {
+        when (event) {
+            is Event.EventPeople.LoadUsers -> {
+                getUsers()
+            }
+        }
     }
 
-    fun getUsers() {
+    private fun getUsers() {
         peopleRepository.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -44,7 +39,7 @@ class PeopleViewModel : ViewModel() {
                     val users = it.users.map { user ->
                         UserFingerPrint(user)
                     }
-                    Log.d("xxx", "get users ${users.size}")
+
                     _users.value = State.Result(users)
                 },
                 onError = { _users.value = State.Error(it.message) }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.ProfileRepository
 import com.baiganov.fintech.model.response.User
+import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -12,14 +13,21 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-class ProfileViewModel : ViewModel() {
+class ProfileViewModel(private val profileRepository: ProfileRepository) : ViewModel() {
 
-    private val profileRepository = ProfileRepository()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private var _profile: MutableLiveData<State<User>> = MutableLiveData()
     val profile: LiveData<State<User>>
         get() = _profile
+
+    fun obtainEvent(event: Event.EventProfile) {
+        when (event) {
+            is Event.EventProfile.LoadProfile -> {
+                loadProfile()
+            }
+        }
+    }
 
     fun loadProfile() {
         profileRepository.loadProfile()

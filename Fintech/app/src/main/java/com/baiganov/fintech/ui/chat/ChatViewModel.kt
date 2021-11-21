@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.MessageRepository
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.Event.*
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,8 +24,65 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
     val messages: LiveData<State<List<ItemFingerPrint>>>
         get() = _messages
 
-    fun getMessagesFromDb(topicName: String, streamId: Int) {
-        messageRepository.getMessagesFromDb(topicName, streamId)
+    fun obtainEvent(event: EventChat) {
+
+        when (event) {
+            is EventChat.LoadFirstMessages -> {
+                getMessagesFromDb(
+                    event.topicTitle,
+                    event.streamId
+                )
+                loadMessage(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.streamId
+                )
+            }
+
+            is EventChat.LoadNextMessages -> {
+                loadNextMessages(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.anchor
+                )
+            }
+
+            is EventChat.AddReaction -> {
+                addReaction(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.messageId,
+                    event.emojiName
+                )
+            }
+
+            is EventChat.DeleteReaction -> {
+                deleteReaction(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.messageId,
+                    event.emojiName
+                )
+            }
+
+            is EventChat.SendMessage -> {
+                sendMessage(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.streamId,
+                    event.message
+                )
+            }
+
+            is EventChat.UploadFile -> {
+
+            }
+        }
+
+    }
+
+    private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
+        messageRepository.getMessagesFromDb(topicTitle, streamId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -41,21 +99,31 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
-    fun sendMessage(stream: String, streamId: Int, topic: String, message: String) {
-        messageRepository.sendMessage(streamId, message, topic)
+    private fun sendMessage(
+        streamTitle: String,
+        topicTitle: String,
+        streamId: Int,
+        message: String
+    ) {
+        messageRepository.sendMessage(streamId, message, topicTitle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    updateMessage(stream, topic)
+                    updateMessage(streamTitle, topicTitle)
                 },
                 onError = { Log.d(javaClass.simpleName, "error send message ${it.message}") }
             )
             .addTo(compositeDisposable)
     }
 
-    fun loadMessage(stream: String, topic: String, streamId: Int, anchor: Long = DEFAULT_ANCHOR) {
-        messageRepository.loadMessages(stream, topic, anchor, streamId)
+    private fun loadMessage(
+        streamTitle: String,
+        topicTitle: String,
+        streamId: Int,
+        anchor: Long = DEFAULT_ANCHOR
+    ) {
+        messageRepository.loadMessages(streamTitle, topicTitle, anchor, streamId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _messages.postValue(State.Loading()) }
@@ -70,8 +138,8 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
-    fun loadNextMessages(stream: String, topic: String, streamId: Int, anchor: Long) {
-        messageRepository.loadNextMessages(stream, topic, anchor)
+    private fun loadNextMessages(streamTitle: String, topicTitle: String, anchor: Long) {
+        messageRepository.loadNextMessages(streamTitle, topicTitle, anchor)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -85,7 +153,12 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
-    fun addReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
+    private fun addReaction(
+        streamTitle: String,
+        topicTitle: String,
+        messageId: Int,
+        emojiName: String
+    ) {
         messageRepository.addReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -98,7 +171,12 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
-    fun deleteReaction(messageId: Int, emojiName: String, streamTitle: String, topicTitle: String) {
+    private fun deleteReaction(
+        streamTitle: String,
+        topicTitle: String,
+        messageId: Int,
+        emojiName: String
+    ) {
         messageRepository.deleteReaction(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -111,8 +189,12 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
-    private fun updateMessage(stream: String, topic: String, anchor: Long = DEFAULT_ANCHOR) {
-        messageRepository.updateMessage(stream, topic, anchor)
+    private fun updateMessage(
+        streamTitle: String,
+        topicTitle: String,
+        anchor: Long = DEFAULT_ANCHOR
+    ) {
+        messageRepository.updateMessage(streamTitle, topicTitle, anchor)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

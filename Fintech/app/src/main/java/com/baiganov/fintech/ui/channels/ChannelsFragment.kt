@@ -1,15 +1,24 @@
 package com.baiganov.fintech.ui.channels
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.baiganov.fintech.R
+import com.baiganov.fintech.data.MessageRepository
+import com.baiganov.fintech.data.StreamRepository
+import com.baiganov.fintech.data.db.DatabaseModule
+import com.baiganov.fintech.data.db.MessagesDao
+import com.baiganov.fintech.data.db.StreamsDao
+import com.baiganov.fintech.data.network.NetworkModule
+import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.ui.chat.ChatViewModel
+import com.baiganov.fintech.ui.chat.ChatViewModelFactory
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -19,7 +28,9 @@ class ChannelsFragment : Fragment() {
     private lateinit var viewPagerChannels: ViewPager2
     private lateinit var tabLayoutChannels: TabLayout
     private lateinit var searchView: SearchView
-    private val viewModel: ChannelsViewModel by activityViewModels()
+//    private val viewModel: ChannelsViewModel by activityViewModels()
+
+    private lateinit var viewModel: ChannelsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +46,7 @@ class ChannelsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupViewModel()
         viewPagerChannels.apply {
             adapter = ChannelsViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             offscreenPageLimit = ChannelsPages.values().size - 1
@@ -53,15 +65,29 @@ class ChannelsFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                viewModel.searchTopics(p0.orEmpty(), tabLayoutChannels.selectedTabPosition)
+                viewModel.obtainEvent(Event.EventChannels.SearchStreams(p0.orEmpty(), tabLayoutChannels.selectedTabPosition))
                 return true
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                viewModel.searchTopics(p0.orEmpty(), tabLayoutChannels.selectedTabPosition)
+                viewModel.obtainEvent(Event.EventChannels.SearchStreams(p0.orEmpty(), tabLayoutChannels.selectedTabPosition))
                 return true
             }
         })
+    }
+
+    private fun setupViewModel() {
+        val networkModule = NetworkModule()
+        val service = networkModule.create()
+
+        val databaseModule = DatabaseModule()
+        val streamsDao: StreamsDao = databaseModule.create(requireActivity()).streamsDao()
+
+        val viewModelFactory =
+            ChannelsViewModelFactory(StreamRepository(service = service, streamsDao = streamsDao))
+
+        viewModel = ViewModelProvider(requireActivity(), viewModelFactory)
+            .get(ChannelsViewModel::class.java)
     }
 
     companion object {

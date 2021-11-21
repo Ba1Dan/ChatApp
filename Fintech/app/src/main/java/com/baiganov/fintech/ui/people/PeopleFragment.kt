@@ -6,8 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
+import com.baiganov.fintech.data.PeopleRepository
+import com.baiganov.fintech.data.network.NetworkModule
+import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.people.adapters.PersonAdapter
@@ -15,13 +18,11 @@ import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 import com.baiganov.fintech.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
 
-
 class PeopleFragment : Fragment(), ItemClickListener {
-
-    private val viewModel: PeopleViewModel by activityViewModels()
 
     private lateinit var adapterPerson: PersonAdapter
     private lateinit var rvUsers: ShimmerRecyclerView
+    private lateinit var viewModel: PeopleViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +31,7 @@ class PeopleFragment : Fragment(), ItemClickListener {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_people, container, false)
         rvUsers = view.findViewById(R.id.rv_users)
+        setupViewModel()
         return view
     }
 
@@ -40,7 +42,7 @@ class PeopleFragment : Fragment(), ItemClickListener {
         viewModel.users.observe(viewLifecycleOwner, {
             processMainScreenState(it)
         })
-        viewModel.getUsers()
+        viewModel.obtainEvent(Event.EventPeople.LoadUsers)
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
@@ -61,6 +63,17 @@ class PeopleFragment : Fragment(), ItemClickListener {
                 rvUsers.hideShimmer()
             }
         }
+    }
+
+    private fun setupViewModel() {
+        val networkModule = NetworkModule()
+        val service = networkModule.create()
+
+        val viewModelFactory =
+            PeopleViewModelFactory(PeopleRepository(service = service))
+
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(PeopleViewModel::class.java)
     }
 
     companion object {

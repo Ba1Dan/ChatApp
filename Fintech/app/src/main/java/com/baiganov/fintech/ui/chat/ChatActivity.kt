@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.text.TextWatcher import android.view.View
+import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -19,17 +20,16 @@ import com.baiganov.fintech.data.MessageRepository
 import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.network.NetworkModule
+import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
-import com.baiganov.fintech.ui.chat.recyclerview.MessageDiffUtil
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.OnClickMessage
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.todkars.shimmer.ShimmerRecyclerView
 
 
 class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
@@ -48,27 +48,38 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
 
     private var isLoadNewPage = true
-    private var positionRecyclerView: TypeScroll = TypeScroll.DOWN
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
         initViews()
-        setupText(streamTitle, topicTitle)
+        setupText()
         setupRecyclerView()
         setupViewModel()
 
         viewModel.messages.observe(this) { handleState(it) }
-        viewModel.getMessagesFromDb(topicTitle, streamId)
-        viewModel.loadMessage(streamTitle, topicTitle, streamId)
+        viewModel.obtainEvent(
+            Event.EventChat.LoadFirstMessages(
+                streamTitle = streamTitle,
+                topicTitle = topicTitle,
+                streamId = streamId
+            )
+        )
 
-        setClickListener(streamId, topicTitle, streamTitle)
+        setClickListener()
     }
 
     override fun sendData(messageId: Int?, emoji: String) {
         messageId?.let {
-            viewModel.addReaction(messageId, emoji, streamTitle, topicTitle)
+            viewModel.obtainEvent(
+                Event.EventChat.AddReaction(
+                    messageId = messageId,
+                    emojiName = emoji,
+                    streamTitle = streamTitle,
+                    topicTitle = topicTitle
+                )
+            )
         }
     }
 
@@ -76,12 +87,26 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
     }
 
-    override fun addReaction(idMessage: Int, nameEmoji: String, position: Int) {
-        viewModel.addReaction(idMessage, nameEmoji, streamTitle, topicTitle)
+    override fun addReaction(messageId: Int, emojiName: String, position: Int) {
+        viewModel.obtainEvent(
+            Event.EventChat.AddReaction(
+                messageId = messageId,
+                emojiName = emojiName,
+                streamTitle = streamTitle,
+                topicTitle = topicTitle
+            )
+        )
     }
 
-    override fun deleteReaction(idMessage: Int, nameEmoji: String, position: Int) {
-        viewModel.deleteReaction(idMessage, nameEmoji, streamTitle, topicTitle)
+    override fun deleteReaction(messageId: Int, emojiName: String, position: Int) {
+        viewModel.obtainEvent(
+            Event.EventChat.DeleteReaction(
+                messageId = messageId,
+                emojiName = emojiName,
+                streamTitle = streamTitle,
+                topicTitle = topicTitle
+            )
+        )
     }
 
     private fun initViews() {
@@ -94,28 +119,34 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         tvTopic = findViewById(R.id.tv_topic)
     }
 
-    private fun setupText(titleStream: String, titleTopic: String) {
-        toolBarChat.title = titleStream
-        tvTopic.text = this.getString(R.string.title_topic, titleTopic)
+    private fun setupText() {
+        toolBarChat.title = streamTitle
+        tvTopic.text = this.getString(R.string.title_topic, topicTitle)
     }
 
     private fun setupRecyclerView() {
         adapter = MessageAdapter(this)
         rvChat.adapter = adapter
 
-        rvChat.addOnScrollListener( object : RecyclerView.OnScrollListener() {
+        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val position: Int = (rvChat.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-
-                    positionRecyclerView = TypeScroll.TOP
+                    val position: Int =
+                        (rvChat.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
                     if (position <= REMAINDER && isLoadNewPage) {
-                        val messageId = (adapter.messages.first() as MessageFingerPrint).message.id.toLong()
+                        val messageId =
+                            (adapter.messages.first() as MessageFingerPrint).message.id.toLong()
 
-                        viewModel.loadNextMessages(streamTitle, topicTitle,  streamId, messageId)
+                        viewModel.obtainEvent(
+                            Event.EventChat.LoadNextMessages(
+                                streamTitle = streamTitle,
+                                topicTitle = topicTitle,
+                                anchor = messageId
+                            )
+                        )
 
                         isLoadNewPage = false
                     }
@@ -124,11 +155,16 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         })
     }
 
-    private fun setClickListener(streamId: Int, titleTopic: String, titleStream: String) {
+    private fun setClickListener() {
         btnSend.setOnClickListener {
-            viewModel.sendMessage(titleStream, streamId, titleTopic, inputMessage.text.toString())
-
-            positionRecyclerView = TypeScroll.DOWN
+            viewModel.obtainEvent(
+                Event.EventChat.SendMessage(
+                    streamTitle = streamTitle,
+                    streamId = streamId,
+                    topicTitle = topicTitle,
+                    message = inputMessage.text.toString()
+                )
+            )
             inputMessage.setText(EMPTY_STRING)
         }
 
@@ -162,12 +198,12 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
             is State.Result -> {
                 adapter.messages = it.data
 
-                if (positionRecyclerView == TypeScroll.DOWN) {
-                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = true
-                    rvChat.smoothScrollToPosition(adapter.messages.size)
-                } else {
-                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = false
-                }
+//                if (positionRecyclerView == TypeScroll.DOWN) {
+//                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = true
+//                    rvChat.smoothScrollToPosition(adapter.messages.size)
+//                } else {
+//                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = false
+//                }
 
 //                rvChat.hideShimmer()
 
@@ -193,7 +229,8 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         val databaseModule = DatabaseModule()
         val messagesDao: MessagesDao = databaseModule.create(this).messagesDao()
 
-        val viewModelFactory = ChatViewModelFactory(MessageRepository(service = service, messagesDao = messagesDao))
+        val viewModelFactory =
+            ChatViewModelFactory(MessageRepository(service = service, messagesDao = messagesDao))
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ChatViewModel::class.java)
