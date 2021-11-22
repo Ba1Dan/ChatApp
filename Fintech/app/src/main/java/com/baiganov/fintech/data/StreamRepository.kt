@@ -25,6 +25,7 @@ class StreamRepository(
                     .map { topicsResponse ->
                         stream.apply {
                             topics = topicsResponse.topics
+                            isSubscribed = getSubscribedStreamsFromDb(stream.id).isNotEmpty()
                         }
                     }
             }
@@ -35,7 +36,7 @@ class StreamRepository(
                         streamId = stream.id,
                         name = stream.name,
                         topics = stream.topics,
-                        isSubscribed = false
+                        isSubscribed = stream.isSubscribed
                     )
                 }
                 saveStreams(entities)
@@ -53,6 +54,7 @@ class StreamRepository(
                     .map { topicsResponse ->
                         stream.apply {
                             topics = topicsResponse.topics
+
                         }
                     }
             }
@@ -82,8 +84,10 @@ class StreamRepository(
         return service.getTopics(streamId)
     }
 
-    private fun getSubscribedStreamsFromDb(): Single<List<StreamEntity>> =
-        streamsDao.getSubscribedStreams()
+    private fun getSubscribedStreamsFromDb(streamId: Int): List<StreamEntity> {
+        return streamsDao.getSubscribedStreams(streamId)
+    }
+
 
     private fun saveStreams(streams: List<StreamEntity>): Completable =
         streamsDao.saveStreams(streams)

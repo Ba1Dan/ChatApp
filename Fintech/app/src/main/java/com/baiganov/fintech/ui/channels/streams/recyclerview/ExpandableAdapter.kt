@@ -1,11 +1,9 @@
 package com.baiganov.fintech.ui.channels.streams.recyclerview
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
@@ -82,7 +80,7 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
         private val btnOpen: MaterialButton = itemView.findViewById(R.id.btn_open)
 
         override fun bind(item: StreamFingerPrint) {
-            tvTitle.text = item.stream.name
+            tvTitle.text = itemView.context.getString(R.string.title_topic_percent, item.stream.name)
             if (item.isExpanded) {
                 btnOpen.setIconResource(R.drawable.ic_arrow_up)
             } else {

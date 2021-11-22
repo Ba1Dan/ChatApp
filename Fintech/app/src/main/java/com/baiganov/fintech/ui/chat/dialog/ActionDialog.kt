@@ -2,7 +2,6 @@ package com.baiganov.fintech.ui.chat.dialog
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import com.baiganov.fintech.R
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
-import com.baiganov.fintech.ui.chat.bottomsheet.TypeActionMessage
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeClick
 
 class ActionDialog : DialogFragment() {
 
@@ -48,11 +47,11 @@ class ActionDialog : DialogFragment() {
             dismiss()
         }
         btnEdit.setOnClickListener {
-            onResultListener.sendData(TypeActionMessage.EditMessage(messageId))
+            onResultListener.sendData(TypeClick.EditMessage(messageId))
             dismiss()
         }
         btnDelete.setOnClickListener {
-            onResultListener.sendData(TypeActionMessage.DeleteMessage(messageId))
+            onResultListener.sendData(TypeClick.DeleteMessage(messageId))
             dismiss()
         }
     }

@@ -34,7 +34,6 @@ class StreamsFragment : Fragment(), ItemClickListener {
     private lateinit var frameNotResult: LinearLayout
     private lateinit var adapterStreams: ExpandableAdapter
     private var tabPosition: Int = -1
-//    private val viewModel: ChannelsViewModel by activityViewModels()
     private lateinit var viewModel: ChannelsViewModel
 
     override fun onCreateView(

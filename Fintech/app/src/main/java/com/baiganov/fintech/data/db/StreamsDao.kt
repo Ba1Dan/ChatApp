@@ -21,8 +21,8 @@ interface StreamsDao {
     @Query("SELECT * FROM streams_table WHERE is_subscribed AND name LIKE :query ORDER BY stream_id")
     fun searchSubscribedStreams(query: String): Flowable<List<StreamEntity>>
 
-    @Query("SELECT * FROM streams_table WHERE is_subscribed ORDER BY stream_id")
-    fun getSubscribedStreams(): Single<List<StreamEntity>>
+    @Query("SELECT * FROM streams_table WHERE is_subscribed AND stream_id = :streamId ORDER BY stream_id")
+    fun getSubscribedStreams(streamId: Int): List<StreamEntity>
 
     @Query("SELECT * FROM streams_table WHERE is_subscribed ORDER BY stream_id")
     fun getSubscribedStreamsDep(): Flowable<List<StreamEntity>>

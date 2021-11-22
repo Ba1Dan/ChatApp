@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
@@ -23,15 +24,15 @@ import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
-import com.baiganov.fintech.ui.chat.bottomsheet.TypeActionMessage
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.ui.chat.dialog.ActionDialog
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.сustomview.OnClickMessage
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-
 
 class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
 
@@ -48,6 +49,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     private val topicTitle: String by lazy { intent.extras?.getString(ARG_TITLE_TOPIC)!! }
     private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
 
+    private var positionRecyclerView: TypeScroll = TypeScroll.DOWN
     private var isLoadNewPage = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +73,9 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         setClickListener()
     }
 
-    override fun sendData(action: TypeActionMessage) {
+    override fun sendData(action: TypeClick) {
         when (action) {
-            is TypeActionMessage.AddReaction -> {
+            is TypeClick.AddReaction -> {
                 action.messageId?.let {
                     viewModel.obtainEvent(
                         Event.EventChat.AddReaction(
@@ -86,19 +88,30 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                 }
             }
 
-            is TypeActionMessage.EditMessage -> {
+            is TypeClick.EditMessage -> {
                 Toast.makeText(this, "edit message", Toast.LENGTH_SHORT).show()
             }
 
-            is TypeActionMessage.DeleteMessage -> {
+            is TypeClick.DeleteMessage -> {
                 Toast.makeText(this, "delete message", Toast.LENGTH_SHORT).show()
             }
         }
 
     }
 
-    override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        ActionDialog.newInstance(position).show(supportFragmentManager, null)
+    override fun onItemClick(click: TypeClick) {
+        when(click) {
+            is TypeClick.OpenBottomSheet -> {
+                EmojiBottomSheetDialog.newInstance(click.messageId).show(supportFragmentManager, null)
+            }
+            is TypeClick.OpenActionDialog -> {
+                ActionDialog.newInstance(click.messageId).show(supportFragmentManager, null)
+            }
+            else -> {
+                Log.d(javaClass.simpleName, "unknown type click")
+            }
+        }
+
     }
 
     override fun addReaction(messageId: Int, emojiName: String, position: Int) {
@@ -150,6 +163,8 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                     val position: Int =
                         (rvChat.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
+                    positionRecyclerView = TypeScroll.TOP
+
                     if (position <= REMAINDER && isLoadNewPage) {
                         val messageId =
                             (adapter.messages.first() as MessageFingerPrint).message.id.toLong()
@@ -179,6 +194,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                     message = inputMessage.text.toString()
                 )
             )
+            positionRecyclerView = TypeScroll.DOWN
             inputMessage.setText(EMPTY_STRING)
         }
 
@@ -212,21 +228,15 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
             is State.Result -> {
                 adapter.messages = it.data
 
-//                if (positionRecyclerView == TypeScroll.DOWN) {
-//                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = true
-//                    rvChat.smoothScrollToPosition(adapter.messages.size)
-//                } else {
-//                    (rvChat.layoutManager as LinearLayoutManager).stackFromEnd = false
-//                }
+                if (positionRecyclerView == TypeScroll.DOWN) {
+                    rvChat.smoothScrollToPosition(adapter.messages.size)
+                }
 
 //                rvChat.hideShimmer()
-
                 isLoadNewPage = true
             }
             is State.Loading -> {
-                if (adapter.itemCount == 0) {
-//                    rvChat.showShimmer()
-                }
+
 //                rvChat.showShimmer()
             }
             is State.Error -> {

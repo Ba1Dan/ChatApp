@@ -2,6 +2,7 @@ package com.baiganov.fintech.ui.chat.recyclerview.viewholders
 
 import android.view.View
 import com.baiganov.fintech.R
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.MessageViewGroup
@@ -26,7 +27,7 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: OnCli
         }
 
         itemView.setOnLongClickListener {
-            clickListener.onItemClick(message.id, item)
+            clickListener.onItemClick(TypeClick.OpenActionDialog(message.id))
             return@setOnLongClickListener true
         }
     }

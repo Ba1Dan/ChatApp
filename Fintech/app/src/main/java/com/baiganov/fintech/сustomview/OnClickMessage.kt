@@ -1,10 +1,10 @@
 package com.baiganov.fintech.сustomview
 
-import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeClick
 
 interface OnClickMessage {
 
-    fun onItemClick(position: Int, item: ItemFingerPrint)
+    fun onItemClick(click: TypeClick)
 
     fun addReaction(messageId: Int, emojiName: String, position: Int)
 

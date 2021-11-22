@@ -12,6 +12,7 @@ import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.response.Reaction
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.google.android.material.imageview.ShapeableImageView
 
@@ -82,7 +83,7 @@ class MessageViewGroup @JvmOverloads constructor(
 
     fun addReactionByButton(clickListener: OnClickMessage, position: Int, item: ItemFingerPrint) {
         addReactionButton.setOnClickListener {
-            clickListener.onItemClick(position, item)
+            clickListener.onItemClick(TypeClick.OpenBottomSheet(position))
         }
     }
 

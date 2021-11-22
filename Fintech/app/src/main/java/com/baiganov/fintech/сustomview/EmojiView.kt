@@ -12,7 +12,6 @@ import android.view.View
 import androidx.core.graphics.withTranslation
 import com.baiganov.fintech.R
 
-
 class EmojiView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -133,10 +132,8 @@ class EmojiView @JvmOverloads constructor(
 
     fun updateEmojiViewOnClick(onClickMessage: OnClickMessage, emojiName: String, idMessage: Int) {
         if (isSelected) {
-//            reactionCount += 1
             onClickMessage.addReaction(idMessage, emojiName, -1)
         } else {
-//            reactionCount -= 1
             onClickMessage.deleteReaction(idMessage, emojiName, -1)
         }
     }

@@ -41,7 +41,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
         searchSubscribeStreams()
         searchAllStreams()
 
-        getAllStreams()
+        getSubscribeStreams()
     }
 
     fun obtainEvent(event: EventChannels) {
@@ -98,7 +98,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { getSubscribeStreams() },
+                onComplete = { Functions.EMPTY_ACTION },
                 onError = { exception -> _allStreams.value = State.Error(exception.message) }
             )
             .addTo(compositeDisposable)
@@ -106,11 +106,10 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
 
     private fun getSubscribeStreams() {
         streamRepository.getSubscribedStreams()
-            .doOnComplete { _subscribeStreams.postValue(State.Loading()) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { Functions.EMPTY_ACTION },
+                onComplete = { getAllStreams() },
                 onError = { exception -> _subscribeStreams.value = State.Error(exception.message) }
             )
             .addTo(compositeDisposable)
@@ -120,6 +119,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
         searchSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
+            .doOnNext { _subscribeStreams.postValue(State.Loading()) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
                 streamRepository.searchSubscribedStreams(searchQuery)
