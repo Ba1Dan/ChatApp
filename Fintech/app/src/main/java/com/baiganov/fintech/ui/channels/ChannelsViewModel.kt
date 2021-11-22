@@ -1,5 +1,6 @@
 package com.baiganov.fintech.ui.channels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,21 +46,17 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
 
     fun obtainEvent(event: EventChannels) {
         when (event) {
-
-            is EventChannels.LoadStreams -> {
-
-            }
-
             is EventChannels.OpenStream -> {
                 openStream(event.type, event.position, event.topics)
             }
-
             is EventChannels.CloseStream -> {
                 closeStream(event.type, event.topics)
             }
-
             is EventChannels.SearchStreams -> {
                 searchTopics(event.searchQuery, event.type)
+            }
+            else -> {
+                Log.d(javaClass.simpleName, "Unknown event")
             }
         }
     }

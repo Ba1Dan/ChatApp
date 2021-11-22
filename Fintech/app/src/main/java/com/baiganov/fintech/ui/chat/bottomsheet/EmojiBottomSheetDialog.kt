@@ -23,7 +23,7 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
     }
 
     override fun emojiClick(emoji: String) {
-        onResultListener.sendData(idMessage, emoji)
+        onResultListener.sendData(TypeActionMessage.AddReaction(idMessage, emoji))
         dismiss()
     }
 
@@ -127,5 +127,5 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
 }
 
 interface OnResultListener {
-    fun sendData(messageId: Int?, emoji: String)
+    fun sendData(action: TypeActionMessage)
 }

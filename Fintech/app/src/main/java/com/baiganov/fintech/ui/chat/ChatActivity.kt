@@ -21,13 +21,14 @@ import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.ui.Event
-import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
-import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.ui.chat.bottomsheet.OnResultListener
+import com.baiganov.fintech.ui.chat.bottomsheet.TypeActionMessage
+import com.baiganov.fintech.ui.chat.dialog.ActionDialog
 import com.baiganov.fintech.ui.chat.recyclerview.MessageAdapter
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.сustomview.OnClickMessage
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -70,21 +71,34 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         setClickListener()
     }
 
-    override fun sendData(messageId: Int?, emoji: String) {
-        messageId?.let {
-            viewModel.obtainEvent(
-                Event.EventChat.AddReaction(
-                    messageId = messageId,
-                    emojiName = emoji,
-                    streamTitle = streamTitle,
-                    topicTitle = topicTitle
-                )
-            )
+    override fun sendData(action: TypeActionMessage) {
+        when (action) {
+            is TypeActionMessage.AddReaction -> {
+                action.messageId?.let {
+                    viewModel.obtainEvent(
+                        Event.EventChat.AddReaction(
+                            messageId = action.messageId,
+                            emojiName = action.emoji,
+                            streamTitle = streamTitle,
+                            topicTitle = topicTitle
+                        )
+                    )
+                }
+            }
+
+            is TypeActionMessage.EditMessage -> {
+                Toast.makeText(this, "edit message", Toast.LENGTH_SHORT).show()
+            }
+
+            is TypeActionMessage.DeleteMessage -> {
+                Toast.makeText(this, "delete message", Toast.LENGTH_SHORT).show()
+            }
         }
+
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        EmojiBottomSheetDialog.newInstance(position).show(supportFragmentManager, null)
+        ActionDialog.newInstance(position).show(supportFragmentManager, null)
     }
 
     override fun addReaction(messageId: Int, emojiName: String, position: Int) {
