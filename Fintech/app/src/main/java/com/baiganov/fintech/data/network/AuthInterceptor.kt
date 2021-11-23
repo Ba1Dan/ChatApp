@@ -1,4 +1,4 @@
-package com.baiganov.fintech.network
+package com.baiganov.fintech.data.network
 
 import okhttp3.Credentials
 import okhttp3.Interceptor

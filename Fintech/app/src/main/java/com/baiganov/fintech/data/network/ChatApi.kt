@@ -1,4 +1,4 @@
-package com.baiganov.fintech.network
+package com.baiganov.fintech.data.network
 
 import com.baiganov.fintech.model.response.*
 import io.reactivex.Completable
@@ -18,8 +18,8 @@ interface ChatApi {
 
     @GET("messages")
     fun getMessages(
-        @Query("anchor") anchor: Long = 10000000000000000,
-        @Query("num_before") numBefore: Int = 100,
+        @Query("anchor") anchor: Long,
+        @Query("num_before") numBefore: Int = 20,
         @Query("num_after") numAfter: Int = 0,
         @Query("narrow") narrow: String,
         @Query("apply_markdown") applyMarkdown: Boolean = false

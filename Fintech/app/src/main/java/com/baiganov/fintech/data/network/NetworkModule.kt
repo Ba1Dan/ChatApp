@@ -1,4 +1,4 @@
-package com.baiganov.fintech.network
+package com.baiganov.fintech.data.network
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory

@@ -1,5 +1,6 @@
 package com.baiganov.fintech.ui.channels.streams.recyclerview
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -82,15 +83,13 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
 
         override fun bind(item: StreamFingerPrint) {
             tvTitle.text = item.stream.name
+            if (item.isExpanded) {
+                btnOpen.setIconResource(R.drawable.ic_arrow_up)
+            } else {
+                btnOpen.setIconResource(R.drawable.ic_arrow)
+            }
             itemView.setOnClickListener {
                 item.isExpanded = !item.isExpanded
-                btnOpen.icon = if (item.isExpanded) ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.ic_arrow_up
-                ) else ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.ic_arrow
-                )
                 clickListener.onItemClick(adapterPosition, item)
             }
         }

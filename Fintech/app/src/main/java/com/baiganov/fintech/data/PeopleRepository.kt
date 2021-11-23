@@ -1,7 +1,7 @@
 package com.baiganov.fintech.data
 
 import com.baiganov.fintech.model.response.UsersResponse
-import com.baiganov.fintech.network.NetworkModule
+import com.baiganov.fintech.data.network.NetworkModule
 import io.reactivex.Single
 
 

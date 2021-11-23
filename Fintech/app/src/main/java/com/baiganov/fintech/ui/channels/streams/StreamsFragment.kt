@@ -1,17 +1,15 @@
 package com.baiganov.fintech.ui.channels.streams
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.baiganov.fintech.R
-import com.baiganov.fintech.util.State
 import com.baiganov.fintech.ui.channels.ChannelsViewModel
 import com.baiganov.fintech.ui.channels.streams.recyclerview.ExpandableAdapter
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
@@ -19,8 +17,8 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.Stream
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.ChatActivity
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
-
 
 class StreamsFragment : Fragment(), ItemClickListener {
 
@@ -83,11 +81,14 @@ class StreamsFragment : Fragment(), ItemClickListener {
                 if (it.data.isEmpty()) {
                     frameNotResult.isVisible = true
                 }
+                frameNotResult.isVisible = false
                 rvStreams.hideShimmer()
             }
             is State.Loading -> {
                 frameNotResult.isVisible = false
-                rvStreams.showShimmer()
+                if (adapterStreams.itemCount == 0) {
+                    rvStreams.showShimmer()
+                }
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
