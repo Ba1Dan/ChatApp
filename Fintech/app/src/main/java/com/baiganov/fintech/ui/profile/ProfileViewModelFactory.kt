@@ -2,7 +2,7 @@ package com.baiganov.fintech.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.baiganov.fintech.data.ProfileRepository
+import com.baiganov.fintech.domain.repositories.ProfileRepository
 
 class ProfileViewModelFactory(private val profileRepository: ProfileRepository) :
     ViewModelProvider.Factory {

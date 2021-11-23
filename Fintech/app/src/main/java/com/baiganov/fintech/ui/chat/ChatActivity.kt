@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.MessageRepository
+import com.baiganov.fintech.data.MessageRepositoryImpl
 import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.network.NetworkModule
@@ -93,7 +93,14 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
             }
 
             is TypeClick.DeleteMessage -> {
-                Toast.makeText(this, "delete message", Toast.LENGTH_SHORT).show()
+                viewModel.obtainEvent(
+                    Event.EventChat.DeleteMessage(
+                        streamTitle = streamTitle,
+                        topicTitle = topicTitle,
+                        messageId = action.messageId,
+                    )
+                )
+                Toast.makeText(this, "deleted message", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -111,7 +118,6 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                 Log.d(javaClass.simpleName, "unknown type click")
             }
         }
-
     }
 
     override fun addReaction(messageId: Int, emojiName: String, position: Int) {
@@ -147,7 +153,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     }
 
     private fun setupText() {
-        toolBarChat.title = streamTitle
+        toolBarChat.title = this.getString(R.string.title_topic_percent, streamTitle)
         tvTopic.text = this.getString(R.string.title_topic, topicTitle)
     }
 
@@ -254,7 +260,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         val messagesDao: MessagesDao = databaseModule.create(this).messagesDao()
 
         val viewModelFactory =
-            ChatViewModelFactory(MessageRepository(service = service, messagesDao = messagesDao))
+            ChatViewModelFactory(MessageRepositoryImpl(service = service, messagesDao = messagesDao))
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ChatViewModel::class.java)

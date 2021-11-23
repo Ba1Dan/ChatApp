@@ -3,18 +3,19 @@ package com.baiganov.fintech.data
 import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.data.network.ChatApi
+import com.baiganov.fintech.domain.repositories.ChannelsRepository
 import com.baiganov.fintech.model.response.TopicsResponse
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-class StreamRepository(
+class ChannelsRepositoryImpl(
     private val service: ChatApi,
     private val streamsDao: StreamsDao
-) {
+) : ChannelsRepository {
 
-    fun getAllStreams(): Completable {
+    override fun getAllStreams(): Completable {
         return service.getStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
@@ -43,7 +44,7 @@ class StreamRepository(
             }
     }
 
-    fun getSubscribedStreams(): Completable {
+    override fun getSubscribedStreams(): Completable {
         return service.getSubscribedStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
@@ -72,11 +73,11 @@ class StreamRepository(
             }
     }
 
-    fun searchStreams(searchQuery: String): Flowable<List<StreamEntity>> {
+    override fun searchStreams(searchQuery: String): Flowable<List<StreamEntity>> {
         return streamsDao.getStreams("$searchQuery%")
     }
 
-    fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>> {
+    override fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>> {
         return streamsDao.searchSubscribedStreams("$searchQuery%")
     }
 

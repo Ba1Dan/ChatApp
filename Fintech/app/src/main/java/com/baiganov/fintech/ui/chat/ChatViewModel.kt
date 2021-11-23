@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.data.MessageRepository
+import com.baiganov.fintech.domain.repositories.MessageRepository
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.Event.*
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
@@ -74,7 +74,18 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
                 )
             }
 
+            is EventChat.DeleteMessage -> {
+                deleteMessage(
+                    event.streamTitle,
+                    event.topicTitle,
+                    event.messageId,
+                )
+            }
+
             is EventChat.UploadFile -> {
+
+            }
+            else -> {
 
             }
         }
@@ -189,12 +200,30 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             .addTo(compositeDisposable)
     }
 
+    //query does not have permission to delete the message
+    private fun deleteMessage(
+        streamTitle: String,
+        topicTitle: String,
+        messageId: Int,
+    ) {
+        messageRepository.deleteMessage(messageId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    updateMessage(streamTitle, topicTitle, messageId.toLong())
+                },
+                onError = { Log.d(javaClass.simpleName, "error delete reaction ${it.message}") }
+            )
+            .addTo(compositeDisposable)
+    }
+
     private fun updateMessage(
         streamTitle: String,
         topicTitle: String,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.updateMessage(streamTitle, topicTitle, anchor)
+        messageRepository.updateMessage(streamTitle, topicTitle, anchor, 1)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

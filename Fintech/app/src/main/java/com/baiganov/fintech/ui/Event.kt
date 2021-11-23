@@ -40,6 +40,12 @@ sealed class Event {
         ) : EventChat()
 
         data class UploadFile(val temp: String) : EventChat()
+
+        data class DeleteMessage(
+            val messageId: Int,
+            val streamTitle: String,
+            val topicTitle: String
+        ) : EventChat()
     }
 
     sealed class EventChannels : EventChat() {

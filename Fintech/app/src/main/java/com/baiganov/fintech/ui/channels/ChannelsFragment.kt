@@ -6,19 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.MessageRepository
-import com.baiganov.fintech.data.StreamRepository
+import com.baiganov.fintech.data.ChannelsRepositoryImpl
 import com.baiganov.fintech.data.db.DatabaseModule
-import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.ui.Event
-import com.baiganov.fintech.ui.chat.ChatViewModel
-import com.baiganov.fintech.ui.chat.ChatViewModelFactory
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -84,7 +79,7 @@ class ChannelsFragment : Fragment() {
         val streamsDao: StreamsDao = databaseModule.create(requireActivity()).streamsDao()
 
         val viewModelFactory =
-            ChannelsViewModelFactory(StreamRepository(service = service, streamsDao = streamsDao))
+            ChannelsViewModelFactory(ChannelsRepositoryImpl(service = service, streamsDao = streamsDao))
 
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)
             .get(ChannelsViewModel::class.java)

@@ -2,7 +2,7 @@ package com.baiganov.fintech.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.baiganov.fintech.data.MessageRepository
+import com.baiganov.fintech.domain.repositories.MessageRepository
 
 class ChatViewModelFactory(private val messageRepository: MessageRepository) : ViewModelProvider.Factory{
 

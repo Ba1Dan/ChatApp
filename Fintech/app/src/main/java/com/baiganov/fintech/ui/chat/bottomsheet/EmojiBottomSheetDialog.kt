@@ -116,13 +116,14 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
     }
 
     companion object {
+
+        private const val ARGUMENT_MESSAGE_ID = "message_id"
+
         fun newInstance(messageId: Int) = EmojiBottomSheetDialog().apply {
             val bundle = Bundle()
             bundle.putInt(ARGUMENT_MESSAGE_ID, messageId)
             arguments = bundle
         }
-
-        private const val ARGUMENT_MESSAGE_ID = "message_id"
     }
 }
 

@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.PeopleRepository
+import com.baiganov.fintech.data.PeopleRepositoryImpl
 import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.ui.Event
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
@@ -70,7 +70,7 @@ class PeopleFragment : Fragment(), ItemClickListener {
         val service = networkModule.create()
 
         val viewModelFactory =
-            PeopleViewModelFactory(PeopleRepository(service = service))
+            PeopleViewModelFactory(PeopleRepositoryImpl(service = service))
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(PeopleViewModel::class.java)

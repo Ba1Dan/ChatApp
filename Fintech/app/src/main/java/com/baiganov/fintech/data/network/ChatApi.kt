@@ -51,4 +51,9 @@ interface ChatApi {
         @Path("message_id") messageId: Int,
         @Query("emoji_name") emojiName: String
     ): Completable
+
+    @DELETE("messages/{msg_id}")
+    fun deleteMessage(
+        @Path("msg_id") id: Int
+    ): Completable
 }

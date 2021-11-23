@@ -9,18 +9,12 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.ProfileRepository
-import com.baiganov.fintech.data.StreamRepository
-import com.baiganov.fintech.data.db.DatabaseModule
-import com.baiganov.fintech.data.db.StreamsDao
+import com.baiganov.fintech.data.ProfileRepositoryImpl
 import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.model.response.User
 import com.baiganov.fintech.ui.Event
-import com.baiganov.fintech.ui.channels.ChannelsViewModel
-import com.baiganov.fintech.ui.channels.ChannelsViewModelFactory
 import com.baiganov.fintech.util.State
 
 class ProfileFragment : Fragment() {
@@ -83,7 +77,7 @@ class ProfileFragment : Fragment() {
         val service = networkModule.create()
 
         val viewModelFactory =
-            ProfileViewModelFactory(ProfileRepository(service = service))
+            ProfileViewModelFactory(ProfileRepositoryImpl(service = service))
 
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ProfileViewModel::class.java)

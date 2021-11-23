@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.data.StreamRepository
 import com.baiganov.fintech.data.db.entity.StreamEntity
+import com.baiganov.fintech.domain.repositories.ChannelsRepository
 import com.baiganov.fintech.ui.Event.EventChannels
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
@@ -20,7 +20,7 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
-class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewModel() {
+class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : ViewModel() {
 
     private var itemsOfRecycler: MutableList<ItemFingerPrint> = mutableListOf()
     private var subscribedItemsOfRecycler: MutableList<ItemFingerPrint> = mutableListOf()
@@ -94,7 +94,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
     }
 
     private fun getAllStreams() {
-        streamRepository.getAllStreams()
+        channelsRepository.getAllStreams()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -105,7 +105,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
     }
 
     private fun getSubscribeStreams() {
-        streamRepository.getSubscribedStreams()
+        channelsRepository.getSubscribedStreams()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -122,7 +122,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
             .doOnNext { _subscribeStreams.postValue(State.Loading()) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
-                streamRepository.searchSubscribedStreams(searchQuery)
+                channelsRepository.searchSubscribedStreams(searchQuery)
                     .subscribeOn(Schedulers.io())
                     .toObservable()
             }
@@ -147,7 +147,7 @@ class ChannelsViewModel(private val streamRepository: StreamRepository) : ViewMo
             .distinctUntilChanged()
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
-                streamRepository.searchStreams(searchQuery)
+                channelsRepository.searchStreams(searchQuery)
                     .subscribeOn(Schedulers.io())
                     .toObservable()
             }

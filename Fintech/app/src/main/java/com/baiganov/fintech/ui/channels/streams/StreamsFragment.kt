@@ -1,7 +1,6 @@
 package com.baiganov.fintech.ui.channels.streams
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +8,9 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.StreamRepository
+import com.baiganov.fintech.data.ChannelsRepositoryImpl
 import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.network.NetworkModule
@@ -116,7 +114,7 @@ class StreamsFragment : Fragment(), ItemClickListener {
         val streamsDao: StreamsDao = databaseModule.create(requireActivity()).streamsDao()
 
         val viewModelFactory =
-            ChannelsViewModelFactory(StreamRepository(service = service, streamsDao = streamsDao))
+            ChannelsViewModelFactory(ChannelsRepositoryImpl(service = service, streamsDao = streamsDao))
 
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)
             .get(ChannelsViewModel::class.java)
