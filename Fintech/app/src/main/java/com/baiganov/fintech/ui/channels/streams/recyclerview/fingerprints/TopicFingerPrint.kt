@@ -11,5 +11,5 @@ class TopicFingerPrint(
 ) : ItemFingerPrint {
 
     override val viewType: Int = R.layout.item_topic
-    override val id: String = streamId.toString()
+    override val id: Int = streamId
 }

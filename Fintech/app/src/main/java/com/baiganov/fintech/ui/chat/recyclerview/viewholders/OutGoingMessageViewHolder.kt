@@ -10,11 +10,17 @@ import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.сustomview.FlexBoxLayout
 import com.baiganov.fintech.сustomview.OnClickMessage
 import org.jsoup.Jsoup
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) :
     BaseViewHolder<MessageFingerPrint>(itemView) {
 
     private val content: TextView = itemView.findViewById(R.id.message_text_outgoing)
+    private val tvDate: TextView = itemView.findViewById(R.id.tv_date)
     private val btnAddReaction: ImageButton = itemView.findViewById(R.id.add_reaction_button_outgoing)
     private val flexBoxLayout: FlexBoxLayout =
         itemView.findViewById(R.id.flexbox_reactions_outgoing)
@@ -28,6 +34,12 @@ class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnCli
         btnAddReaction.setOnClickListener {
             clickListener.onItemClick(TypeClick.OpenBottomSheet(message.id))
         }
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val date = Date(item.message.timestamp * 1000L)
+
+        tvDate.text =  sdf.format(date)
+
+
         itemView.setOnLongClickListener {
             clickListener.onItemClick(TypeClick.OpenActionDialog(message.id))
             return@setOnLongClickListener true

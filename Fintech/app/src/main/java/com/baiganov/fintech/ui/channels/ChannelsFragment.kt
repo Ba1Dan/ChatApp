@@ -13,17 +13,15 @@ import com.baiganov.fintech.data.ChannelsRepositoryImpl
 import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-
 
 class ChannelsFragment : Fragment() {
 
     private lateinit var viewPagerChannels: ViewPager2
     private lateinit var tabLayoutChannels: TabLayout
     private lateinit var searchView: SearchView
-//    private val viewModel: ChannelsViewModel by activityViewModels()
 
     private lateinit var viewModel: ChannelsViewModel
 

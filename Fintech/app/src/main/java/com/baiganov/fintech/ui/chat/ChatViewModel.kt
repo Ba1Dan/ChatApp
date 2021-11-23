@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repositories.MessageRepository
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.ui.Event.*
+import com.baiganov.fintech.util.Event.*
 import com.baiganov.fintech.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -85,11 +85,11 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
             is EventChat.UploadFile -> {
 
             }
-            else -> {
 
+            else -> {
+                Log.d(javaClass.simpleName, "unknown type event")
             }
         }
-
     }
 
     private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
@@ -134,7 +134,7 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
         streamId: Int,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.loadMessages(streamTitle, topicTitle, anchor, streamId)
+        messageRepository.loadMessages(streamTitle, topicTitle, anchor, streamId, INITIAL_PAGE_SIZE)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { _messages.postValue(State.Loading()) }
@@ -150,7 +150,7 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
     }
 
     private fun loadNextMessages(streamTitle: String, topicTitle: String, anchor: Long) {
-        messageRepository.loadNextMessages(streamTitle, topicTitle, anchor)
+        messageRepository.loadNextMessages(streamTitle, topicTitle, anchor, INITIAL_PAGE_SIZE)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -223,7 +223,7 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
         topicTitle: String,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.updateMessage(streamTitle, topicTitle, anchor, 1)
+        messageRepository.updateMessage(streamTitle, topicTitle, anchor, NUM_BEFORE_UPDATE)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -244,6 +244,8 @@ class ChatViewModel(private val messageRepository: MessageRepository) : ViewMode
 
     companion object {
 
+        private const val INITIAL_PAGE_SIZE = 20
+        private const val NUM_BEFORE_UPDATE = 1
         private const val DEFAULT_ANCHOR = 10000000000000000
     }
 }

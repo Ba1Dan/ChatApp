@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repositories.ChannelsRepository
-import com.baiganov.fintech.ui.Event.EventChannels
+import com.baiganov.fintech.util.Event.EventChannels
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
@@ -107,6 +107,7 @@ class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : Vi
     private fun getSubscribeStreams() {
         channelsRepository.getSubscribedStreams()
             .subscribeOn(Schedulers.io())
+            .doOnComplete { _subscribeStreams.postValue(State.Loading()) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { getAllStreams() },
@@ -119,7 +120,6 @@ class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : Vi
         searchSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
-            .doOnNext { _subscribeStreams.postValue(State.Loading()) }
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
                 channelsRepository.searchSubscribedStreams(searchQuery)
@@ -133,7 +133,7 @@ class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : Vi
 
                     subscribedItemsOfRecycler.clear()
                     subscribedItemsOfRecycler.addAll(list)
-                    _subscribeStreams.value = State.Result(list)
+                    _subscribeStreams.value = State.Result(subscribedItemsOfRecycler)
 
                 },
                 onError = { _subscribeStreams.value = State.Error(it.message) }
@@ -158,7 +158,8 @@ class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : Vi
 
                     itemsOfRecycler.clear()
                     itemsOfRecycler.addAll(list)
-                    _allStreams.value = State.Result(list)
+
+                    _allStreams.value = State.Result(itemsOfRecycler)
                 },
                 onError = { _allStreams.value = State.Error(it.message) }
             )
@@ -180,7 +181,5 @@ class ChannelsViewModel(private val channelsRepository: ChannelsRepository) : Vi
 
     companion object {
         const val INITIAL_QUERY: String = ""
-        private const val INITIAL_PAGE_SIZE = 50
-        private const val NEWEST_ANCHOR_MESSAGE = 10000000000000000
     }
 }

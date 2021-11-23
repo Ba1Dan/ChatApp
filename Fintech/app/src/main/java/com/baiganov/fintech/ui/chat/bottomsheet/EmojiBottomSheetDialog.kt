@@ -128,5 +128,5 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
 }
 
 interface OnResultListener {
-    fun sendData(action: TypeClick)
+    fun sendData(click: TypeClick)
 }

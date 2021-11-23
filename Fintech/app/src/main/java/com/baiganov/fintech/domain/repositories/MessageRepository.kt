@@ -6,7 +6,7 @@ import io.reactivex.Flowable
 
 interface MessageRepository {
 
-    fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int): Completable
+    fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int, numBefore: Int): Completable
 
     fun updateMessage(
         stream: String,
@@ -15,7 +15,7 @@ interface MessageRepository {
         numBefore: Int
     ): Completable
 
-    fun loadNextMessages(stream: String, topic: String, anchor: Long): Completable
+    fun loadNextMessages(stream: String, topic: String, anchor: Long, numBefore: Int): Completable
 
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable
 

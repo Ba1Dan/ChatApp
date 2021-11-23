@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repositories.PeopleRepository
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.ui.people.adapters.UserFingerPrint
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers

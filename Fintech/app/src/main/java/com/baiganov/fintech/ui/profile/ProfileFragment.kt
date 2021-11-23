@@ -14,7 +14,7 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.data.ProfileRepositoryImpl
 import com.baiganov.fintech.data.network.NetworkModule
 import com.baiganov.fintech.model.response.User
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 
 class ProfileFragment : Fragment() {

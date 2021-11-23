@@ -21,7 +21,7 @@ import com.baiganov.fintech.data.MessageRepositoryImpl
 import com.baiganov.fintech.data.db.DatabaseModule
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -73,14 +73,14 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         setClickListener()
     }
 
-    override fun sendData(action: TypeClick) {
-        when (action) {
+    override fun sendData(click: TypeClick) {
+        when (click) {
             is TypeClick.AddReaction -> {
-                action.messageId?.let {
+                click.messageId?.let {
                     viewModel.obtainEvent(
                         Event.EventChat.AddReaction(
-                            messageId = action.messageId,
-                            emojiName = action.emoji,
+                            messageId = click.messageId,
+                            emojiName = click.emoji,
                             streamTitle = streamTitle,
                             topicTitle = topicTitle
                         )
@@ -97,13 +97,15 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                     Event.EventChat.DeleteMessage(
                         streamTitle = streamTitle,
                         topicTitle = topicTitle,
-                        messageId = action.messageId,
+                        messageId = click.messageId,
                     )
                 )
                 Toast.makeText(this, "deleted message", Toast.LENGTH_SHORT).show()
             }
+            else -> {
+                Log.d(javaClass.simpleName, "unknown type click")
+            }
         }
-
     }
 
     override fun onItemClick(click: TypeClick) {

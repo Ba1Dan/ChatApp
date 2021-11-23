@@ -20,7 +20,7 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.ui.chat.ChatActivity
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.ui.channels.ChannelsViewModelFactory
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.util.State
@@ -49,7 +49,12 @@ class StreamsFragment : Fragment(), ItemClickListener {
         setupViewModel()
         tabPosition = requireArguments().getInt(ARG_TAB_POSITION)
 
-        viewModel.obtainEvent(Event.EventChannels.SearchStreams(ChannelsViewModel.INITIAL_QUERY, tabPosition))
+        viewModel.obtainEvent(
+            Event.EventChannels.SearchStreams(
+                ChannelsViewModel.INITIAL_QUERY,
+                tabPosition
+            )
+        )
 
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
@@ -60,9 +65,20 @@ class StreamsFragment : Fragment(), ItemClickListener {
         when (item) {
             is StreamFingerPrint -> {
                 if (item.isExpanded) {
-                    viewModel.obtainEvent(Event.EventChannels.OpenStream(tabPosition, position, item.childTopics))
+                    viewModel.obtainEvent(
+                        Event.EventChannels.OpenStream(
+                            tabPosition,
+                            position,
+                            item.childTopics
+                        )
+                    )
                 } else {
-                    viewModel.obtainEvent(Event.EventChannels.CloseStream(tabPosition, item.childTopics))
+                    viewModel.obtainEvent(
+                        Event.EventChannels.CloseStream(
+                            tabPosition,
+                            item.childTopics
+                        )
+                    )
                 }
             }
             is TopicFingerPrint -> {
@@ -114,7 +130,12 @@ class StreamsFragment : Fragment(), ItemClickListener {
         val streamsDao: StreamsDao = databaseModule.create(requireActivity()).streamsDao()
 
         val viewModelFactory =
-            ChannelsViewModelFactory(ChannelsRepositoryImpl(service = service, streamsDao = streamsDao))
+            ChannelsViewModelFactory(
+                ChannelsRepositoryImpl(
+                    service = service,
+                    streamsDao = streamsDao
+                )
+            )
 
         viewModel = ViewModelProvider(requireActivity(), viewModelFactory)
             .get(ChannelsViewModel::class.java)
@@ -123,6 +144,7 @@ class StreamsFragment : Fragment(), ItemClickListener {
     companion object {
 
         private const val ARG_TAB_POSITION = "arg_tab_position"
+
         fun newInstance(tabPosition: Int) =
             StreamsFragment().apply {
                 arguments = Bundle().apply {

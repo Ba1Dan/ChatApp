@@ -15,10 +15,10 @@ import kotlinx.serialization.json.Json
 class MessageRepositoryImpl(private val service: ChatApi, private val messagesDao: MessagesDao) :
     MessageRepository {
 
-    override fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int): Completable {
+    override fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int, numBefore: Int): Completable {
         val narrow = getNarrow(stream, topicName)
 
-        return service.getMessages(narrow = narrow, anchor = anchor)
+        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
@@ -45,10 +45,10 @@ class MessageRepositoryImpl(private val service: ChatApi, private val messagesDa
             }
     }
 
-    override fun loadNextMessages(stream: String, topic: String, anchor: Long): Completable {
+    override fun loadNextMessages(stream: String, topic: String, anchor: Long, numBefore: Int): Completable {
         val narrow = getNarrow(stream, topic)
 
-        return service.getMessages(narrow = narrow, anchor = anchor)
+        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)

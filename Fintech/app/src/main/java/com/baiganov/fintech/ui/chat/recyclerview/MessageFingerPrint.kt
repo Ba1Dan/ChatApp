@@ -9,6 +9,6 @@ import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFi
 class MessageFingerPrint(
     var message: MessageEntity
 ) : ItemFingerPrint {
-    override val id: String = message.id.toString()
+    override val id: Int = message.id
     override val viewType: Int = if (message.senderId == MyUser.getId()) R.layout.outgoing_message else R.layout.incoming_message
 }

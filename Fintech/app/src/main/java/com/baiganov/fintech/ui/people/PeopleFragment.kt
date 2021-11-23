@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.PeopleRepositoryImpl
 import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.ui.Event
+import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.ui.people.adapters.PersonAdapter

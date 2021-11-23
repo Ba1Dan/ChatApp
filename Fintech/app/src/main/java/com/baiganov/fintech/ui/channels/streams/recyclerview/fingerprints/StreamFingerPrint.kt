@@ -8,7 +8,7 @@ class StreamFingerPrint(
     val stream: StreamEntity
 ) : ItemFingerPrint {
     override val viewType: Int = R.layout.item_stream
-    override val id: String = stream.name
+    override val id: Int = stream.streamId
 
     val childTopics: List<TopicFingerPrint> = stream.topics.map { topic -> TopicFingerPrint(topic, stream.name, stream.streamId) }
 

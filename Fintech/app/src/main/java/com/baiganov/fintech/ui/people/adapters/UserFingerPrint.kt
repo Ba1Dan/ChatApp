@@ -8,5 +8,5 @@ class UserFingerPrint(
     val user: User
 ) : ItemFingerPrint {
     override val viewType: Int =  R.layout.item_user
-    override val id: String = user.userId.toString()
+    override val id: Int = user.userId
 }

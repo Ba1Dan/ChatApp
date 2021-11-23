@@ -1,4 +1,4 @@
-package com.baiganov.fintech.ui
+package com.baiganov.fintech.util
 
 import com.baiganov.fintech.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 
