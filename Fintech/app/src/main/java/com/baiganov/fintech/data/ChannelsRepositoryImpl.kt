@@ -9,8 +9,9 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class ChannelsRepositoryImpl(
+class ChannelsRepositoryImpl @Inject constructor(
     private val service: ChatApi,
     private val streamsDao: StreamsDao
 ) : ChannelsRepository {

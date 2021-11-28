@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_light_black"
-    tools:context=".ui.channels.streams.StreamsFragment">
+    tools:context=".presentation.ui.channels.streams.StreamsFragment">
 
     <com.todkars.shimmer.ShimmerRecyclerView
         android:id="@+id/rv_stream"

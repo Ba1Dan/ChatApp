@@ -4,8 +4,9 @@ import com.baiganov.fintech.data.network.ChatApi
 import com.baiganov.fintech.domain.repositories.ProfileRepository
 import com.baiganov.fintech.model.response.User
 import io.reactivex.Single
+import javax.inject.Inject
 
-class ProfileRepositoryImpl(
+class ProfileRepositoryImpl @Inject constructor(
     private val service: ChatApi,
 ) : ProfileRepository {
 

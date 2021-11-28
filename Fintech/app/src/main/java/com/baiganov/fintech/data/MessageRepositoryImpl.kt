@@ -11,11 +11,21 @@ import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class MessageRepositoryImpl(private val service: ChatApi, private val messagesDao: MessagesDao) :
+class MessageRepositoryImpl @Inject constructor(
+    private val service: ChatApi,
+    private val messagesDao: MessagesDao
+) :
     MessageRepository {
 
-    override fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int, numBefore: Int): Completable {
+    override fun loadMessages(
+        stream: String,
+        topicName: String,
+        anchor: Long,
+        streamId: Int,
+        numBefore: Int
+    ): Completable {
         val narrow = getNarrow(stream, topicName)
 
         return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
@@ -45,7 +55,12 @@ class MessageRepositoryImpl(private val service: ChatApi, private val messagesDa
             }
     }
 
-    override fun loadNextMessages(stream: String, topic: String, anchor: Long, numBefore: Int): Completable {
+    override fun loadNextMessages(
+        stream: String,
+        topic: String,
+        anchor: Long,
+        numBefore: Int
+    ): Completable {
         val narrow = getNarrow(stream, topic)
 
         return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
@@ -73,7 +88,10 @@ class MessageRepositoryImpl(private val service: ChatApi, private val messagesDa
         return service.deleteMessage(messageId)
     }
 
-    override fun getMessagesFromDb(topicName: String, streamId: Int): Flowable<List<MessageEntity>> =
+    override fun getMessagesFromDb(
+        topicName: String,
+        streamId: Int
+    ): Flowable<List<MessageEntity>> =
         messagesDao.getTopicMessages(topicName, streamId)
 
     private fun getNarrow(stream: String, topic: String): String {

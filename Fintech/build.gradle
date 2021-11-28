@@ -41,4 +41,6 @@ ext {
     rxjava2_adapter_version = '1.0.0'
     navigation_version = '2.3.5'
     room_version = "2.3.0"
+    dagger_version = '2.35'
+    moxy_version = '2.2.1'
 }
