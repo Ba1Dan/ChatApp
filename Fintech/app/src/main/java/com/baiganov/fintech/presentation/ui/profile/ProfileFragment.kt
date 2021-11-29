@@ -12,8 +12,7 @@ import androidx.core.view.isVisible
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.response.User
-import com.baiganov.fintech.presentation.ui.people.ChatState
-import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.util.State
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import javax.inject.Inject
@@ -39,7 +38,6 @@ class ProfileFragment : MvpAppCompatFragment(), ProfileView {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         tvName = view.findViewById(R.id.profile_name)
@@ -49,24 +47,16 @@ class ProfileFragment : MvpAppCompatFragment(), ProfileView {
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-//        viewModel.profile.observe(viewLifecycleOwner, {
-//            handleState(it)
-//        })
-//        viewModel.obtainEvent(Event.EventProfile.LoadProfile)
-    }
-
-    override fun render(state: ChatState<User>) {
+    override fun render(state: State<User>) {
         when (state) {
-            is ChatState.Result -> {
+            is State.Result -> {
                 progressBar.isVisible = false
                 setData(state.data)
             }
-            is ChatState.Loading -> {
+            is State.Loading -> {
                 progressBar.isVisible = true
             }
-            is ChatState.Error -> {
+            is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 progressBar.isVisible = false
             }

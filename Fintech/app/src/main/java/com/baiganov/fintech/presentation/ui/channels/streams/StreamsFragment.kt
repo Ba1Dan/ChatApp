@@ -8,36 +8,35 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.ChannelsRepositoryImpl
-import com.baiganov.fintech.data.db.DatabaseModule
-import com.baiganov.fintech.data.db.StreamsDao
-import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.presentation.ui.channels.ChannelsViewModel
+import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
+import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter.Companion.INITIAL_QUERY
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.ExpandableAdapter
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
-import com.baiganov.fintech.presentation.util.Event
-import com.baiganov.fintech.presentation.ui.channels.ChannelsViewModelFactory
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
-import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.util.Event
+import com.baiganov.fintech.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
-class StreamsFragment : Fragment(), ItemClickListener {
-
-    @Inject
-    lateinit var viewModel: ChannelsViewModel
+class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
+    SearchQueryListener {
 
     private lateinit var rvStreams: ShimmerRecyclerView
     private lateinit var frameNotResult: LinearLayout
     private lateinit var adapterStreams: ExpandableAdapter
-    private var tabPosition: Int = -1
+
+    @Inject
+    lateinit var presenterProvider: Provider<StreamsPresenter>
+
+    private val presenter: StreamsPresenter by moxyPresenter { presenterProvider.get() }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,35 +55,32 @@ class StreamsFragment : Fragment(), ItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tabPosition = requireArguments().getInt(ARG_TAB_POSITION)
+        presenter.tabPosition = requireArguments().getInt(ARG_TAB_POSITION)
 
-        viewModel.obtainEvent(
+
+        presenter.obtainEvent(
             Event.EventChannels.SearchStreams(
-                ChannelsViewModel.INITIAL_QUERY,
-                tabPosition
+                INITIAL_QUERY
             )
         )
 
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
-        initUi()
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
         when (item) {
             is StreamFingerPrint -> {
                 if (item.isExpanded) {
-                    viewModel.obtainEvent(
+                    presenter.obtainEvent(
                         Event.EventChannels.OpenStream(
-                            tabPosition,
                             position,
                             item.childTopics
                         )
                     )
                 } else {
-                    viewModel.obtainEvent(
+                    presenter.obtainEvent(
                         Event.EventChannels.CloseStream(
-                            tabPosition,
                             item.childTopics
                         )
                     )
@@ -96,24 +92,12 @@ class StreamsFragment : Fragment(), ItemClickListener {
         }
     }
 
-    private fun initUi() {
-        if (tabPosition == 0) {
-            viewModel.subscribeStreams.observe(viewLifecycleOwner) {
-                handleState(it)
-            }
-        } else {
-            viewModel.mainScreenState.observe(viewLifecycleOwner) {
-                handleState(it)
-            }
-        }
-    }
-
-    private fun handleState(it: State<List<ItemFingerPrint>>) {
-        when (it) {
+    override fun render(state: State<List<ItemFingerPrint>>) {
+        when (state) {
             is State.Result -> {
-                adapterStreams.dataOfList = it.data
+                adapterStreams.dataOfList = state.data
 
-                frameNotResult.isVisible = it.data.isEmpty()
+                frameNotResult.isVisible = state.data.isEmpty()
 
                 rvStreams.hideShimmer()
             }
@@ -124,11 +108,19 @@ class StreamsFragment : Fragment(), ItemClickListener {
                 }
             }
             is State.Error -> {
-                Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 frameNotResult.isVisible = false
                 rvStreams.hideShimmer()
             }
         }
+    }
+
+    override fun search(searchQuery: String) {
+        presenter.obtainEvent(
+            Event.EventChannels.SearchStreams(
+                searchQuery
+            )
+        )
     }
 
     companion object {

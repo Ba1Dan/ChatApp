@@ -2,6 +2,7 @@ package com.baiganov.fintech.presentation.ui.people
 
 import com.baiganov.fintech.domain.repositories.PeopleRepository
 import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
+import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -28,7 +29,7 @@ class PeoplePresenter @Inject constructor(private val repository: PeopleReposito
     }
 
     private fun getUsers() {
-        viewState.render(ChatState.Loading())
+        viewState.render(State.Loading())
         repository.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -38,9 +39,9 @@ class PeoplePresenter @Inject constructor(private val repository: PeopleReposito
                         UserFingerPrint(user)
                     }
 
-                    viewState.render(ChatState.Result(users))
+                    viewState.render(State.Result(users))
                 },
-                onError = { viewState.render(ChatState.Error(it.message))}
+                onError = { viewState.render(State.Error(it.message))}
             )
             .addTo(compositeDisposable)
     }

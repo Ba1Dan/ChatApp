@@ -1,36 +1,35 @@
 package com.baiganov.fintech.presentation.ui.chat
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repositories.MessageRepository
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.presentation.util.Event.*
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
-import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.util.Event
+import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import moxy.InjectViewState
+import moxy.MvpPresenter
 import javax.inject.Inject
 
-class ChatViewModel @Inject constructor(
-    private val messageRepository: MessageRepository
-) : ViewModel() {
+@InjectViewState
+class ChatPresenter @Inject constructor(private val messageRepository: MessageRepository) : MvpPresenter<ChatView>() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var _messages: MutableLiveData<State<List<ItemFingerPrint>>> = MutableLiveData()
 
-    val messages: LiveData<State<List<ItemFingerPrint>>>
-        get() = _messages
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
+    }
 
-    fun obtainEvent(event: EventChat) {
+
+    fun obtainEvent(event: Event.EventChat) {
 
         when (event) {
-            is EventChat.LoadFirstMessages -> {
+            is Event.EventChat.LoadFirstMessages -> {
                 getMessagesFromDb(
                     event.topicTitle,
                     event.streamId
@@ -42,7 +41,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.LoadNextMessages -> {
+            is Event.EventChat.LoadNextMessages -> {
                 loadNextMessages(
                     event.streamTitle,
                     event.topicTitle,
@@ -50,7 +49,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.AddReaction -> {
+            is Event.EventChat.AddReaction -> {
                 addReaction(
                     event.streamTitle,
                     event.topicTitle,
@@ -59,7 +58,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.DeleteReaction -> {
+            is Event.EventChat.DeleteReaction -> {
                 deleteReaction(
                     event.streamTitle,
                     event.topicTitle,
@@ -68,7 +67,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.SendMessage -> {
+            is Event.EventChat.SendMessage -> {
                 sendMessage(
                     event.streamTitle,
                     event.topicTitle,
@@ -77,7 +76,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.DeleteMessage -> {
+            is Event.EventChat.DeleteMessage -> {
                 deleteMessage(
                     event.streamTitle,
                     event.topicTitle,
@@ -85,7 +84,7 @@ class ChatViewModel @Inject constructor(
                 )
             }
 
-            is EventChat.UploadFile -> {
+            is Event.EventChat.UploadFile -> {
 
             }
 
@@ -104,7 +103,7 @@ class ChatViewModel @Inject constructor(
                     val messages = streamEntities.map { message ->
                         MessageFingerPrint(message)
                     }
-                    _messages.value = State.Result(messages)
+                    viewState.render(State.Result(messages))
                 },
                 onError = {
                     Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
@@ -112,6 +111,7 @@ class ChatViewModel @Inject constructor(
             )
             .addTo(compositeDisposable)
     }
+
 
     private fun sendMessage(
         streamTitle: String,
@@ -137,23 +137,38 @@ class ChatViewModel @Inject constructor(
         streamId: Int,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.loadMessages(streamTitle, topicTitle, anchor, streamId, INITIAL_PAGE_SIZE)
+        viewState.render(State.Loading())
+        messageRepository.loadMessages(
+            streamTitle,
+            topicTitle,
+            anchor,
+            streamId,
+            INITIAL_PAGE_SIZE
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { _messages.postValue(State.Loading()) }
             .subscribeBy(
                 onComplete = {
                     Functions.EMPTY_ACTION
                 },
                 onError = { exception ->
-                    _messages.value = State.Error(exception.message)
+                    viewState.render(State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun loadNextMessages(streamTitle: String, topicTitle: String, anchor: Long) {
-        messageRepository.loadNextMessages(streamTitle, topicTitle, anchor, INITIAL_PAGE_SIZE)
+    private fun loadNextMessages(
+        streamTitle: String,
+        topicTitle: String,
+        anchor: Long
+    ) {
+        messageRepository.loadNextMessages(
+            streamTitle,
+            topicTitle,
+            anchor,
+            INITIAL_PAGE_SIZE
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -161,7 +176,7 @@ class ChatViewModel @Inject constructor(
                     Functions.EMPTY_ACTION
                 },
                 onError = { exception ->
-                    _messages.value = State.Error(exception.message)
+                    viewState.render(State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
@@ -180,7 +195,12 @@ class ChatViewModel @Inject constructor(
                 onComplete = {
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
-                onError = { Log.d(javaClass.simpleName, "error add reaction ${it.message}") }
+                onError = {
+                    Log.d(
+                        javaClass.simpleName,
+                        "error add reaction ${it.message}"
+                    )
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -198,10 +218,16 @@ class ChatViewModel @Inject constructor(
                 onComplete = {
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
-                onError = { Log.d(javaClass.simpleName, "error delete reaction ${it.message}") }
+                onError = {
+                    Log.d(
+                        javaClass.simpleName,
+                        "error delete reaction ${it.message}"
+                    )
+                }
             )
             .addTo(compositeDisposable)
     }
+
 
     //query does not have permission to delete the message
     private fun deleteMessage(
@@ -214,9 +240,18 @@ class ChatViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    updateMessage(streamTitle, topicTitle, messageId.toLong())
+                    updateMessage(
+                        streamTitle,
+                        topicTitle,
+                        messageId.toLong()
+                    )
                 },
-                onError = { Log.d(javaClass.simpleName, "error delete reaction ${it.message}") }
+                onError = {
+                    Log.d(
+                        javaClass.simpleName,
+                        "error delete reaction ${it.message}"
+                    )
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -226,23 +261,23 @@ class ChatViewModel @Inject constructor(
         topicTitle: String,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.updateMessage(streamTitle, topicTitle, anchor, NUM_BEFORE_UPDATE)
+        messageRepository.updateMessage(
+            streamTitle,
+            topicTitle,
+            anchor,
+            NUM_BEFORE_UPDATE
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
                     Functions.EMPTY_ACTION
                 },
-                onError = {
-                    _messages.value = State.Error(it.message)
+                onError = { exception ->
+                    viewState.render(State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
     }
 
     companion object {

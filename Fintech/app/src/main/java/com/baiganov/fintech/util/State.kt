@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.util
+package com.baiganov.fintech.util
 
 
 sealed class State<T> {

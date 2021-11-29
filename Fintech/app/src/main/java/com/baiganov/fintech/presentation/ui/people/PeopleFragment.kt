@@ -12,7 +12,7 @@ import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.finger
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.people.adapters.PersonAdapter
 import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
-import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -70,17 +70,17 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
         }
     }
 
-    override fun render(state: ChatState<List<UserFingerPrint>>) {
+    override fun render(state: State<List<UserFingerPrint>>) {
 
         when (state) {
-            is ChatState.Result -> {
+            is State.Result -> {
                 adapterPerson.listOfUser = state.data
                 rvUsers.hideShimmer()
             }
-            is ChatState.Loading -> {
+            is State.Loading -> {
                 rvUsers.showShimmer()
             }
-            is ChatState.Error -> {
+            is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 rvUsers.hideShimmer()
             }

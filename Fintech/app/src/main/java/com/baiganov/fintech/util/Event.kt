@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.util
+package com.baiganov.fintech.util
 
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 
@@ -6,42 +6,42 @@ sealed class Event {
 
     sealed class EventChat : Event() {
 
-        data class LoadFirstMessages(
+        class LoadFirstMessages(
             val streamTitle: String,
             val topicTitle: String,
             val streamId: Int
         ) : EventChat()
 
-        data class LoadNextMessages(
+        class LoadNextMessages(
             val streamTitle: String,
             val topicTitle: String,
             val anchor: Long
         ) : EventChat()
 
-        data class AddReaction(
+        class AddReaction(
             val messageId: Int,
             val emojiName: String,
             val streamTitle: String,
             val topicTitle: String
         ) : EventChat()
 
-        data class DeleteReaction(
+        class DeleteReaction(
             val messageId: Int,
             val emojiName: String,
             val streamTitle: String,
             val topicTitle: String
         ) : EventChat()
 
-        data class SendMessage(
+        class SendMessage(
             val streamTitle: String,
             val streamId: Int,
             val topicTitle: String,
             val message: String
         ) : EventChat()
 
-        data class UploadFile(val temp: String) : EventChat()
+        class UploadFile(val temp: String) : EventChat()
 
-        data class DeleteMessage(
+        class DeleteMessage(
             val messageId: Int,
             val streamTitle: String,
             val topicTitle: String
@@ -50,26 +50,23 @@ sealed class Event {
 
     sealed class EventChannels : EventChat() {
 
-        data class LoadStreams(
+        class LoadStreams(
             val streamTitle: String,
             val topicTitle: String,
             val streamId: Int
         ) : EventChannels()
 
-        data class OpenStream(
-            val type: Int,
+        class OpenStream(
             val position: Int,
             val topics: List<TopicFingerPrint>,
         ) : EventChannels()
 
-        data class CloseStream(
-            val type: Int,
+        class CloseStream(
             val topics: List<TopicFingerPrint>
         ) : EventChannels()
 
-        data class SearchStreams(
+        class SearchStreams(
             val searchQuery: String,
-            val type: Int
         ) : EventChannels()
 
     }

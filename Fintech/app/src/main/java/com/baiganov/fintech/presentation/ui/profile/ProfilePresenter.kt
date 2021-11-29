@@ -1,7 +1,7 @@
 package com.baiganov.fintech.presentation.ui.profile
 
 import com.baiganov.fintech.domain.repositories.ProfileRepository
-import com.baiganov.fintech.presentation.ui.people.ChatState
+import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -28,14 +28,14 @@ class ProfilePresenter @Inject constructor(private val repository: ProfileReposi
     }
 
     private fun loadProfile() {
-        viewState.render(ChatState.Loading())
+        viewState.render(State.Loading())
         repository.loadProfile()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {  viewState.render(ChatState.Result(it)) },
+                onSuccess = {  viewState.render(State.Result(it)) },
                 onError = {
-                    viewState.render(ChatState.Error(it.message))
+                    viewState.render(State.Error(it.message))
                 }
             )
             .addTo(compositeDisposable)

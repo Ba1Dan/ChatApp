@@ -5,6 +5,7 @@ import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.data.network.ChatApi
 import com.baiganov.fintech.domain.repositories.ChannelsRepository
 import com.baiganov.fintech.model.response.TopicsResponse
+import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -74,9 +75,13 @@ class ChannelsRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun searchStreams(searchQuery: String): Flowable<List<StreamEntity>> {
-        return streamsDao.getStreams("$searchQuery%")
-    }
+    override fun searchStreams(searchQuery: String, type: Int?): Flowable<List<StreamEntity>> =
+        when (type) {
+            ChannelsPages.SUBSCRIBED.ordinal -> streamsDao.searchSubscribedStreams("$searchQuery%")
+            ChannelsPages.ALL_STREAMS.ordinal -> streamsDao.getStreams("$searchQuery%")
+            else -> throw IllegalStateException("Undefined StreamsFragment tabPosition: $type")
+        }
+
 
     override fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>> {
         return streamsDao.searchSubscribedStreams("$searchQuery%")

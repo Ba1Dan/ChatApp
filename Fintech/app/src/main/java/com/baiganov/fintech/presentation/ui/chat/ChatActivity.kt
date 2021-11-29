@@ -11,18 +11,11 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.MessageRepositoryImpl
-import com.baiganov.fintech.data.db.DatabaseModule
-import com.baiganov.fintech.data.db.MessagesDao
-import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.presentation.util.Event
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -31,19 +24,22 @@ import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.presentation.ui.chat.dialog.ActionDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
-import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.util.Event
+import com.baiganov.fintech.util.State
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import moxy.MvpAppCompatActivity
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
-class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
+class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, ChatView {
 
     @Inject
-    lateinit var viewModel: ChatViewModel
+    lateinit var presenterProvider: Provider<ChatPresenter>
 
-    private val component by lazy {
-        (application as App).component
-    }
+    private val presenter: ChatPresenter by moxyPresenter { presenterProvider.get() }
+    private val component by lazy { (application as App).component }
 
     private lateinit var adapter: MessageAdapter
     private lateinit var toolBarChat: Toolbar
@@ -69,8 +65,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         setupText()
         setupRecyclerView()
 
-        viewModel.messages.observe(this) { handleState(it) }
-        viewModel.obtainEvent(
+        presenter.obtainEvent(
             Event.EventChat.LoadFirstMessages(
                 streamTitle = streamTitle,
                 topicTitle = topicTitle,
@@ -85,7 +80,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         when (click) {
             is TypeClick.AddReaction -> {
                 click.messageId?.let {
-                    viewModel.obtainEvent(
+                    presenter.obtainEvent(
                         Event.EventChat.AddReaction(
                             messageId = click.messageId,
                             emojiName = click.emoji,
@@ -101,7 +96,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
             }
 
             is TypeClick.DeleteMessage -> {
-                viewModel.obtainEvent(
+                presenter.obtainEvent(
                     Event.EventChat.DeleteMessage(
                         streamTitle = streamTitle,
                         topicTitle = topicTitle,
@@ -131,7 +126,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     }
 
     override fun addReaction(messageId: Int, emojiName: String, position: Int) {
-        viewModel.obtainEvent(
+        presenter.obtainEvent(
             Event.EventChat.AddReaction(
                 messageId = messageId,
                 emojiName = emojiName,
@@ -142,7 +137,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
     }
 
     override fun deleteReaction(messageId: Int, emojiName: String, position: Int) {
-        viewModel.obtainEvent(
+        presenter.obtainEvent(
             Event.EventChat.DeleteReaction(
                 messageId = messageId,
                 emojiName = emojiName,
@@ -150,6 +145,26 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                 topicTitle = topicTitle
             )
         )
+    }
+
+    override fun render(state: State<List<ItemFingerPrint>>) {
+        when (state) {
+            is State.Result -> {
+                adapter.messages = state.data
+
+                if (positionRecyclerView == TypeScroll.DOWN) {
+                    rvChat.smoothScrollToPosition(state.data.size)
+                }
+                isLoadNewPage = true
+            }
+            is State.Loading -> {
+
+//                rvChat.showShimmer()
+            }
+            is State.Error -> {
+                Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun initViews() {
@@ -185,7 +200,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
                         val messageId =
                             (adapter.messages.first() as MessageFingerPrint).message.id.toLong()
 
-                        viewModel.obtainEvent(
+                        presenter.obtainEvent(
                             Event.EventChat.LoadNextMessages(
                                 streamTitle = streamTitle,
                                 topicTitle = topicTitle,
@@ -202,7 +217,7 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
 
     private fun setClickListener() {
         btnSend.setOnClickListener {
-            viewModel.obtainEvent(
+            presenter.obtainEvent(
                 Event.EventChat.SendMessage(
                     streamTitle = streamTitle,
                     streamId = streamId,
@@ -237,29 +252,6 @@ class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
         })
 
         toolBarChat.setNavigationOnClickListener { finish() }
-    }
-
-    private fun handleState(it: State<List<ItemFingerPrint>>) {
-        when (it) {
-            is State.Result -> {
-                adapter.messages = it.data
-
-                if (positionRecyclerView == TypeScroll.DOWN) {
-                    rvChat.smoothScrollToPosition(adapter.messages.size)
-                }
-
-//                rvChat.hideShimmer()
-                isLoadNewPage = true
-            }
-            is State.Loading -> {
-
-//                rvChat.showShimmer()
-            }
-            is State.Error -> {
-                Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-//                rvChat.hideShimmer()
-            }
-        }
     }
 
     companion object {

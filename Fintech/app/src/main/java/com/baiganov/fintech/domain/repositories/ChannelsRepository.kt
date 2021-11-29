@@ -10,7 +10,7 @@ interface ChannelsRepository {
 
     fun getSubscribedStreams(): Completable
 
-    fun searchStreams(searchQuery: String): Flowable<List<StreamEntity>>
+    fun searchStreams(searchQuery: String, type: Int?): Flowable<List<StreamEntity>>
 
     fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>>
 }
