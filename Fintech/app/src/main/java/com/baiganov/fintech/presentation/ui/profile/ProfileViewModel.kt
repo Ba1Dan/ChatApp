@@ -32,7 +32,7 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun loadProfile() {
+    private fun loadProfile() {
         profileRepository.loadProfile()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

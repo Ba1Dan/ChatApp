@@ -26,15 +26,14 @@
             android:paddingHorizontal="@dimen/padding_normal"
             android:textColor="@color/white"
             android:textSize="@dimen/normal_text_size"
-            tools:text="Hello it's me!" />
+            tools:text="t" />
 
         <TextView
             android:id="@+id/tv_date"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:paddingStart="@dimen/padding_large"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingHorizontal="@dimen/padding_large"
             android:textColor="@color/white"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="@+id/message_text_outgoing"

@@ -2,7 +2,6 @@ package com.baiganov.fintech.presentation.ui.profile
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,18 +12,23 @@ import androidx.core.view.isVisible
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.response.User
-import com.baiganov.fintech.presentation.util.Event
+import com.baiganov.fintech.presentation.ui.people.ChatState
 import com.baiganov.fintech.presentation.util.State
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
-class ProfileFragment : Fragment() {
-
-    @Inject
-    lateinit var viewModel: ProfileViewModel
+class ProfileFragment : MvpAppCompatFragment(), ProfileView {
 
     private lateinit var tvName: TextView
     private lateinit var tvIsOnline: TextView
     private lateinit var progressBar: ProgressBar
+
+    @Inject
+    lateinit var presenterProvider: Provider<ProfilePresenter>
+
+    private val presenter: ProfilePresenter by moxyPresenter { presenterProvider.get() }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -47,10 +51,26 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.profile.observe(viewLifecycleOwner, {
-            handleState(it)
-        })
-        viewModel.obtainEvent(Event.EventProfile.LoadProfile)
+//        viewModel.profile.observe(viewLifecycleOwner, {
+//            handleState(it)
+//        })
+//        viewModel.obtainEvent(Event.EventProfile.LoadProfile)
+    }
+
+    override fun render(state: ChatState<User>) {
+        when (state) {
+            is ChatState.Result -> {
+                progressBar.isVisible = false
+                setData(state.data)
+            }
+            is ChatState.Loading -> {
+                progressBar.isVisible = true
+            }
+            is ChatState.Error -> {
+                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                progressBar.isVisible = false
+            }
+        }
     }
 
     private fun handleState(it: State<User>) {

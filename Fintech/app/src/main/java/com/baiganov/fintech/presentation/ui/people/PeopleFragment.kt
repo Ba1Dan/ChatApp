@@ -6,28 +6,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.PeopleRepositoryImpl
-import com.baiganov.fintech.data.network.NetworkModule
-import com.baiganov.fintech.presentation.util.Event
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.people.adapters.PersonAdapter
 import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
 import com.baiganov.fintech.presentation.util.State
 import com.todkars.shimmer.ShimmerRecyclerView
+import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 import javax.inject.Inject
+import javax.inject.Provider
 
-class PeopleFragment : Fragment(), ItemClickListener {
-
-    @Inject
-    lateinit var viewModel: PeopleViewModel
+class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
 
     private lateinit var adapterPerson: PersonAdapter
     private lateinit var rvUsers: ShimmerRecyclerView
+
+    @Inject
+    lateinit var presenterProvider: Provider<PeoplePresenter>
+
+    private val presenter: PeoplePresenter by moxyPresenter { presenterProvider.get() }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -48,10 +48,6 @@ class PeopleFragment : Fragment(), ItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         adapterPerson = PersonAdapter(this)
         rvUsers.adapter = adapterPerson
-        viewModel.users.observe(viewLifecycleOwner, {
-            processMainScreenState(it)
-        })
-        viewModel.obtainEvent(Event.EventPeople.LoadUsers)
     }
 
     override fun onItemClick(position: Int, item: ItemFingerPrint) {
@@ -69,6 +65,23 @@ class PeopleFragment : Fragment(), ItemClickListener {
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                rvUsers.hideShimmer()
+            }
+        }
+    }
+
+    override fun render(state: ChatState<List<UserFingerPrint>>) {
+
+        when (state) {
+            is ChatState.Result -> {
+                adapterPerson.listOfUser = state.data
+                rvUsers.hideShimmer()
+            }
+            is ChatState.Loading -> {
+                rvUsers.showShimmer()
+            }
+            is ChatState.Error -> {
+                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 rvUsers.hideShimmer()
             }
         }
