@@ -1,10 +1,14 @@
 package com.baiganov.fintech.presentation.ui.chat
 
 import android.util.Log
+import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repositories.MessageRepository
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
+import com.baiganov.fintech.util.formatDate
+import com.baiganov.fintech.util.formatDateByDay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions
@@ -16,7 +20,8 @@ import moxy.MvpPresenter
 import javax.inject.Inject
 
 @InjectViewState
-class ChatPresenter @Inject constructor(private val messageRepository: MessageRepository) : MvpPresenter<ChatView>() {
+class ChatPresenter @Inject constructor(private val messageRepository: MessageRepository) :
+    MvpPresenter<ChatView>() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -100,10 +105,15 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { streamEntities ->
-                    val messages = streamEntities.map { message ->
-                        MessageFingerPrint(message)
-                    }
-                    viewState.render(State.Result(messages))
+
+                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
+                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
+                            listOf(DateDividerFingerPrint(date)) +
+                                    messagesByDate.map { message -> MessageFingerPrint(message) }
+
+                        }
+
+                    viewState.render(State.Result(mess))
                 },
                 onError = {
                     Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")

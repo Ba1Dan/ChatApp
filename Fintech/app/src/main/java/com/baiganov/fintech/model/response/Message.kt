@@ -12,7 +12,7 @@ data class Message(
     @SerialName("sender_email") val senderEmail: String,
     @SerialName("sender_full_name") val senderFullName: String,
     @SerialName("sender_id") val senderId: Int,
-    @SerialName("timestamp") val timestamp: Int,
+    @SerialName("timestamp") val timestamp: Long,
     @SerialName("stream_id") val streamId: Int,
     @SerialName("subject") val topicName: String
 )

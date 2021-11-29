@@ -16,7 +16,7 @@ data class MessageEntity(
     @ColumnInfo(name = "sender_email") val senderEmail: String,
     @ColumnInfo(name = "sender_full_name") val senderFullName: String,
     @ColumnInfo(name = "sender_id") val senderId: Int,
-    @ColumnInfo(name = "timestamp") val timestamp: Int,
+    @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "stream_id") val streamId: Int,
     @ColumnInfo(name = "topic_name") val topicName: String
 ) {

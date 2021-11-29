@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
+import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -198,7 +199,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
                     if (position <= REMAINDER && isLoadNewPage) {
                         val messageId =
-                            (adapter.messages.first() as MessageFingerPrint).message.id.toLong()
+                            adapter.messages.first { uiItem -> uiItem is MessageFingerPrint }.id.toLong()
 
                         presenter.obtainEvent(
                             Event.EventChat.LoadNextMessages(

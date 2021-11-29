@@ -13,6 +13,6 @@ class DateDividerViewHolder(itemView: View) : BaseViewHolder<DateDividerFingerPr
 
     override fun bind(item: DateDividerFingerPrint) {
         val date = item.date
-        txt.text = date.date
+        txt.text = date
     }
 }

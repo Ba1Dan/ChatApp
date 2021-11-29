@@ -9,6 +9,7 @@ import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.baiganov.fintech.util.formatDate
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,11 +32,8 @@ class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnCli
         btnAddReaction.setOnClickListener {
             clickListener.onItemClick(TypeClick.OpenBottomSheet(message.id))
         }
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val date = Date(item.message.timestamp * 1000L)
 
-        tvDate.text =  sdf.format(date)
-
+        tvDate.text = formatDate(item.message.timestamp)
 
         itemView.setOnLongClickListener {
             clickListener.onItemClick(TypeClick.OpenActionDialog(message.id))
