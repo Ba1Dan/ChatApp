@@ -1,9 +1,9 @@
-package com.baiganov.fintech.data
+package com.baiganov.fintech.data.repository
 
 import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.data.network.ChatApi
-import com.baiganov.fintech.domain.repositories.ChannelsRepository
+import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.model.response.TopicsResponse
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import io.reactivex.Completable

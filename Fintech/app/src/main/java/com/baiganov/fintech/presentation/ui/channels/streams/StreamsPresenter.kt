@@ -2,7 +2,7 @@ package com.baiganov.fintech.presentation.ui.channels.streams
 
 import android.util.Log
 import com.baiganov.fintech.data.db.entity.StreamEntity
-import com.baiganov.fintech.domain.repositories.ChannelsRepository
+import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint

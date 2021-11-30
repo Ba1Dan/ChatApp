@@ -2,12 +2,11 @@ package com.baiganov.fintech.presentation.ui.chat
 
 import android.util.Log
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.domain.repositories.MessageRepository
+import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
-import com.baiganov.fintech.util.formatDate
 import com.baiganov.fintech.util.formatDateByDay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

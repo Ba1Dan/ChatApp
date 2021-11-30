@@ -1,9 +1,9 @@
-package com.baiganov.fintech.data
+package com.baiganov.fintech.data.repository
 
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.network.ChatApi
-import com.baiganov.fintech.domain.repositories.MessageRepository
+import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.model.response.Message
 import com.baiganov.fintech.model.response.Narrow
 import io.reactivex.Completable

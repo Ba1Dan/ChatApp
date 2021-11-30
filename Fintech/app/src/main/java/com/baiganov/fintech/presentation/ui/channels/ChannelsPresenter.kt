@@ -1,7 +1,7 @@
 package com.baiganov.fintech.presentation.ui.channels
 
 import android.util.Log
-import com.baiganov.fintech.domain.repositories.ChannelsRepository
+import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import io.reactivex.disposables.CompositeDisposable

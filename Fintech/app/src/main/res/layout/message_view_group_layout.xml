@@ -43,6 +43,17 @@
             android:textColor="@color/white"
             android:textSize="@dimen/normal_text_size" />
 
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/message_text_outgoing"
+            app:layout_constraintEnd_toEndOf="@+id/message_text_outgoing"
+            tools:text="12:30" />
+
     </LinearLayout>
 
     <com.baiganov.fintech.presentation.сustomview.FlexBoxLayout

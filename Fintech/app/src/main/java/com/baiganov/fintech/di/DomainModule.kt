@@ -1,13 +1,13 @@
 package com.baiganov.fintech.di
 
-import com.baiganov.fintech.data.ChannelsRepositoryImpl
-import com.baiganov.fintech.data.MessageRepositoryImpl
-import com.baiganov.fintech.data.PeopleRepositoryImpl
-import com.baiganov.fintech.data.ProfileRepositoryImpl
-import com.baiganov.fintech.domain.repositories.ChannelsRepository
-import com.baiganov.fintech.domain.repositories.MessageRepository
-import com.baiganov.fintech.domain.repositories.PeopleRepository
-import com.baiganov.fintech.domain.repositories.ProfileRepository
+import com.baiganov.fintech.data.repository.ChannelsRepositoryImpl
+import com.baiganov.fintech.data.repository.MessageRepositoryImpl
+import com.baiganov.fintech.data.repository.PeopleRepositoryImpl
+import com.baiganov.fintech.data.repository.ProfileRepositoryImpl
+import com.baiganov.fintech.domain.repository.ChannelsRepository
+import com.baiganov.fintech.domain.repository.MessageRepository
+import com.baiganov.fintech.domain.repository.PeopleRepository
+import com.baiganov.fintech.domain.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
 

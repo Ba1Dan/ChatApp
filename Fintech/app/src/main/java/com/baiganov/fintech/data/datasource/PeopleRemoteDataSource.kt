@@ -1,16 +1,15 @@
-package com.baiganov.fintech.data
+package com.baiganov.fintech.data.datasource
 
 import com.baiganov.fintech.data.network.ChatApi
-import com.baiganov.fintech.domain.repositories.PeopleRepository
 import com.baiganov.fintech.model.response.UsersResponse
 import io.reactivex.Single
 import javax.inject.Inject
 
-class PeopleRepositoryImpl @Inject constructor(
+class PeopleRemoteDataSource @Inject constructor(
     private val service: ChatApi,
-) : PeopleRepository {
+) {
 
-    override fun getUsers(): Single<UsersResponse> {
+    fun getUsers(): Single<UsersResponse> {
         return service.getUsers()
     }
 }

@@ -7,6 +7,7 @@ import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.MessageViewGroup
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.baiganov.fintech.util.formatDate
 import org.jsoup.Jsoup
 
 class InComingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) : BaseViewHolder<MessageFingerPrint>(itemView) {
@@ -23,6 +24,7 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: OnCli
             )
             text = Jsoup.parse(message.content).text()
             author = message.senderFullName
+            date = formatDate(message.timestamp)
             addReactionByButton(clickListener, message.id, item)
         }
 

@@ -1,4 +1,4 @@
-package com.baiganov.fintech.domain.repositories
+package com.baiganov.fintech.domain.repository
 
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import io.reactivex.Completable

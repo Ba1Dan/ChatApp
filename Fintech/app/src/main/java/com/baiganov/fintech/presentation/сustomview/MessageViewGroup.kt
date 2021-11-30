@@ -31,6 +31,7 @@ class MessageViewGroup @JvmOverloads constructor(
 
     private val messageText: TextView
     private val authorText: TextView
+    private val dateText: TextView
 
     private val flexBox: FlexBoxLayout
     private var flexBoxWidth = 0
@@ -52,6 +53,13 @@ class MessageViewGroup @JvmOverloads constructor(
             requestLayout()
         }
 
+    var date: String
+        get() = dateText.text.toString()
+        set(value) {
+            dateText.text = value
+            requestLayout()
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.message_view_group_layout, this)
         avatarView = findViewById(R.id.avatar_view)
@@ -60,6 +68,7 @@ class MessageViewGroup @JvmOverloads constructor(
         messageText = findViewById<TextView>(R.id.message_text_incoming).apply {
             movementMethod = LinkMovementMethod.getInstance()
         }
+        dateText = findViewById(R.id.tv_date)
         flexBox = findViewById(R.id.flex_box)
         addReactionButton = findViewById(R.id.add_reaction_button_incoming)
 

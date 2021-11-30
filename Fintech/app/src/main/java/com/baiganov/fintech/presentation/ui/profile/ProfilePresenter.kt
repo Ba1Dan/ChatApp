@@ -1,6 +1,6 @@
 package com.baiganov.fintech.presentation.ui.profile
 
-import com.baiganov.fintech.domain.repositories.ProfileRepository
+import com.baiganov.fintech.domain.repository.ProfileRepository
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

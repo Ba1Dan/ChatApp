@@ -49,7 +49,7 @@ class EmojiBottomSheetDialog : BottomSheetDialogFragment(), EmojiClickListener {
         val adapter = EmojiAdapter(this)
         recyclerView.adapter = adapter
 
-        adapter.setData(
+        adapter.emojis = (
             listOf(
                 Emoji(0x1f47e, "space_invader"),
                 Emoji(0x1f52c, "scientist"),

@@ -1,4 +1,4 @@
-package com.baiganov.fintech.domain.repositories
+package com.baiganov.fintech.domain.repository
 
 import com.baiganov.fintech.model.response.UsersResponse
 import io.reactivex.Single

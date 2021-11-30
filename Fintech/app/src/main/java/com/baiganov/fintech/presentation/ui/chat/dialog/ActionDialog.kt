@@ -6,13 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class ActionDialog : DialogFragment() {
+class ActionDialog : BottomSheetDialogFragment() {
 
     private lateinit var btnEdit: TextView
     private lateinit var btnDelete: TextView

@@ -4,13 +4,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.model.Emoji
+import com.baiganov.fintech.presentation.ui.people.adapters.PersonDiffUtil
 
 class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : RecyclerView.Adapter<EmojiAdapter.EmojiViewHolder>() {
 
-    private var emojis = emptyList<Emoji>()
+    private val differ = AsyncListDiffer(this, EmojiDiffUtil())
+
+    var emojis: List<Emoji>
+        set(value) = differ.submitList(value)
+        get() = differ.currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmojiViewHolder {
         return EmojiViewHolder(
@@ -24,11 +30,6 @@ class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : Recycle
 
     override fun getItemCount(): Int {
         return emojis.size
-    }
-
-    fun setData(newData: List<Emoji>) {
-        emojis = newData
-        notifyDataSetChanged()
     }
 
     class EmojiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
