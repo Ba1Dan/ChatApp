@@ -4,8 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.baiganov.fintech.data.db.entity.MessageEntity.Companion.MESSAGES_TABLE
-import com.baiganov.fintech.model.response.Reaction
-import kotlinx.serialization.SerialName
+import com.baiganov.fintech.data.model.response.Reaction
 
 @Entity(tableName = MESSAGES_TABLE)
 data class MessageEntity(

@@ -1,6 +1,6 @@
-package com.baiganov.fintech.presentation.ui.people.adapters
+package com.baiganov.fintech.presentation.model
 
-import com.baiganov.fintech.model.response.UsersResponse
+import com.baiganov.fintech.data.model.response.UsersResponse
 
 class UserToUserFingerPrintMapper : (UsersResponse) -> (List<UserFingerPrint>) {
 

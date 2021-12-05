@@ -4,7 +4,7 @@ import android.view.View
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.MessageViewGroup
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.baiganov.fintech.util.formatDate

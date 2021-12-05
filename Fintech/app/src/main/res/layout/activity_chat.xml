@@ -20,11 +20,11 @@
         android:id="@+id/tv_topic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#1C1C1C"
         android:gravity="center"
         android:padding="10dp"
         android:textColor="#CCCCCC"
         android:textSize="20sp"
-        android:background="#1C1C1C"
         app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
         tools:text="Topic: #testing" />
 
@@ -32,8 +32,6 @@
         android:id="@+id/rv_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:shimmer_recycler_item_count="7"
-        app:shimmer_recycler_layout="@layout/placeholder_message"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/input_message"
         app:layout_constraintEnd_toEndOf="parent"
@@ -89,4 +87,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/input_message"
         app:srcCompat="@drawable/ic_add" />
+
+    <include
+        android:id="@+id/shimmer_messages"
+        layout="@layout/shimmer_chat"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/input_message"
+        app:layout_constraintTop_toBottomOf="@id/tv_topic" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

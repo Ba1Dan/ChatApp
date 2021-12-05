@@ -1,6 +1,6 @@
-package com.baiganov.fintech.model.response
+package com.baiganov.fintech.data.model.response
 
-import com.baiganov.fintech.model.Stream
+import com.baiganov.fintech.data.model.Stream
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -1,7 +1,7 @@
 package com.baiganov.fintech.presentation.ui.chat.bottomsheet
 
 import androidx.recyclerview.widget.DiffUtil
-import com.baiganov.fintech.model.Emoji
+import com.baiganov.fintech.data.model.Emoji
 
 class EmojiDiffUtil : DiffUtil.ItemCallback<Emoji>() {
 

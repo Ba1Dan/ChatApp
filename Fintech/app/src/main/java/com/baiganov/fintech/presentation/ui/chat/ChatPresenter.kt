@@ -5,7 +5,7 @@ import android.util.Log
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.util.formatDateByDay
@@ -29,7 +29,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         super.onDestroy()
         compositeDisposable.dispose()
     }
-
 
     fun obtainEvent(event: Event.EventChat) {
 
@@ -123,10 +122,13 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
                         .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
                             listOf(DateDividerFingerPrint(date)) +
                                     messagesByDate.map { message -> MessageFingerPrint(message) }
-
                         }
 
-                    viewState.render(State.Result(mess))
+                    if (mess.isEmpty()) {
+                        viewState.render(State.Loading())
+                    } else {
+                        viewState.render(State.Result(mess))
+                    }
                 },
                 onError = {
                     Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
@@ -134,7 +136,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             )
             .addTo(compositeDisposable)
     }
-
 
     private fun sendMessage(
         streamTitle: String,
@@ -250,7 +251,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             )
             .addTo(compositeDisposable)
     }
-
 
     //query does not have permission to delete the message
     private fun deleteMessage(

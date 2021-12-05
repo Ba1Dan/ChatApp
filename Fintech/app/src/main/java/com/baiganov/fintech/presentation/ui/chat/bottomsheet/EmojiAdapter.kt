@@ -7,8 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.model.Emoji
-import com.baiganov.fintech.presentation.ui.people.adapters.PersonDiffUtil
+import com.baiganov.fintech.data.model.Emoji
 
 class EmojiAdapter(private val emojiClickListener: EmojiClickListener) : RecyclerView.Adapter<EmojiAdapter.EmojiViewHolder>() {
 

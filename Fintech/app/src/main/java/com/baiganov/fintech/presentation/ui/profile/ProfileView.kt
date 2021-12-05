@@ -1,6 +1,6 @@
 package com.baiganov.fintech.presentation.ui.profile
 
-import com.baiganov.fintech.model.response.User
+import com.baiganov.fintech.data.model.response.User
 import com.baiganov.fintech.util.State
 import moxy.MvpView
 import moxy.viewstate.strategy.alias.AddToEndSingle

@@ -4,12 +4,11 @@ import android.util.Log
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.StreamFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
-import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions
@@ -30,15 +29,17 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
     private val compositeDisposable = CompositeDisposable()
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
 
+    private var isGettingAllStreams = true
+
     var tabPosition: Int? = null
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        getStreams()
+        getStreams(ChannelsPages.SUBSCRIBED.ordinal)
     }
 
     init {
-        searchSubscribeStreams()
+        searchStreams()
     }
 
     override fun onDestroy() {
@@ -67,24 +68,6 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
         searchSubject.onNext(searchQuery)
     }
 
-    private fun getStreams() {
-        getStreamsByTabPosition()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-//            .doOnSubscribe {
-//                viewState.render(ChatState.Loading())
-//            }
-            .subscribeBy(
-                onComplete = {
-                    Functions.EMPTY_ACTION
-                },
-                onError = { exception ->
-                    viewState.render(State.Error(exception.message))
-                }
-            )
-            .addTo(compositeDisposable)
-    }
-
     private fun openStream(
         position: Int,
         topics: List<TopicFingerPrint>,
@@ -98,13 +81,7 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
         viewState.render(State.Result(itemsOfRecycler))
     }
 
-    private fun getStreamsByTabPosition(): Completable = when (tabPosition) {
-        ChannelsPages.SUBSCRIBED.ordinal -> repository.getSubscribedStreams()
-        ChannelsPages.ALL_STREAMS.ordinal -> repository.getAllStreams()
-        else -> throw IllegalStateException("Undefined StreamsFragment tabPosition: $tabPosition")
-    }
-
-    private fun searchSubscribeStreams() {
+    private fun searchStreams() {
         searchSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
@@ -121,11 +98,37 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
 
                     itemsOfRecycler.clear()
                     itemsOfRecycler.addAll(list)
+                    Log.d("gett", "size ${itemsOfRecycler.size}")
                     viewState.render(State.Result(itemsOfRecycler))
 
                 },
                 onError = {
                     viewState.render(State.Error(it.message)) }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun getStreams(type: Int) {
+        repository.getStreams(type)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+//            .doOnSubscribe {
+//                viewState.render(ChatState.Loading())
+//            }
+            .subscribeBy(
+                onComplete = {
+//                    if (isGettingAllStreams) {
+//                        Log.d("gett", "ChannelsPages.ALL_STREAMS.ordinal")
+//                        getStreams(ChannelsPages.ALL_STREAMS.ordinal)
+//                        isGettingAllStreams = false
+//                    } else {
+//                        Functions.EMPTY_ACTION
+//                    }
+                    Functions.EMPTY_ACTION
+                },
+                onError = { exception ->
+                    viewState.render(State.Error(exception.message))
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -137,6 +140,7 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
             )
         }
     }
+
     companion object {
         const val INITIAL_QUERY = ""
     }

@@ -1,6 +1,6 @@
 package com.baiganov.fintech.presentation.ui.chat.recyclerview
 
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 
 interface ItemClickListener {
 

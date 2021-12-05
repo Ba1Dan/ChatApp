@@ -1,7 +1,8 @@
 package com.baiganov.fintech.presentation.ui.chat.recyclerview
 
 import androidx.recyclerview.widget.DiffUtil
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 
 class MessageDiffUtil : DiffUtil.ItemCallback<ItemFingerPrint>() {
 

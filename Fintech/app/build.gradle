@@ -59,7 +59,6 @@ dependencies {
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:$shimmer_version"
-    implementation "com.todkars:shimmer-recyclerview:$rv_shimmer_version"
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

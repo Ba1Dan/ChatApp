@@ -5,10 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.DateDividerViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.InComingMessageViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.OutGoingMessageViewHolder
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 
 class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {

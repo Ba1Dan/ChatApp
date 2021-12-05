@@ -2,7 +2,7 @@ package com.baiganov.fintech.data.repository
 
 import com.baiganov.fintech.data.datasource.PeopleRemoteDataSource
 import com.baiganov.fintech.domain.repository.PeopleRepository
-import com.baiganov.fintech.model.response.UsersResponse
+import com.baiganov.fintech.data.model.response.UsersResponse
 import io.reactivex.Single
 import javax.inject.Inject
 

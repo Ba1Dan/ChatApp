@@ -2,7 +2,7 @@ package com.baiganov.fintech.domain.repository
 
 import android.net.Uri
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.model.response.FileResponse
+import com.baiganov.fintech.data.model.response.FileResponse
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

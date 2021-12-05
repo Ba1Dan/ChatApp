@@ -1,8 +1,7 @@
 package com.baiganov.fintech.presentation.ui.people
 
 import com.baiganov.fintech.domain.repository.PeopleRepository
-import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
-import com.baiganov.fintech.presentation.ui.people.adapters.UserToUserFingerPrintMapper
+import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable

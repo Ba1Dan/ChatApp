@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
+import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.google.android.material.imageview.ShapeableImageView

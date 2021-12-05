@@ -8,8 +8,7 @@ import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.MyUser
 import android.widget.LinearLayout
-import com.baiganov.fintech.model.response.Reaction
-
+import com.baiganov.fintech.data.model.response.Reaction
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,

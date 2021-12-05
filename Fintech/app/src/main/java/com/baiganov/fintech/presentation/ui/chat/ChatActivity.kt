@@ -17,22 +17,23 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.presentation.ui.chat.dialog.ActionDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import moxy.MvpAppCompatActivity
 import moxy.ktx.moxyPresenter
@@ -54,6 +55,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     private lateinit var inputMessage: EditText
     private lateinit var btnAddFile: ImageButton
     private lateinit var rvChat: RecyclerView
+    private lateinit var shimmer: ShimmerFrameLayout
 
     private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
     private val topicTitle: String by lazy { intent.extras?.getString(ARG_TITLE_TOPIC)!! }
@@ -156,6 +158,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     override fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
+                shimmer.isVisible = false
                 adapter.messages = state.data
 
                 if (positionRecyclerView == TypeScroll.DOWN) {
@@ -163,11 +166,13 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                 }
                 isLoadNewPage = true
             }
-            is State.Loading -> {
 
-//                rvChat.showShimmer()
+            is State.Loading -> {
+                shimmer.isVisible = true
             }
+
             is State.Error -> {
+                shimmer.isVisible = false
                 Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -181,6 +186,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         btnAddFile = findViewById(R.id.btn_add_file)
         toolBarChat = findViewById(R.id.toolbar_chat)
         tvTopic = findViewById(R.id.tv_topic)
+        shimmer = findViewById(R.id.shimmer_messages)
     }
 
     private fun setupText() {

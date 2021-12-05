@@ -1,6 +1,6 @@
 package com.baiganov.fintech.presentation.ui.people
 
-import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
+import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.util.State
 import moxy.MvpView
 import moxy.viewstate.strategy.alias.AddToEndSingle

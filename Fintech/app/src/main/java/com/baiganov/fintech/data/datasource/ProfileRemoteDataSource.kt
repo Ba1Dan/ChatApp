@@ -1,7 +1,7 @@
 package com.baiganov.fintech.data.datasource
 
 import com.baiganov.fintech.data.network.ChatApi
-import com.baiganov.fintech.model.response.User
+import com.baiganov.fintech.data.model.response.User
 import io.reactivex.Single
 import javax.inject.Inject
 

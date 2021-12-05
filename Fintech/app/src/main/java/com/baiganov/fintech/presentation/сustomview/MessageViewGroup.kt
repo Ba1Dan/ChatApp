@@ -10,8 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.*
 import com.baiganov.fintech.R
-import com.baiganov.fintech.model.response.Reaction
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.data.model.response.Reaction
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.google.android.material.imageview.ShapeableImageView
 

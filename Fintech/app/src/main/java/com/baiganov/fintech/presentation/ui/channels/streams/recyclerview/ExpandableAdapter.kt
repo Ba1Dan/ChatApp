@@ -1,5 +1,6 @@
 package com.baiganov.fintech.presentation.ui.channels.streams.recyclerview
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,9 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.StreamFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.google.android.material.button.MaterialButton
@@ -17,11 +18,11 @@ import com.google.android.material.button.MaterialButton
 class ExpandableAdapter(private val clickListener: ItemClickListener) :
     RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
 
+    private val differ = AsyncListDiffer(this, StreamDiffCallback)
+
     var dataOfList: List<ItemFingerPrint>
         get() = differ.currentList
         set(value) = differ.submitList(value)
-
-    private val differ = AsyncListDiffer(this, StreamDiffCallback())
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -90,6 +91,7 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
 
             itemView.setOnClickListener {
                 item.isExpanded = !item.isExpanded
+                Log.d("gett", "click open")
                 clickListener.onItemClick(adapterPosition, item)
             }
         }

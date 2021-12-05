@@ -1,11 +1,11 @@
 package com.baiganov.fintech.presentation.ui.channels.streams.recyclerview
 
 import androidx.recyclerview.widget.DiffUtil
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.StreamFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 
-class StreamDiffCallback : DiffUtil.ItemCallback<ItemFingerPrint>() {
+object StreamDiffCallback : DiffUtil.ItemCallback<ItemFingerPrint>() {
 
     override fun areItemsTheSame(oldItem: ItemFingerPrint, newItem: ItemFingerPrint): Boolean {
         return oldItem.id == newItem.id

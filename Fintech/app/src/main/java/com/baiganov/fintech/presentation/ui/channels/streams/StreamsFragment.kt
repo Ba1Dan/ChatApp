@@ -2,25 +2,28 @@ package com.baiganov.fintech.presentation.ui.channels.streams
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
+import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
 import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter.Companion.INITIAL_QUERY
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.ExpandableAdapter
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.StreamFingerPrint
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.StreamFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
-import com.todkars.shimmer.ShimmerRecyclerView
+import com.facebook.shimmer.ShimmerFrameLayout
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import javax.inject.Inject
@@ -29,9 +32,10 @@ import javax.inject.Provider
 class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     SearchQueryListener {
 
-    private lateinit var rvStreams: ShimmerRecyclerView
+    private lateinit var rvStreams: RecyclerView
     private lateinit var frameNotResult: LinearLayout
     private lateinit var adapterStreams: ExpandableAdapter
+    private lateinit var shimmer: ShimmerFrameLayout
 
     @Inject
     lateinit var presenterProvider: Provider<StreamsPresenter>
@@ -50,13 +54,13 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         val view = inflater.inflate(R.layout.fragment_streams, container, false)
         rvStreams = view.findViewById(R.id.rv_stream)
         frameNotResult = view.findViewById(R.id.no_result_found)
+        shimmer = view.findViewById(R.id.shimmer_streams)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         presenter.tabPosition = requireArguments().getInt(ARG_TAB_POSITION)
-
 
         presenter.obtainEvent(
             Event.EventChannels.SearchStreams(
@@ -95,22 +99,23 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     override fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
+                Log.d("gett", "result ${state.data.forEach { (it is StreamFingerPrint)} }}")
                 adapterStreams.dataOfList = state.data
 
                 frameNotResult.isVisible = state.data.isEmpty()
 
-                rvStreams.hideShimmer()
+                shimmer.isVisible = false
             }
             is State.Loading -> {
-                frameNotResult.isVisible = false
-                if (adapterStreams.itemCount == 0) {
-                    rvStreams.showShimmer()
-                }
+//                frameNotResult.isVisible = false
+//                if (adapterStreams.itemCount == 0) {
+//                    shimmer.isVisible = true
+//                }
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 frameNotResult.isVisible = false
-                rvStreams.hideShimmer()
+                shimmer.isVisible = false
             }
         }
     }

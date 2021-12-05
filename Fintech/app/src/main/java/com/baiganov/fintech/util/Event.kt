@@ -1,7 +1,7 @@
 package com.baiganov.fintech.util
 
 import android.net.Uri
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
+import com.baiganov.fintech.presentation.model.TopicFingerPrint
 
 sealed class Event {
 

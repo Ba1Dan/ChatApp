@@ -1,4 +1,4 @@
-package com.baiganov.fintech.model
+package com.baiganov.fintech.data.model
 
 data class Profile(
     val name: String,

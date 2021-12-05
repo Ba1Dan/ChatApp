@@ -6,9 +6,9 @@ import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.network.ChatApi
 import com.baiganov.fintech.domain.repository.MessageRepository
-import com.baiganov.fintech.model.response.FileResponse
-import com.baiganov.fintech.model.response.Message
-import com.baiganov.fintech.model.response.Narrow
+import com.baiganov.fintech.data.model.response.FileResponse
+import com.baiganov.fintech.data.model.response.Message
+import com.baiganov.fintech.data.model.response.Narrow
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -18,15 +18,13 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
     private val service: ChatApi,
     private val messagesDao: MessagesDao,
     private val uriReader: UriReader
-) :
-    MessageRepository {
+) : MessageRepository {
 
     override fun loadMessages(
         stream: String,

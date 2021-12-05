@@ -6,12 +6,11 @@ import android.widget.TextView
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.baiganov.fintech.util.formatDate
 import org.jsoup.Jsoup
-import java.text.SimpleDateFormat
 import java.util.*
 
 class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) :

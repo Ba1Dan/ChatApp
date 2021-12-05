@@ -1,9 +1,8 @@
-package com.baiganov.fintech.presentation.ui.chat.recyclerview
+package com.baiganov.fintech.presentation.model
 
 import com.baiganov.fintech.MyUser
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.ItemFingerPrint
 
 class MessageFingerPrint(
     var message: MessageEntity

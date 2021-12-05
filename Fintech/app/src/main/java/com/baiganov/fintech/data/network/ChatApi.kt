@@ -1,6 +1,6 @@
 package com.baiganov.fintech.data.network
 
-import com.baiganov.fintech.model.response.*
+import com.baiganov.fintech.data.model.response.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.MultipartBody
