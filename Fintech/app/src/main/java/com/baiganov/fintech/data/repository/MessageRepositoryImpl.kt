@@ -1,21 +1,30 @@
 package com.baiganov.fintech.data.repository
 
+import android.net.Uri
+import com.baiganov.fintech.data.UriReader
 import com.baiganov.fintech.data.db.MessagesDao
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.network.ChatApi
 import com.baiganov.fintech.domain.repository.MessageRepository
+import com.baiganov.fintech.model.response.FileResponse
 import com.baiganov.fintech.model.response.Message
 import com.baiganov.fintech.model.response.Narrow
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
     private val service: ChatApi,
-    private val messagesDao: MessagesDao
+    private val messagesDao: MessagesDao,
+    private val uriReader: UriReader
 ) :
     MessageRepository {
 
@@ -93,6 +102,19 @@ class MessageRepositoryImpl @Inject constructor(
         streamId: Int
     ): Flowable<List<MessageEntity>> =
         messagesDao.getTopicMessages(topicName, streamId)
+
+    override fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse> {
+        val bytes = uriReader.readBytes(uri)
+
+        bytes?.let {
+            val body = bytes.toRequestBody(type.toMediaType())
+            val part = MultipartBody.Part.createFormData("file", name, body)
+
+
+            return service.uploadFile(part)
+        }
+        return Single.just(null)
+    }
 
     private fun getNarrow(stream: String, topic: String): String {
         return Json.encodeToString(

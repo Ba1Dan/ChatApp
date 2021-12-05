@@ -3,6 +3,7 @@ package com.baiganov.fintech.data.network
 import com.baiganov.fintech.model.response.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface ChatApi {
@@ -38,6 +39,17 @@ interface ChatApi {
         @Query("content") text: String,
         @Query("topic") topicTitle: String
     ): Completable
+
+    @POST("users/me/subscriptions")
+    fun subscribeOnStreams(
+        @Query("subscriptions") subscriptions: String,
+    ): Completable
+
+    @Multipart
+    @POST("user_uploads")
+    fun uploadFile(
+        @Part file: MultipartBody.Part
+    ): Single<FileResponse>
 
     @POST("messages/{message_id}/reactions")
     fun addReaction(

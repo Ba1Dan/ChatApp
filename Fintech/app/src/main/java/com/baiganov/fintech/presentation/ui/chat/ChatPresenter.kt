@@ -1,5 +1,6 @@
 package com.baiganov.fintech.presentation.ui.chat
 
+import android.net.Uri
 import android.util.Log
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repository.MessageRepository
@@ -89,13 +90,26 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             }
 
             is Event.EventChat.UploadFile -> {
-
+                uploadFile(event.uri, event.type, event.name)
             }
 
             else -> {
                 Log.d(javaClass.simpleName, "unknown type event")
             }
         }
+    }
+
+    private fun uploadFile(uri: Uri, type: String, name: String) {
+        messageRepository.uploadFile(uri, type, name)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { fileResponse ->
+                    Log.d("upload_message", "[${fileResponse.uri.split("/").last()}](${fileResponse.uri})")
+                },
+                { Log.d("upload_message", "error get messages from db  ${it.message}") }
+            )
+            .addTo(compositeDisposable)
     }
 
     private fun getMessagesFromDb(topicTitle: String, streamId: Int) {

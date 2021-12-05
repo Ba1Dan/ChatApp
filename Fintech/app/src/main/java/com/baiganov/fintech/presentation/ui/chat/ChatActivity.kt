@@ -1,8 +1,11 @@
 package com.baiganov.fintech.presentation.ui.chat
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -11,6 +14,8 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -253,6 +258,47 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         })
 
         toolBarChat.setNavigationOnClickListener { finish() }
+
+        val getContentLauncher = registerUploadFileActivityLauncher()
+        btnAddFile.setOnClickListener {
+            getContentLauncher.launch( "*/*")
+        }
+    }
+
+    private fun registerUploadFileActivityLauncher(): ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { data ->
+            data?.let { uri ->
+                uploadFile(uri)
+            }
+        }
+
+    private fun uploadFile(uri: Uri) {
+        val contentResolver = this.contentResolver
+        val type = contentResolver.getType(uri)
+
+        getNameAndSize(contentResolver, uri) { name: String, size: Int ->
+            if (size > MEGABYTES_25_IN_BYTES) {
+                Toast.makeText(this, "Big file", Toast.LENGTH_SHORT).show()
+            } else if (type != null) {
+                Log.d("upload_file", " $name $size $type")
+                presenter.obtainEvent(Event.EventChat.UploadFile(name = name, uri = uri, type = type))
+            }
+        }
+    }
+
+    private fun getNameAndSize(contentResolver: ContentResolver, uri: Uri, callback: (String, Int) -> Unit) {
+        contentResolver.query(uri, null, null, null, null)
+            ?.use { cursor ->
+                val nameColumn = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                val sizeColumn = cursor.getColumnIndexOrThrow(OpenableColumns.SIZE)
+
+                cursor.moveToFirst()
+                val name = cursor.getString(nameColumn)
+                val size = cursor.getInt(sizeColumn)
+
+                callback(name, size)
+            }
+
     }
 
     companion object {
@@ -263,6 +309,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         private const val ARG_ID_TOPIC = "id_topic"
         private const val ARG_STREAM_ID = "id_stream"
         private const val EMPTY_STRING = ""
+        private const val MEGABYTES_25_IN_BYTES = 26_214_400
 
         fun createIntent(context: Context, item: TopicFingerPrint): Intent {
             return Intent(context, ChatActivity::class.java)

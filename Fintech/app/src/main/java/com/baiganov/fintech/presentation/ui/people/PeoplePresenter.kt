@@ -2,6 +2,7 @@ package com.baiganov.fintech.presentation.ui.people
 
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import com.baiganov.fintech.presentation.ui.people.adapters.UserFingerPrint
+import com.baiganov.fintech.presentation.ui.people.adapters.UserToUserFingerPrintMapper
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -13,7 +14,7 @@ import moxy.MvpPresenter
 import javax.inject.Inject
 
 @InjectViewState
-class PeoplePresenter @Inject constructor(private val repository: PeopleRepository) :
+class PeoplePresenter @Inject constructor(private val repository: PeopleRepository, private val userToUserFingerPrintMapper: UserToUserFingerPrintMapper) :
     MvpPresenter<PeopleView>() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -33,12 +34,9 @@ class PeoplePresenter @Inject constructor(private val repository: PeopleReposito
         repository.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .map(userToUserFingerPrintMapper)
             .subscribeBy(
-                onSuccess = {
-                    val users = it.users.map { user ->
-                        UserFingerPrint(user)
-                    }
-
+                onSuccess = { users ->
                     viewState.render(State.Result(users))
                 },
                 onError = { viewState.render(State.Error(it.message))}

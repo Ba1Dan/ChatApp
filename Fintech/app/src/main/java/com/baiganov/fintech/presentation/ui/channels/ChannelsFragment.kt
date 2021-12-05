@@ -2,6 +2,7 @@ package com.baiganov.fintech.presentation.ui.channels
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,6 +87,9 @@ class ChannelsFragment : MvpAppCompatFragment(), ChannelsView {
                 fragment?.let {
                     (it as SearchQueryListener).search(state.data)
                 }
+            }
+            else -> {
+                Log.d(javaClass.simpleName, "unknown state")
             }
         }
     }

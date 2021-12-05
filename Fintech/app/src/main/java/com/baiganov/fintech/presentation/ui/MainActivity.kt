@@ -20,19 +20,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        channelsFragment = ChannelsFragment.newInstance()
-        peopleFragment = PeopleFragment.newInstance()
-        profileFragment = ProfileFragment.newInstance()
-
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        supportFragmentManager.commit {
-            add(R.id.main_fragment_container, channelsFragment, BottomNavigationPages.CHANNELS.name)
-            add(R.id.main_fragment_container, peopleFragment, BottomNavigationPages.CHANNELS.name)
-            add(R.id.main_fragment_container, profileFragment, BottomNavigationPages.CHANNELS.name)
-        }
+        if (savedInstanceState == null) {
 
-        setFragment(BottomNavigationPages.CHANNELS)
+            channelsFragment = ChannelsFragment.newInstance()
+            peopleFragment = PeopleFragment.newInstance()
+            profileFragment = ProfileFragment.newInstance()
+
+            supportFragmentManager.commit {
+                add(R.id.main_fragment_container, channelsFragment, BottomNavigationPages.CHANNELS.name)
+                add(R.id.main_fragment_container, peopleFragment, BottomNavigationPages.CHANNELS.name)
+                add(R.id.main_fragment_container, profileFragment, BottomNavigationPages.CHANNELS.name)
+            }
+
+            setFragment(BottomNavigationPages.CHANNELS)
+        }
 
         bottomNavigationView.setOnItemSelectedListener  { item ->
             when (item.itemId) {

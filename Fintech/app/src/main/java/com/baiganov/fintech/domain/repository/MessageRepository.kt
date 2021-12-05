@@ -1,8 +1,11 @@
 package com.baiganov.fintech.domain.repository
 
+import android.net.Uri
 import com.baiganov.fintech.data.db.entity.MessageEntity
+import com.baiganov.fintech.model.response.FileResponse
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 
 interface MessageRepository {
 
@@ -26,4 +29,6 @@ interface MessageRepository {
     fun deleteMessage(messageId: Int): Completable
 
     fun getMessagesFromDb(topicName: String, streamId: Int): Flowable<List<MessageEntity>>
+
+    fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse>
 }

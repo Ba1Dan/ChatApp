@@ -1,5 +1,6 @@
 package com.baiganov.fintech.util
 
+import android.net.Uri
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.fingerprints.TopicFingerPrint
 
 sealed class Event {
@@ -39,7 +40,7 @@ sealed class Event {
             val message: String
         ) : EventChat()
 
-        class UploadFile(val temp: String) : EventChat()
+        class UploadFile(val uri: Uri, val type: String, val name: String) : EventChat()
 
         class DeleteMessage(
             val messageId: Int,
