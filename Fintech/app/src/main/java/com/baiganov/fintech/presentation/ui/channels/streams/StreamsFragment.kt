@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
 import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter.Companion.INITIAL_QUERY
 import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.ExpandableAdapter
@@ -99,7 +98,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     override fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
-                Log.d("gett", "result ${state.data.forEach { (it is StreamFingerPrint)} }}")
+//                Log.d("gett", "result ${state.data.forEach { (it is StreamFingerPrint)} }}")
                 adapterStreams.dataOfList = state.data
 
                 frameNotResult.isVisible = state.data.isEmpty()
@@ -107,10 +106,10 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                 shimmer.isVisible = false
             }
             is State.Loading -> {
-//                frameNotResult.isVisible = false
-//                if (adapterStreams.itemCount == 0) {
-//                    shimmer.isVisible = true
-//                }
+                frameNotResult.isVisible = false
+                if (adapterStreams.itemCount == 0) {
+                    shimmer.isVisible = true
+                }
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()

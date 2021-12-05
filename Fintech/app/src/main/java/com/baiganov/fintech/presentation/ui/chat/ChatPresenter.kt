@@ -161,7 +161,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         streamId: Int,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        viewState.render(State.Loading())
         messageRepository.loadMessages(
             streamTitle,
             topicTitle,

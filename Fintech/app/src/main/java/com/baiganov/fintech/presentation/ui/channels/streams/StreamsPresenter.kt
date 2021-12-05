@@ -25,18 +25,13 @@ import javax.inject.Inject
 class StreamsPresenter @Inject constructor(private val repository: ChannelsRepository) :
     MvpPresenter<StreamsView>() {
 
-    private var itemsOfRecycler: MutableList<ItemFingerPrint> = mutableListOf()
+    private var itemsOfRecycler: List<ItemFingerPrint> = mutableListOf()
     private val compositeDisposable = CompositeDisposable()
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
 
     private var isGettingAllStreams = true
 
     var tabPosition: Int? = null
-
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        getStreams(ChannelsPages.SUBSCRIBED.ordinal)
-    }
 
     init {
         searchStreams()
@@ -72,12 +67,21 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
         position: Int,
         topics: List<TopicFingerPrint>,
     ) {
-        itemsOfRecycler.addAll(position + 1, topics)
+        itemsOfRecycler  = itemsOfRecycler.toMutableList().apply {
+            addAll(position + 1, topics)
+        }
+        (itemsOfRecycler[position] as StreamFingerPrint).isExpanded = true
+
         viewState.render(State.Result(itemsOfRecycler))
     }
 
-    private fun closeStream(topics: List<TopicFingerPrint>) {
-        itemsOfRecycler.removeAll(topics)
+    private fun closeStream(topicUI: List<TopicFingerPrint>) {
+        val topics = topicUI.map { it.topic }
+
+        itemsOfRecycler  = itemsOfRecycler.toMutableList().apply {
+            removeAll { itemUi -> itemUi is TopicFingerPrint && itemUi.topic in topics }
+        }
+
         viewState.render(State.Result(itemsOfRecycler))
     }
 
@@ -96,10 +100,10 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
                 onNext = {
                     val list = mapToFingerPrint(it)
 
-                    itemsOfRecycler.clear()
-                    itemsOfRecycler.addAll(list)
-                    Log.d("gett", "size ${itemsOfRecycler.size}")
+                    itemsOfRecycler = ArrayList(list)
+
                     viewState.render(State.Result(itemsOfRecycler))
+                    if (isGettingAllStreams) { getStreams(ChannelsPages.SUBSCRIBED.ordinal)}
 
                 },
                 onError = {
@@ -112,19 +116,17 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
         repository.getStreams(type)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-//            .doOnSubscribe {
-//                viewState.render(ChatState.Loading())
-//            }
+            .doOnSubscribe {
+                viewState.render(State.Loading())
+            }
             .subscribeBy(
                 onComplete = {
-//                    if (isGettingAllStreams) {
-//                        Log.d("gett", "ChannelsPages.ALL_STREAMS.ordinal")
-//                        getStreams(ChannelsPages.ALL_STREAMS.ordinal)
-//                        isGettingAllStreams = false
-//                    } else {
-//                        Functions.EMPTY_ACTION
-//                    }
-                    Functions.EMPTY_ACTION
+                    if (isGettingAllStreams) {
+                        getStreams(ChannelsPages.ALL_STREAMS.ordinal)
+                        isGettingAllStreams = false
+                    } else {
+                        Functions.EMPTY_ACTION
+                    }
                 },
                 onError = { exception ->
                     viewState.render(State.Error(exception.message))
