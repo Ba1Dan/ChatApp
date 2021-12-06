@@ -9,16 +9,27 @@ import io.reactivex.Single
 
 interface MessageRepository {
 
-    fun loadMessages(stream: String, topicName: String, anchor: Long, streamId: Int, numBefore: Int): Completable
+    fun loadMessages(
+        streamTitle: String,
+        topicTitle: String,
+        anchor: Long,
+        streamId: Int,
+        numBefore: Int
+    ): Completable
 
     fun updateMessage(
-        stream: String,
-        topic: String,
+        streamTitle: String,
+        topicTitle: String,
         anchor: Long,
         numBefore: Int
     ): Completable
 
-    fun loadNextMessages(stream: String, topic: String, anchor: Long, numBefore: Int): Completable
+    fun loadNextMessages(
+        streamTitle: String,
+        topicTitle: String,
+        anchor: Long,
+        numBefore: Int
+    ): Completable
 
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable
 
@@ -28,7 +39,7 @@ interface MessageRepository {
 
     fun deleteMessage(messageId: Int): Completable
 
-    fun getMessagesFromDb(topicName: String, streamId: Int): Flowable<List<MessageEntity>>
+    fun getMessagesFromDb(topicTitle: String, streamId: Int): Flowable<List<MessageEntity>>
 
     fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse>
 }

@@ -2,104 +2,98 @@ package com.baiganov.fintech.data.repository
 
 import android.net.Uri
 import com.baiganov.fintech.data.UriReader
-import com.baiganov.fintech.data.db.MessagesDao
+import com.baiganov.fintech.data.datasource.MessageLocalDataSource
+import com.baiganov.fintech.data.datasource.MessageRemoteDataSource
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.data.network.ChatApi
-import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.data.model.response.FileResponse
 import com.baiganov.fintech.data.model.response.Message
-import com.baiganov.fintech.data.model.response.Narrow
+import com.baiganov.fintech.domain.repository.MessageRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
-    private val service: ChatApi,
-    private val messagesDao: MessagesDao,
+    private val messageRemoteDataSource: MessageRemoteDataSource,
+    private val messageLocalDataSource: MessageLocalDataSource,
     private val uriReader: UriReader
 ) : MessageRepository {
 
     override fun loadMessages(
-        stream: String,
-        topicName: String,
+        streamTitle: String,
+        topicTitle: String,
         anchor: Long,
         streamId: Int,
         numBefore: Int
     ): Completable {
-        val narrow = getNarrow(stream, topicName)
 
-        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
 
-                messagesDao.deleteTopicMessages(topicName, streamId)
-                    .andThen(messagesDao.saveMessages(messages))
+                messageLocalDataSource.deleteTopicMessages(topicTitle, streamId)
+                    .andThen(messageLocalDataSource.saveMessages(messages))
             }
     }
 
     override fun updateMessage(
-        stream: String,
-        topic: String,
+        streamTitle: String,
+        topicTitle: String,
         anchor: Long,
         numBefore: Int
     ): Completable {
-        val narrow = getNarrow(stream, topic)
 
-        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
 
-                messagesDao.saveMessages(messages)
+                messageLocalDataSource.saveMessages(messages)
             }
     }
 
     override fun loadNextMessages(
-        stream: String,
-        topic: String,
+        streamTitle: String,
+        topicTitle: String,
         anchor: Long,
         numBefore: Int
     ): Completable {
-        val narrow = getNarrow(stream, topic)
 
-        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
 
-                messagesDao.saveMessages(messages)
+                messageLocalDataSource.saveMessages(messages)
             }
     }
 
     override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
-        return service.sendMessage(streamId = streamId, text = message, topicTitle = topicTitle)
+        return messageRemoteDataSource.sendMessage(streamId = streamId, message = message, topicTitle = topicTitle)
     }
 
     override fun addReaction(messageId: Int, emojiName: String): Completable {
-        return service.addReaction(messageId, emojiName)
+        return messageRemoteDataSource.addReaction(messageId, emojiName)
     }
 
     override fun deleteReaction(messageId: Int, emojiName: String): Completable {
-        return service.deleteReaction(messageId, emojiName)
+        return messageRemoteDataSource.deleteReaction(messageId, emojiName)
     }
 
     override fun deleteMessage(messageId: Int): Completable {
-        return service.deleteMessage(messageId)
+        return messageRemoteDataSource.deleteMessage(messageId)
     }
 
     override fun getMessagesFromDb(
-        topicName: String,
+        topicTitle: String,
         streamId: Int
     ): Flowable<List<MessageEntity>> =
-        messagesDao.getTopicMessages(topicName, streamId)
+        messageLocalDataSource.getTopicMessages(topicTitle, streamId)
 
     override fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse> {
         val bytes = uriReader.readBytes(uri)
@@ -109,18 +103,9 @@ class MessageRepositoryImpl @Inject constructor(
             val part = MultipartBody.Part.createFormData("file", name, body)
 
 
-            return service.uploadFile(part)
+            return messageRemoteDataSource.uploadFile(part)
         }
         return Single.just(null)
-    }
-
-    private fun getNarrow(stream: String, topic: String): String {
-        return Json.encodeToString(
-            listOf(
-                Narrow(OPERATOR_STREAM, stream),
-                Narrow(OPERATOR_TOPIC, topic)
-            )
-        )
     }
 
     private fun mapToEntity(list: List<Message>): List<MessageEntity> {
