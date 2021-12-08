@@ -20,6 +20,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
@@ -120,9 +121,10 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     }
 
     override fun onItemClick(click: TypeClick) {
-        when(click) {
+        when (click) {
             is TypeClick.OpenBottomSheet -> {
-                EmojiBottomSheetDialog.newInstance(click.messageId).show(supportFragmentManager, null)
+                EmojiBottomSheetDialog.newInstance(click.messageId)
+                    .show(supportFragmentManager, null)
             }
             is TypeClick.OpenActionDialog -> {
                 ActionDialog.newInstance(click.messageId).show(supportFragmentManager, null)
@@ -195,6 +197,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     }
 
     private fun setupRecyclerView() {
+        (rvChat.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         adapter = MessageAdapter(this)
         rvChat.adapter = adapter
 
@@ -267,7 +270,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
         val getContentLauncher = registerUploadFileActivityLauncher()
         btnAddFile.setOnClickListener {
-            getContentLauncher.launch( "*/*")
+            getContentLauncher.launch("*/*")
         }
     }
 
@@ -286,13 +289,22 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             if (size > MEGABYTES_25_IN_BYTES) {
                 Toast.makeText(this, "Big file", Toast.LENGTH_SHORT).show()
             } else if (type != null) {
-                Log.d("upload_file", " $name $size $type")
-                presenter.obtainEvent(Event.EventChat.UploadFile(name = name, uri = uri, type = type))
+                presenter.obtainEvent(
+                    Event.EventChat.UploadFile(
+                        name = name,
+                        uri = uri,
+                        type = type
+                    )
+                )
             }
         }
     }
 
-    private fun getNameAndSize(contentResolver: ContentResolver, uri: Uri, callback: (String, Int) -> Unit) {
+    private fun getNameAndSize(
+        contentResolver: ContentResolver,
+        uri: Uri,
+        callback: (String, Int) -> Unit
+    ) {
         contentResolver.query(uri, null, null, null, null)
             ?.use { cursor ->
                 val nameColumn = cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)

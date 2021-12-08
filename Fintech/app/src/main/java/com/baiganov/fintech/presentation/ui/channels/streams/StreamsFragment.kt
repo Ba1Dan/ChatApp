@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
@@ -66,7 +67,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                 INITIAL_QUERY
             )
         )
-
+        
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
     }
@@ -98,7 +99,6 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     override fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
-//                Log.d("gett", "result ${state.data.forEach { (it is StreamFingerPrint)} }}")
                 adapterStreams.dataOfList = state.data
 
                 frameNotResult.isVisible = state.data.isEmpty()
