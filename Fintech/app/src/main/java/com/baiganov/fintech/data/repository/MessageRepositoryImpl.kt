@@ -31,7 +31,7 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
@@ -48,7 +48,7 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
@@ -64,7 +64,7 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor,numBefore)
+        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
@@ -74,7 +74,11 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
-        return messageRemoteDataSource.sendMessage(streamId = streamId, message = message, topicTitle = topicTitle)
+        return messageRemoteDataSource.sendMessage(
+            streamId = streamId,
+            message = message,
+            topicTitle = topicTitle
+        )
     }
 
     override fun addReaction(messageId: Int, emojiName: String): Completable {
@@ -106,6 +110,10 @@ class MessageRepositoryImpl @Inject constructor(
             return messageRemoteDataSource.uploadFile(part)
         }
         return Single.just(null)
+    }
+
+    override fun editMessage(messageId: Int, content: String): Completable {
+        return messageRemoteDataSource.editMessage(messageId, content)
     }
 
     private fun mapToEntity(list: List<Message>): List<MessageEntity> {

@@ -35,7 +35,7 @@ class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnCli
         tvDate.text = formatDate(item.message.timestamp)
 
         itemView.setOnLongClickListener {
-            clickListener.onItemClick(TypeClick.OpenActionDialog(message.id))
+            clickListener.onItemClick(TypeClick.OpenActionDialog(message))
             return@setOnLongClickListener true
         }
     }

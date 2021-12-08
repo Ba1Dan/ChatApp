@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.ui.chat.dialog
+package com.baiganov.fintech.presentation.ui.chat.bottomsheet
 
 import android.content.Context
 import android.os.Bundle
@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.baiganov.fintech.R
-import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
-import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
-import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
+import com.baiganov.fintech.data.db.entity.MessageEntity
+import com.baiganov.fintech.data.model.response.Message
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ActionDialog : BottomSheetDialogFragment() {
@@ -18,8 +18,6 @@ class ActionDialog : BottomSheetDialogFragment() {
     private lateinit var btnDelete: TextView
     private lateinit var btnAddReaction: TextView
     private lateinit var onResultListener: OnResultListener
-
-    private val messageId: Int by lazy { arguments?.getInt(ARGUMENT_MESSAGE_ID)!! }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,27 +40,32 @@ class ActionDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val message: MessageEntity = requireArguments().getParcelable<MessageEntity>(ARGUMENT_MESSAGE) as MessageEntity
+
+//        if (!message.isMeMessage) {
+//            btnEdit.
+//        }
         btnAddReaction.setOnClickListener {
-            EmojiBottomSheetDialog.newInstance(messageId).show(parentFragmentManager, null)
+            EmojiBottomSheetDialog.newInstance(message.id).show(parentFragmentManager, null)
             dismiss()
         }
         btnEdit.setOnClickListener {
-            onResultListener.sendData(TypeClick.EditMessage(messageId))
+            onResultListener.sendData(TypeClick.EditMessage(message))
             dismiss()
         }
         btnDelete.setOnClickListener {
-            onResultListener.sendData(TypeClick.DeleteMessage(messageId))
+            onResultListener.sendData(TypeClick.DeleteMessage(message.id))
             dismiss()
         }
     }
 
     companion object {
 
-        private const val ARGUMENT_MESSAGE_ID = "message_id"
+        private const val ARGUMENT_MESSAGE = "message"
 
-        fun newInstance(messageId: Int) = ActionDialog().apply {
+        fun newInstance(message: MessageEntity) = ActionDialog().apply {
             val bundle = Bundle()
-            bundle.putInt(ARGUMENT_MESSAGE_ID, messageId)
+            bundle.putParcelable(ARGUMENT_MESSAGE, message)
             arguments = bundle
         }
     }

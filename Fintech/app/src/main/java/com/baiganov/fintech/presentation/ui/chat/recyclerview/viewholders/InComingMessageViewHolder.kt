@@ -29,7 +29,7 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: OnCli
         }
 
         itemView.setOnLongClickListener {
-            clickListener.onItemClick(TypeClick.OpenActionDialog(message.id))
+            clickListener.onItemClick(TypeClick.OpenActionDialog(message))
             return@setOnLongClickListener true
         }
     }

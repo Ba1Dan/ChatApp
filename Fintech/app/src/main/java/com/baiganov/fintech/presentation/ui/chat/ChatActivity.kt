@@ -28,9 +28,13 @@ import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
-import com.baiganov.fintech.presentation.ui.chat.dialog.ActionDialog
+import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Companion.MESSAGE_ID_RESULT_KEY
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Companion.NEW_CONTENT_RESULT_KEY
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Companion.REQUEST_KEY_EDIT_MESSAGE
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
@@ -73,6 +77,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         initViews()
         setupText()
         setupRecyclerView()
+        presenter.init(streamTitle, topicTitle)
 
         presenter.obtainEvent(
             Event.EventChat.LoadFirstMessages(
@@ -83,6 +88,17 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         )
 
         setClickListener()
+
+        supportFragmentManager
+            .setFragmentResultListener(REQUEST_KEY_EDIT_MESSAGE, this) { requestKey, bundle ->
+                // We use a String here, but any type that can be put in a Bundle is supported
+                Log.d("edit_message", "getting content")
+                val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
+                val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
+
+                presenter.editMessage(id, content)
+                // Do something with the result
+            }
     }
 
     override fun sendData(click: TypeClick) {
@@ -102,6 +118,8 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
             is TypeClick.EditMessage -> {
                 Toast.makeText(this, "edit message", Toast.LENGTH_SHORT).show()
+
+                EditMessageDialog.newInstance(click.message).show(supportFragmentManager, null)
             }
 
             is TypeClick.DeleteMessage -> {
@@ -109,6 +127,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                     Event.EventChat.DeleteMessage(
                         streamTitle = streamTitle,
                         topicTitle = topicTitle,
+                        streamId = streamId,
                         messageId = click.messageId,
                     )
                 )
@@ -127,7 +146,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                     .show(supportFragmentManager, null)
             }
             is TypeClick.OpenActionDialog -> {
-                ActionDialog.newInstance(click.messageId).show(supportFragmentManager, null)
+                ActionDialog.newInstance(click.message).show(supportFragmentManager, null)
             }
             else -> {
                 Log.d(javaClass.simpleName, "unknown type click")

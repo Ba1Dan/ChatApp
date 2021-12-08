@@ -45,6 +45,7 @@ sealed class Event {
         class DeleteMessage(
             val messageId: Int,
             val streamTitle: String,
+            val streamId: Int,
             val topicTitle: String
         ) : EventChat()
     }

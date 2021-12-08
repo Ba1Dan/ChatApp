@@ -68,4 +68,10 @@ interface ChatApi {
     fun deleteMessage(
         @Path("msg_id") id: Int
     ): Completable
+
+    @PATCH("messages/{msgId}")
+    fun editMessageText(
+        @Path("msgId") id: Int,
+        @Query("content") newText: String
+    ): Completable
 }

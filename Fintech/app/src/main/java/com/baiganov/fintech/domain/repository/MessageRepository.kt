@@ -42,4 +42,6 @@ interface MessageRepository {
     fun getMessagesFromDb(topicTitle: String, streamId: Int): Flowable<List<MessageEntity>>
 
     fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse>
+
+    fun editMessage(messageId: Int, content: String): Completable
 }

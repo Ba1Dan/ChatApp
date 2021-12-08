@@ -25,6 +25,14 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
+    private lateinit var streamTitle: String
+    private lateinit var topicTitle: String
+
+    fun init(streamTitle: String, topicTitle: String) {
+        this.streamTitle = streamTitle
+        this.topicTitle = topicTitle
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
@@ -84,7 +92,8 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
                 deleteMessage(
                     event.streamTitle,
                     event.topicTitle,
-                    event.messageId,
+                    event.streamId,
+                    event.messageId
                 )
             }
 
@@ -255,6 +264,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     private fun deleteMessage(
         streamTitle: String,
         topicTitle: String,
+        streamId: Int,
         messageId: Int,
     ) {
         messageRepository.deleteMessage(messageId)
@@ -262,11 +272,30 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    updateMessage(
+                    loadMessage(
                         streamTitle,
                         topicTitle,
+                        streamId,
                         messageId.toLong()
                     )
+                },
+                onError = {
+                    Log.d(
+                        javaClass.simpleName,
+                        "error delete reaction ${it.message}"
+                    )
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    fun editMessage(messageId: Int, content: String) {
+        messageRepository.editMessage(messageId, content)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
                 onError = {
                     Log.d(

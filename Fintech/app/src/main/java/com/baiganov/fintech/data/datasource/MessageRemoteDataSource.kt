@@ -45,6 +45,10 @@ class MessageRemoteDataSource @Inject constructor(
         return service.uploadFile(part)
     }
 
+    fun editMessage(messageId: Int, content: String): Completable {
+       return service.editMessageText(messageId, content)
+    }
+
     private fun getNarrow(stream: String, topic: String): String {
         return Json.encodeToString(
             listOf(
