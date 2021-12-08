@@ -2,9 +2,8 @@ package com.baiganov.fintech.data.repository
 
 import com.baiganov.fintech.data.datasource.ChannelsLocalDataSource
 import com.baiganov.fintech.data.datasource.ChannelsRemoteDataSource
-import com.baiganov.fintech.data.db.StreamsDao
 import com.baiganov.fintech.data.db.entity.StreamEntity
-import com.baiganov.fintech.data.network.ChatApi
+import com.baiganov.fintech.data.model.response.Subscription
 import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.data.model.response.TopicsResponse
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
@@ -15,8 +14,8 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ChannelsRepositoryImpl @Inject constructor(
-    private val channelsRemoteDataSource: ChannelsRemoteDataSource,
-    private val channelsLocalDataSource: ChannelsLocalDataSource
+    private val remoteDataSource: ChannelsRemoteDataSource,
+    private val localDataSource: ChannelsLocalDataSource
 ) : ChannelsRepository {
 
     override fun getStreams(type: Int): Completable {
@@ -25,21 +24,25 @@ class ChannelsRepositoryImpl @Inject constructor(
 
     override fun searchStreams(searchQuery: String, type: Int?): Flowable<List<StreamEntity>> =
         when (type) {
-            ChannelsPages.SUBSCRIBED.ordinal -> channelsLocalDataSource.searchSubscribedStreams("$searchQuery%")
-            ChannelsPages.ALL_STREAMS.ordinal -> channelsLocalDataSource.searchAllStreams("$searchQuery%")
+            ChannelsPages.SUBSCRIBED.ordinal -> localDataSource.searchSubscribedStreams("$searchQuery%")
+            ChannelsPages.ALL_STREAMS.ordinal -> localDataSource.searchAllStreams("$searchQuery%")
             else -> throw IllegalStateException("Undefined StreamsFragment tabPosition: $type")
         }
 
+    override fun createStream(name: String, description: String): Completable {
+        return remoteDataSource.createStream(Subscription(name, description))
+    }
+
     private fun getTopics(streamId: Int): Single<TopicsResponse> {
-        return channelsRemoteDataSource.getTopics(streamId)
+        return remoteDataSource.getTopics(streamId)
     }
 
     private fun getSubscribedStreamsFromDb(streamId: Int): List<StreamEntity> {
-        return channelsLocalDataSource.getSubscribedStreams(streamId)
+        return localDataSource.getSubscribedStreams(streamId)
     }
 
     private fun saveStreams(streams: List<StreamEntity>): Completable =
-        channelsLocalDataSource.saveStreams(streams)
+        localDataSource.saveStreams(streams)
 
     private fun getStreamsByTabPosition(type: Int): Completable = when (type) {
         ChannelsPages.SUBSCRIBED.ordinal -> getSubscribedStreams()
@@ -48,7 +51,7 @@ class ChannelsRepositoryImpl @Inject constructor(
     }
 
     private fun getAllStreams(): Completable {
-        return channelsRemoteDataSource.getAllStreams()
+        return remoteDataSource.getAllStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
                 streamResponse.streams
@@ -77,7 +80,7 @@ class ChannelsRepositoryImpl @Inject constructor(
     }
 
     private fun getSubscribedStreams(): Completable {
-        return channelsRemoteDataSource.getSubscribedStreams()
+        return remoteDataSource.getSubscribedStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
                 streamResponse.streams

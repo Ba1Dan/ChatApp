@@ -8,9 +8,14 @@ import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.MessageViewGroup
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.baiganov.fintech.util.formatDate
+import com.bumptech.glide.RequestManager
 import org.jsoup.Jsoup
 
-class InComingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) : BaseViewHolder<MessageFingerPrint>(itemView) {
+class InComingMessageViewHolder(
+    private val clickListener: OnClickMessage,
+    private val glide: RequestManager,
+    itemView: View
+) : BaseViewHolder<MessageFingerPrint>(itemView) {
 
     private val viewGroup: MessageViewGroup = itemView.findViewById(R.id.incoming_message)
 
@@ -25,7 +30,9 @@ class InComingMessageViewHolder(itemView: View, private val clickListener: OnCli
             text = Jsoup.parse(message.content).text()
             author = message.senderFullName
             date = formatDate(message.timestamp)
+
             addReactionByButton(clickListener, message.id, item)
+            setAvatar(glide, item.message.avatarUrl)
         }
 
         itemView.setOnLongClickListener {

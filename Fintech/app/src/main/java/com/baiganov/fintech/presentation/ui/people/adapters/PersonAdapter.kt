@@ -10,6 +10,7 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
+import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 
 class PersonAdapter(private val clickListener: ItemClickListener) :
@@ -50,6 +51,12 @@ class PersonAdapter(private val clickListener: ItemClickListener) :
         override fun bind(item: UserFingerPrint) {
             tvName.text = item.user.fullName
             tvEmail.text = item.user.email
+            Glide.with(itemView.context).load(item.user.avatarUrl).into(ivAvatar)
+            if (item.user.isActive) {
+                isOnline.setBackgroundResource(R.drawable.bg_online_view)
+            } else {
+                isOnline.setBackgroundResource(R.drawable.bg_offline_view)
+            }
         }
     }
 }

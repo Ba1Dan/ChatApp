@@ -52,10 +52,9 @@ sealed class Event {
 
     sealed class EventChannels : EventChat() {
 
-        class LoadStreams(
-            val streamTitle: String,
-            val topicTitle: String,
-            val streamId: Int
+        class CreateStream(
+            val streamName: String,
+            val streamDescription: String,
         ) : EventChannels()
 
         class OpenStream(

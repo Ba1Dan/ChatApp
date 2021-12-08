@@ -1,12 +1,11 @@
 package com.baiganov.fintech.presentation.ui.channels.streams
 
-import android.util.Log
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
-import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -53,8 +52,8 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
             is Event.EventChannels.SearchStreams -> {
                 searchTopics(event.searchQuery)
             }
-            else -> {
-                Log.d(javaClass.simpleName, "Unknown event")
+            is Event.EventChannels.CreateStream -> {
+                createStream(event.streamName, event.streamDescription)
             }
         }
     }
@@ -67,7 +66,7 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
         position: Int,
         topics: List<TopicFingerPrint>,
     ) {
-        itemsOfRecycler  = itemsOfRecycler.toMutableList().apply {
+        itemsOfRecycler = itemsOfRecycler.toMutableList().apply {
             addAll(position + 1, topics)
         }
         (itemsOfRecycler[position] as StreamFingerPrint).isExpanded = true
@@ -78,7 +77,7 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
     private fun closeStream(topicUI: List<TopicFingerPrint>) {
         val topics = topicUI.map { it.topic }
 
-        itemsOfRecycler  = itemsOfRecycler.toMutableList().apply {
+        itemsOfRecycler = itemsOfRecycler.toMutableList().apply {
             removeAll { itemUi -> itemUi is TopicFingerPrint && itemUi.topic in topics }
         }
 
@@ -98,16 +97,19 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
+                    if (isGettingAllStreams) {
+                        getStreams(ChannelsPages.SUBSCRIBED.ordinal)
+                    }
+
                     val list = mapToFingerPrint(it)
-
                     itemsOfRecycler = ArrayList(list)
-
                     viewState.render(State.Result(itemsOfRecycler))
-                    if (isGettingAllStreams) { getStreams(ChannelsPages.SUBSCRIBED.ordinal)}
+
 
                 },
                 onError = {
-                    viewState.render(State.Error(it.message)) }
+                    viewState.render(State.Error(it.message))
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -127,6 +129,22 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
                     } else {
                         Functions.EMPTY_ACTION
                     }
+                },
+                onError = { exception ->
+                    viewState.render(State.Error(exception.message))
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun createStream(name: String, description: String) {
+        repository.createStream(name, description)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+            .subscribeBy(
+                onComplete = {
+                    getStreams(ChannelsPages.SUBSCRIBED.ordinal)
                 },
                 onError = { exception ->
                     viewState.render(State.Error(exception.message))

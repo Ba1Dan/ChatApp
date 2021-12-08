@@ -62,6 +62,15 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
                 (holder as TopicViewHolder).apply {
                     bind(dataOfList[position] as TopicFingerPrint)
                 }
+                if (position % 2 == 0) {
+                    holder.itemView.apply {
+                        setBackgroundColor(context.getColor(R.color.yellow))
+                    }
+                } else {
+                    holder.itemView.apply {
+                        setBackgroundColor(context.getColor(R.color.green))
+                    }
+                }
             }
         }
     }

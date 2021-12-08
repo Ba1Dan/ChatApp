@@ -13,6 +13,8 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.data.model.response.Reaction
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.android.material.imageview.ShapeableImageView
 
 class MessageViewGroup @JvmOverloads constructor(
@@ -93,6 +95,10 @@ class MessageViewGroup @JvmOverloads constructor(
         addReactionButton.setOnClickListener {
             clickListener.onItemClick(TypeClick.OpenBottomSheet(position))
         }
+    }
+
+    fun setAvatar(glide: RequestManager, avatarUrl: String) {
+        Glide.with(avatarView.context).load(avatarUrl).into(avatarView)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

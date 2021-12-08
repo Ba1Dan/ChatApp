@@ -21,4 +21,12 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_add_reaction">Add reaction</string>
+    <string name="create_stream">Create stream</string>
+    <string name="edit">Edit</string>
+    <string name="message">Message</string>
+    <string name="create">Create</string>
+    <string name="label_name">Name</string>
+    <string name="label_description">Description</string>
+    <string name="input_description">Input description</string>
+    <string name="input_name">Input name</string>
 </resources>

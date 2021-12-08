@@ -10,8 +10,10 @@
         android:id="@+id/edit_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints="@string/message"
         android:backgroundTint="@color/white"
-        android:hint="Message"
+        android:hint="@string/message"
+        android:inputType="text"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:textSize="@dimen/normal_text_size" />
@@ -22,6 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
         android:backgroundTint="@color/green_dark"
-        android:text="Edit"
+        android:text="@string/edit"
         android:textAllCaps="false" />
 </LinearLayout>

@@ -28,8 +28,6 @@ class EditMessageDialog : DialogFragment() {
 
         editMessage = view.findViewById(R.id.edit_message)
         btnEdit = view.findViewById(R.id.btn_edit)
-//        btnEdit = view.findViewById(R.id.btn_edit)
-//        btnDelete = view.findViewById(R.id.btn_delete)
 
         return view
     }

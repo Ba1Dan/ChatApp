@@ -11,8 +11,12 @@ import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.InComi
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.OutGoingMessageViewHolder
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.bumptech.glide.RequestManager
 
-class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
+class MessageAdapter(
+    private val clickListener: OnClickMessage,
+    private val glide: RequestManager
+) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
 
     private val differ = AsyncListDiffer(this, MessageDiffUtil());
 
@@ -20,14 +24,19 @@ class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.A
         set(value) = differ.submitList(value)
         get() = differ.currentList
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<ItemFingerPrint> {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BaseViewHolder<ItemFingerPrint> {
         return when (viewType) {
             R.layout.incoming_message -> {
                 InComingMessageViewHolder(
+                    clickListener,
+                    glide,
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.incoming_message, parent, false),
-                    clickListener
-                )
+
+                    )
             }
 
             R.layout.outgoing_message -> {
@@ -50,7 +59,7 @@ class MessageAdapter(private val clickListener: OnClickMessage) : RecyclerView.A
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<ItemFingerPrint>, position: Int) {
-        when(getItemViewType(position)) {
+        when (getItemViewType(position)) {
             R.layout.outgoing_message -> {
                 (holder as OutGoingMessageViewHolder).bind(messages[position] as MessageFingerPrint)
             }

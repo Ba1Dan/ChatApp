@@ -38,6 +38,7 @@ import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Compan
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import moxy.MvpAppCompatActivity
@@ -217,7 +218,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
     private fun setupRecyclerView() {
         (rvChat.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        adapter = MessageAdapter(this)
+        adapter = MessageAdapter(this, Glide.with(this@ChatActivity))
         rvChat.adapter = adapter
 
         rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {

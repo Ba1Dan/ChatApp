@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.baiganov.fintech.App
@@ -19,11 +20,16 @@ import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.Expand
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.CREATE_STREAM_REQUEST_KEY
+import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.DESCRIPTION_RESULT_KEY
+import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.NAME_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
+import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import javax.inject.Inject
@@ -36,11 +42,21 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     private lateinit var frameNotResult: LinearLayout
     private lateinit var adapterStreams: ExpandableAdapter
     private lateinit var shimmer: ShimmerFrameLayout
+    private lateinit var btnCreateStream: FloatingActionButton
 
     @Inject
     lateinit var presenterProvider: Provider<StreamsPresenter>
 
     private val presenter: StreamsPresenter by moxyPresenter { presenterProvider.get() }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setFragmentResultListener(CREATE_STREAM_REQUEST_KEY) { _, bundle ->
+            val streamName = bundle.getString(NAME_RESULT_KEY) as String
+            val streamDescription = bundle.getString(DESCRIPTION_RESULT_KEY) as String
+            presenter.obtainEvent(Event.EventChannels.CreateStream(streamName, streamDescription))
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -55,6 +71,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         rvStreams = view.findViewById(R.id.rv_stream)
         frameNotResult = view.findViewById(R.id.no_result_found)
         shimmer = view.findViewById(R.id.shimmer_streams)
+        btnCreateStream = view.findViewById(R.id.btn_create_stream)
         return view
     }
 
@@ -67,6 +84,11 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                 INITIAL_QUERY
             )
         )
+
+        btnCreateStream.setOnClickListener {
+            //show dialog
+            CreateStreamDialog.newInstance().show(parentFragmentManager, null)
+        }
         
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
