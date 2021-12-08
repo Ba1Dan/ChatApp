@@ -7,31 +7,54 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_small">
 
-    <TextView
-        android:id="@+id/message_text_outgoing"
+
+    <LinearLayout
+        android:id="@+id/layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_outgoing_message_text_view"
-        android:maxWidth="@dimen/message_text_max_width"
-        android:padding="@dimen/normal_margin"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Hello it's me!" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.baiganov.fintech.сustomview.FlexBoxLayout
+        <TextView
+            android:id="@+id/message_text_outgoing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/normal_margin"
+            android:maxWidth="@dimen/message_text_max_width"
+            android:paddingHorizontal="@dimen/padding_normal"
+            android:textColor="@color/white"
+            android:textSize="@dimen/normal_text_size"
+            tools:text="t" />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingHorizontal="@dimen/padding_large"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/message_text_outgoing"
+            app:layout_constraintEnd_toEndOf="@+id/message_text_outgoing"
+            tools:text="12:30" />
+    </LinearLayout>
+
+
+    <com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
         android:id="@+id/flexbox_reactions_outgoing"
         android:layout_width="230dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_small"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/message_text_outgoing">
+        app:layout_constraintTop_toBottomOf="@+id/layout">
 
         <include
             android:id="@+id/add_reaction_button_outgoing"
             layout="@layout/add_emoji_button" />
 
-    </com.baiganov.fintech.сustomview.FlexBoxLayout>
+    </com.baiganov.fintech.presentation.сustomview.FlexBoxLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

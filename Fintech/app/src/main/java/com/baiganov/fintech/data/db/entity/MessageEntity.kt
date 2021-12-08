@@ -4,8 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.baiganov.fintech.data.db.entity.MessageEntity.Companion.MESSAGES_TABLE
-import com.baiganov.fintech.model.response.Reaction
-import kotlinx.serialization.SerialName
+import com.baiganov.fintech.data.model.response.Reaction
 
 @Entity(tableName = MESSAGES_TABLE)
 data class MessageEntity(
@@ -16,7 +15,7 @@ data class MessageEntity(
     @ColumnInfo(name = "sender_email") val senderEmail: String,
     @ColumnInfo(name = "sender_full_name") val senderFullName: String,
     @ColumnInfo(name = "sender_id") val senderId: Int,
-    @ColumnInfo(name = "timestamp") val timestamp: Int,
+    @ColumnInfo(name = "timestamp") val timestamp: Long,
     @ColumnInfo(name = "stream_id") val streamId: Int,
     @ColumnInfo(name = "topic_name") val topicName: String
 ) {

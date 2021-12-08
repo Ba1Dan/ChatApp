@@ -22,6 +22,7 @@
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_arrow_up.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_emoji_24.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_launcher_background.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_search_24.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/ic_search_27.xml" value="0.3828125" />
@@ -31,6 +32,7 @@
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/outcoming_message_text_view_bg.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/outgoing_message_text_view_bg.xml" value="0.3828125" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/drawable/round_rect_shape_bg.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/action_dialog.xml" value="0.5" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/activity_chat.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/add_emoji_button.xml" value="0.36666666666666664" />
@@ -52,16 +54,38 @@
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/item_topic.xml" value="0.9" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/item_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/message_edit_text_bg.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/message_view_group_layout.xml" value="0.20520833333333333" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/message_view_group_layout.xml" value="0.5" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/not_found_layout.xml" value="0.3641304347826087" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/outcoming_message.xml" value="0.36666666666666664" />
-        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/outgoing_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/outgoing_message.xml" value="0.5" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/placeholder_message.xml" value="0.3641304347826087" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/placeholder_stream.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/placeholder_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/layout/search_action_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/menu/bottom_nav_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021/Fintech/app/src/main/res/menu/search_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/drawable-v24/ic_delete_24.xml" value="0.37864583333333335" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/drawable/bg_bottom_sheet_dialog.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/drawable/bg_bottom_sheet_rect.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/drawable/bg_message_text_view.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/drawable/bg_shimmer_message.xml" value="0.3828125" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/action_dialog.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/activity_chat.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/fragment_people.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/fragment_streams.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/incoming_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/item_stream.xml" value="0.3296875" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/item_topic.xml" value="0.3296875" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/item_user.xml" value="0.3296875" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/outgoing_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/placeholder_user.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_channels.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_chat.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_incoming_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_outgoing_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_people.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_stream.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Daniyar/AndroidStudioProjects/tfs-android-fall-2021f/Fintech/app/src/main/res/layout/shimmer_user.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>

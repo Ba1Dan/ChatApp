@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.baiganov.fintech.data.db.entity.StreamEntity.Companion.STREAMS_TABLE
-import com.baiganov.fintech.model.Topic
+import com.baiganov.fintech.data.model.Topic
 
 @Entity(tableName = STREAMS_TABLE)
 data class StreamEntity(

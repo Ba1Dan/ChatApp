@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:parentTag="com.baiganov.fintech.сustomview.MessageViewGroup">
+    tools:parentTag="com.baiganov.fintech.presentation.сustomview.MessageViewGroup">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/avatar_view"
@@ -43,9 +43,20 @@
             android:textColor="@color/white"
             android:textSize="@dimen/normal_text_size" />
 
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@+id/message_text_outgoing"
+            app:layout_constraintEnd_toEndOf="@+id/message_text_outgoing"
+            tools:text="12:30" />
+
     </LinearLayout>
 
-    <com.baiganov.fintech.сustomview.FlexBoxLayout
+    <com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
         android:id="@+id/flex_box"
         android:layout_width="300dp"
         android:layout_height="wrap_content">
@@ -54,5 +65,5 @@
             android:id="@+id/add_reaction_button_incoming"
             layout="@layout/add_emoji_button" />
 
-    </com.baiganov.fintech.сustomview.FlexBoxLayout>
+    </com.baiganov.fintech.presentation.сustomview.FlexBoxLayout>
 </merge>

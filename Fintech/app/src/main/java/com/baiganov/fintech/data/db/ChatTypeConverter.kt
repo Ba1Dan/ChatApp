@@ -1,8 +1,8 @@
 package com.baiganov.fintech.data.db
 
 import androidx.room.TypeConverter
-import com.baiganov.fintech.model.Topic
-import com.baiganov.fintech.model.response.Reaction
+import com.baiganov.fintech.data.model.Topic
+import com.baiganov.fintech.data.model.response.Reaction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

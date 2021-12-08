@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_light_black"
-    tools:context=".ui.channels.streams.StreamsFragment">
+    tools:context=".presentation.ui.channels.streams.StreamsFragment">
 
-    <com.todkars.shimmer.ShimmerRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_stream"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:shimmer_recycler_item_count="7"
-        app:shimmer_recycler_layout="@layout/placeholder_stream" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <include android:id="@+id/no_result_found"
-        android:layout_gravity="center"
+    <include
+        android:id="@+id/no_result_found"
         layout="@layout/not_found_layout"
-        android:visibility="gone"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content" />
-</FrameLayout>
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/shimmer_streams"
+        layout="@layout/shimmer_channels"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+</androidx.constraintlayout.widget.ConstraintLayout>

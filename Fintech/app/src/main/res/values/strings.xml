@@ -17,4 +17,8 @@
     <string name="status_active">active</string>
     <string name="status_offline">offline</string>
     <string name="no_result_found">No result found</string>
+    <string name="title_topic_percent">#%1$s</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_add_reaction">Add reaction</string>
 </resources>

@@ -59,7 +59,6 @@ dependencies {
 
     // Shimmer
     implementation "com.facebook.shimmer:shimmer:$shimmer_version"
-    implementation "com.todkars:shimmer-recyclerview:$rv_shimmer_version"
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -78,8 +77,20 @@ dependencies {
     //Glide
     implementation "com.github.bumptech.glide:glide:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
+
     //Room
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
+
+    //Dagger
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+    //Moxy
+    implementation "com.github.moxy-community:moxy:$moxy_version"
+    kapt "com.github.moxy-community:moxy-compiler:$moxy_version"
+    implementation "com.github.moxy-community:moxy-androidx:$moxy_version"
+    implementation "com.github.moxy-community:moxy-material:$moxy_version"
+    implementation "com.github.moxy-community:moxy-ktx:$moxy_version"
 }
