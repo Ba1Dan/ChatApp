@@ -17,6 +17,7 @@ class ActionDialog : BottomSheetDialogFragment() {
     private lateinit var btnEdit: TextView
     private lateinit var btnDelete: TextView
     private lateinit var btnAddReaction: TextView
+    private lateinit var btnCopy: TextView
     private lateinit var onResultListener: OnResultListener
 
     override fun onAttach(context: Context) {
@@ -34,6 +35,7 @@ class ActionDialog : BottomSheetDialogFragment() {
         btnEdit = view.findViewById(R.id.btn_edit)
         btnDelete = view.findViewById(R.id.btn_delete)
         btnAddReaction = view.findViewById(R.id.btn_add_reaction)
+        btnCopy = view.findViewById(R.id.btn_copy)
 
         return view
     }
@@ -42,9 +44,6 @@ class ActionDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val message: MessageEntity = requireArguments().getParcelable<MessageEntity>(ARGUMENT_MESSAGE) as MessageEntity
 
-//        if (!message.isMeMessage) {
-//            btnEdit.
-//        }
         btnAddReaction.setOnClickListener {
             EmojiBottomSheetDialog.newInstance(message.id).show(parentFragmentManager, null)
             dismiss()
@@ -55,6 +54,10 @@ class ActionDialog : BottomSheetDialogFragment() {
         }
         btnDelete.setOnClickListener {
             onResultListener.sendData(TypeClick.DeleteMessage(message.id))
+            dismiss()
+        }
+        btnCopy.setOnClickListener {
+            onResultListener.sendData(TypeClick.Copy(message))
             dismiss()
         }
     }

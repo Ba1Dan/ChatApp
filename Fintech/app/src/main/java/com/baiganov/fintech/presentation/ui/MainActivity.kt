@@ -4,17 +4,34 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
+import com.baiganov.fintech.App
 import com.baiganov.fintech.R
+import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.ui.channels.ChannelsFragment
 import com.baiganov.fintech.presentation.ui.people.PeopleFragment
 import com.baiganov.fintech.presentation.ui.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var channelsFragment: ChannelsFragment
     private lateinit var peopleFragment: PeopleFragment
     private lateinit var profileFragment: ProfileFragment
+
+    @Inject
+    lateinit var networkManager: NetworkManager
+
+    override fun onStart() {
+        super.onStart()
+        (application as App).component.inject(this)
+        networkManager.registerCallback()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        networkManager.unregisterCallback()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,8 +1,6 @@
 package com.baiganov.fintech.presentation.ui.chat
 
-import android.content.ContentResolver
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -133,6 +131,13 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                     )
                 )
                 Toast.makeText(this, "deleted message", Toast.LENGTH_SHORT).show()
+            }
+            is TypeClick.Copy -> {
+                val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText(null, click.message.content)
+                clipBoard.setPrimaryClip(clip)
+
+                Toast.makeText(this, "Message copied to clipboard", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Log.d(javaClass.simpleName, "unknown type click")

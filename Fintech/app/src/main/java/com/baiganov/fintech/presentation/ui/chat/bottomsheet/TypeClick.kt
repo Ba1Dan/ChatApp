@@ -7,6 +7,7 @@ sealed interface TypeClick {
     class AddReaction(val messageId: Int?, val emoji: String) : TypeClick
     class EditMessage(val message: MessageEntity) : TypeClick
     class DeleteMessage(val messageId: Int) : TypeClick
+    class Copy(val message: MessageEntity) : TypeClick
 
     class OpenBottomSheet(val messageId: Int) : TypeClick
     class OpenActionDialog(val message: MessageEntity) : TypeClick

@@ -1,6 +1,7 @@
 package com.baiganov.fintech.presentation.ui.profile
 
 import com.baiganov.fintech.domain.repository.ProfileRepository
+import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -12,7 +13,10 @@ import moxy.MvpPresenter
 import javax.inject.Inject
 
 @InjectViewState
-class ProfilePresenter @Inject constructor(private val repository: ProfileRepository) :
+class ProfilePresenter @Inject constructor(
+    private val repository: ProfileRepository,
+    private val networkManager: NetworkManager
+) :
     MvpPresenter<ProfileView>() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -28,16 +32,18 @@ class ProfilePresenter @Inject constructor(private val repository: ProfileReposi
     }
 
     private fun loadProfile() {
-        viewState.render(State.Loading())
-        repository.loadProfile()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {  viewState.render(State.Result(it)) },
-                onError = {
-                    viewState.render(State.Error(it.message))
-                }
-            )
-            .addTo(compositeDisposable)
+        if (networkManager.isConnected().value) {
+            viewState.render(State.Loading())
+            repository.loadProfile()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { viewState.render(State.Result(it)) },
+                    onError = {
+                        viewState.render(State.Error(it.message))
+                    }
+                )
+                .addTo(compositeDisposable)
+        }
     }
 }

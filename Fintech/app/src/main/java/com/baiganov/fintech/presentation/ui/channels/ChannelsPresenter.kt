@@ -10,8 +10,9 @@ import moxy.MvpPresenter
 import javax.inject.Inject
 
 @InjectViewState
-class ChannelsPresenter @Inject constructor(private val repository: ChannelsRepository) :
-    MvpPresenter<ChannelsView>() {
+class ChannelsPresenter @Inject constructor(
+    private val repository: ChannelsRepository,
+) : MvpPresenter<ChannelsView>() {
 
     private val compositeDisposable = CompositeDisposable()
 

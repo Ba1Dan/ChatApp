@@ -6,8 +6,8 @@ import com.baiganov.fintech.data.model.response.Narrow
 import com.baiganov.fintech.data.network.ChatApi
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -51,6 +51,7 @@ class MessageRemoteDataSource @Inject constructor(
 
     private fun getNarrow(stream: String, topic: String): String {
         return Json.encodeToString(
+            serializer(),
             listOf(
                 Narrow(OPERATOR_STREAM, stream),
                 Narrow(OPERATOR_TOPIC, topic)

@@ -1,7 +1,9 @@
 package com.baiganov.fintech.presentation.ui.channels.streams
 
+import android.util.Log
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
+import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
@@ -21,8 +23,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectViewState
-class StreamsPresenter @Inject constructor(private val repository: ChannelsRepository) :
-    MvpPresenter<StreamsView>() {
+class StreamsPresenter @Inject constructor(
+    private val repository: ChannelsRepository,
+    private val networkManager: NetworkManager
+) : MvpPresenter<StreamsView>() {
 
     private var itemsOfRecycler: List<ItemFingerPrint> = mutableListOf()
     private val compositeDisposable = CompositeDisposable()
@@ -42,6 +46,7 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
     }
 
     fun obtainEvent(event: Event.EventChannels) {
+
         when (event) {
             is Event.EventChannels.OpenStream -> {
                 openStream(event.position, event.topics)
@@ -53,9 +58,21 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
                 searchTopics(event.searchQuery)
             }
             is Event.EventChannels.CreateStream -> {
-                createStream(event.streamName, event.streamDescription)
+                if (networkManager.isConnected().value) {
+                    Log.d("networkManager", "Есть интернет интернета")
+//                    createStream(event.streamName, event.streamDescription)
+                } else {
+                    Log.d("networkManager", "Нет интернета")
+
+                    viewState.render(State.Error("No connection"))
+                }
             }
         }
+
+        if (!networkManager.isConnected().value) {
+            Log.d("networkManager", "Нет интернета")
+        }
+
     }
 
     private fun searchTopics(searchQuery: String) {
@@ -97,15 +114,18 @@ class StreamsPresenter @Inject constructor(private val repository: ChannelsRepos
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
-                    if (isGettingAllStreams) {
-                        getStreams(ChannelsPages.SUBSCRIBED.ordinal)
+                    Log.d("networkManager", "No connection")
+                    if (networkManager.isConnected().value) {
+                        if (isGettingAllStreams) {
+                            getStreams(ChannelsPages.SUBSCRIBED.ordinal)
+                        }
+                    } else {
+                        //Нет подключения к инету
+                        viewState.render(State.Error("No connection"))
                     }
-
                     val list = mapToFingerPrint(it)
                     itemsOfRecycler = ArrayList(list)
                     viewState.render(State.Result(itemsOfRecycler))
-
-
                 },
                 onError = {
                     viewState.render(State.Error(it.message))
