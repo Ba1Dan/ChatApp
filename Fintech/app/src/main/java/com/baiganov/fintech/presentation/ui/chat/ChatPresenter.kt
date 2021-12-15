@@ -18,6 +18,7 @@ import io.reactivex.schedulers.Schedulers
 import moxy.InjectViewState
 import moxy.MvpPresenter
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 @InjectViewState
 class ChatPresenter @Inject constructor(private val messageRepository: MessageRepository) :
@@ -26,11 +27,14 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private lateinit var streamTitle: String
-    private lateinit var topicTitle: String
+    private var streamId by Delegates.notNull<Int>()
+    private var topicTitle: String? = null
 
-    fun init(streamTitle: String, topicTitle: String) {
+
+    fun init(streamTitle: String, streamId: Int, topicTitle: String?) {
         this.streamTitle = streamTitle
         this.topicTitle = topicTitle
+        this.streamId = streamId
     }
 
     override fun onDestroy() {
@@ -42,29 +46,25 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
         when (event) {
             is Event.EventChat.LoadFirstMessages -> {
-                getMessagesFromDb(
-                    event.topicTitle,
-                    event.streamId
-                )
+                topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
+
                 loadMessage(
-                    event.streamTitle,
-                    event.topicTitle,
+                    streamTitle,
+                    topicTitle,
                     event.streamId
                 )
             }
 
             is Event.EventChat.LoadNextMessages -> {
                 loadNextMessages(
-                    event.streamTitle,
-                    event.topicTitle,
+                    streamTitle,
+                    topicTitle,
                     event.anchor
                 )
             }
 
             is Event.EventChat.AddReaction -> {
                 addReaction(
-                    event.streamTitle,
-                    event.topicTitle,
                     event.messageId,
                     event.emojiName
                 )
@@ -72,8 +72,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
             is Event.EventChat.DeleteReaction -> {
                 deleteReaction(
-                    event.streamTitle,
-                    event.topicTitle,
                     event.messageId,
                     event.emojiName
                 )
@@ -81,17 +79,14 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
             is Event.EventChat.SendMessage -> {
                 sendMessage(
-                    event.streamTitle,
-                    event.topicTitle,
                     event.streamId,
-                    event.message
+                    event.message,
+                    event.topicTitle,
                 )
             }
 
             is Event.EventChat.DeleteMessage -> {
                 deleteMessage(
-                    event.streamTitle,
-                    event.topicTitle,
                     event.streamId,
                     event.messageId
                 )
@@ -113,7 +108,10 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { fileResponse ->
-                    Log.d("upload_message", "[${fileResponse.uri.split("/").last()}](${fileResponse.uri})")
+                    viewState.render(
+                        State.AddFile("[${fileResponse.uri.split("/").last()}](${fileResponse.uri})"
+                        )
+                    )
                 },
                 { Log.d("upload_message", "error get messages from db  ${it.message}") }
             )
@@ -121,7 +119,33 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     }
 
     private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
-        messageRepository.getMessagesFromDb(topicTitle, streamId)
+        messageRepository.getTopicMessages(topicTitle, streamId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { streamEntities ->
+
+                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
+                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
+                            listOf(DateDividerFingerPrint(date)) +
+                                    messagesByDate.map { message -> MessageFingerPrint(message) }
+                        }
+
+                    if (mess.isEmpty()) {
+                        viewState.render(State.Loading())
+                    } else {
+                        viewState.render(State.Result(mess))
+                    }
+                },
+                onError = {
+                    Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun getStreamMessages(streamId: Int) {
+        messageRepository.getStreamMessages(streamId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -147,17 +171,27 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     }
 
     private fun sendMessage(
-        streamTitle: String,
-        topicTitle: String,
         streamId: Int,
-        message: String
+        message: String,
+        _topicTitle: String
     ) {
-        messageRepository.sendMessage(streamId, message, topicTitle)
+        var topic = ""
+        if (topicTitle != null) {
+            topic = topicTitle!!
+        } else {
+            if (_topicTitle.isEmpty()) {
+                viewState.render(State.Error("No input topic"))
+            } else {
+                topic = _topicTitle
+            }
+        }
+
+        messageRepository.sendMessage(streamId, message, topic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    updateMessage(streamTitle, topicTitle)
+                    updateMessage(streamTitle, topic)
                 },
                 onError = { Log.d(javaClass.simpleName, "error send message ${it.message}") }
             )
@@ -166,7 +200,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
     private fun loadMessage(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         streamId: Int,
         anchor: Long = DEFAULT_ANCHOR
     ) {
@@ -192,7 +226,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
     private fun loadNextMessages(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         anchor: Long
     ) {
         messageRepository.loadNextMessages(
@@ -215,8 +249,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     }
 
     private fun addReaction(
-        streamTitle: String,
-        topicTitle: String,
         messageId: Int,
         emojiName: String
     ) {
@@ -238,8 +270,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     }
 
     private fun deleteReaction(
-        streamTitle: String,
-        topicTitle: String,
         messageId: Int,
         emojiName: String
     ) {
@@ -260,10 +290,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .addTo(compositeDisposable)
     }
 
-    //query does not have permission to delete the message
     private fun deleteMessage(
-        streamTitle: String,
-        topicTitle: String,
         streamId: Int,
         messageId: Int,
     ) {
@@ -309,7 +336,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
 
     private fun updateMessage(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         anchor: Long = DEFAULT_ANCHOR
     ) {
         messageRepository.updateMessage(

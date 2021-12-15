@@ -17,7 +17,7 @@ class MessageRemoteDataSource @Inject constructor(
 
     fun loadMessages(
         stream: String,
-        topicName: String,
+        topicName: String?,
         anchor: Long,
         numBefore: Int,
     ): Single<MessagesResponse> {
@@ -27,6 +27,9 @@ class MessageRemoteDataSource @Inject constructor(
 
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
         return service.sendMessage(streamId = streamId, text = message, topicTitle = topicTitle)
+    }
+    fun sendMessage(streamId: Int, message: String): Completable {
+        return service.sendMessage(streamId = streamId, text = message)
     }
 
     fun addReaction(messageId: Int, emojiName: String): Completable {
@@ -45,16 +48,23 @@ class MessageRemoteDataSource @Inject constructor(
         return service.uploadFile(part)
     }
 
+    fun markTopicAsRead(streamId: Int, topicTitle: String): Completable =
+        service.markTopicAsRead(streamId, topicTitle)
+
     fun editMessage(messageId: Int, content: String): Completable {
-       return service.editMessageText(messageId, content)
+        return service.editMessageText(messageId, content)
     }
 
-    private fun getNarrow(stream: String, topic: String): String {
+    private fun getNarrow(stream: String, topic: String?): String {
         return Json.encodeToString(
             serializer(),
-            listOf(
+            topic?.let {
+                listOf(
+                    Narrow(OPERATOR_STREAM, stream),
+                    Narrow(OPERATOR_TOPIC, topic)
+                )
+            } ?: listOf(
                 Narrow(OPERATOR_STREAM, stream),
-                Narrow(OPERATOR_TOPIC, topic)
             )
         )
     }

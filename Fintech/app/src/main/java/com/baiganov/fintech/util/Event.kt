@@ -9,13 +9,13 @@ sealed class Event {
 
         class LoadFirstMessages(
             val streamTitle: String,
-            val topicTitle: String,
+
             val streamId: Int
         ) : EventChat()
 
         class LoadNextMessages(
             val streamTitle: String,
-            val topicTitle: String,
+
             val anchor: Long
         ) : EventChat()
 
@@ -23,20 +23,19 @@ sealed class Event {
             val messageId: Int,
             val emojiName: String,
             val streamTitle: String,
-            val topicTitle: String
+
         ) : EventChat()
 
         class DeleteReaction(
             val messageId: Int,
             val emojiName: String,
             val streamTitle: String,
-            val topicTitle: String
+
         ) : EventChat()
 
         class SendMessage(
-            val streamTitle: String,
-            val streamId: Int,
             val topicTitle: String,
+            val streamId: Int,
             val message: String
         ) : EventChat()
 
@@ -46,7 +45,7 @@ sealed class Event {
             val messageId: Int,
             val streamTitle: String,
             val streamId: Int,
-            val topicTitle: String
+
         ) : EventChat()
     }
 
@@ -63,6 +62,7 @@ sealed class Event {
         ) : EventChannels()
 
         class CloseStream(
+            val position: Int,
             val topics: List<TopicFingerPrint>
         ) : EventChannels()
 

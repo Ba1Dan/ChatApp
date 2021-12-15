@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/bg_light_black"
     tools:context=".presentation.ui.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -25,21 +25,41 @@
         android:padding="10dp"
         android:textColor="#CCCCCC"
         android:textSize="20sp"
+        android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
-        tools:text="Topic: #testing" />
+        tools:text="Topic: #testing"
+        tools:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/input_message"
+        app:layout_constraintBottom_toTopOf="@id/input_topic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_topic"
         app:stackFromEnd="true"
         tools:itemCount="4"
         tools:listitem="@layout/incoming_message" />
+
+    <EditText
+        android:id="@+id/input_topic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@drawable/bg_message_edit_text"
+        android:hint="@string/hint_topic"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:paddingHorizontal="@dimen/normal_margin"
+        android:paddingVertical="@dimen/normal_margin"
+        android:textColor="@color/white"
+        android:textColorHint="@color/color_hint"
+        app:layout_constraintBottom_toTopOf="@id/input_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/input_message"
@@ -51,6 +71,7 @@
         android:background="@drawable/bg_message_edit_text"
         android:hint="@string/hint_message"
         android:imeOptions="flagNoExtractUi"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:maxLines="3"
         android:paddingHorizontal="@dimen/normal_margin"

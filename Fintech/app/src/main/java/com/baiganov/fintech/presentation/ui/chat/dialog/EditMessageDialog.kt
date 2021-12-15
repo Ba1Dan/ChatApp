@@ -13,6 +13,7 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.model.response.Message
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
+import com.baiganov.fintech.util.parseHtml
 
 class EditMessageDialog : DialogFragment() {
 
@@ -36,7 +37,7 @@ class EditMessageDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val message: MessageEntity = requireArguments().getParcelable<MessageEntity>(ARGUMENT_MESSAGE) as MessageEntity
 
-        editMessage.setText(message.content)
+        editMessage.setText(parseHtml(message.content))
 
         btnEdit.setOnClickListener {
             setFragmentResult(

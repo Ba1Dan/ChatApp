@@ -13,6 +13,7 @@ import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
 import com.google.android.material.button.MaterialButton
 
 class ExpandableAdapter(private val clickListener: ItemClickListener) :
@@ -88,6 +89,7 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
 
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
         private val btnOpen: MaterialButton = itemView.findViewById(R.id.btn_open)
+        private val btnOpenStream: MaterialButton = itemView.findViewById(R.id.btn_open_stream)
 
         override fun bind(item: StreamFingerPrint) {
             tvTitle.text = itemView.context.getString(R.string.title_topic_percent, item.stream.name)
@@ -101,7 +103,11 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
             itemView.setOnClickListener {
                 item.isExpanded = !item.isExpanded
                 Log.d("gett", "click open")
-                clickListener.onItemClick(adapterPosition, item)
+                clickListener.onItemClick(TypeItemClickStream.ClickSteam(adapterPosition, item))
+            }
+
+            btnOpenStream.setOnClickListener {
+                clickListener.onItemClick(TypeItemClickStream.OpenStream(item.stream))
             }
         }
     }
@@ -114,7 +120,7 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
         override fun bind(item: TopicFingerPrint) {
             tvTitle.text = item.topic.title
             itemView.setOnClickListener {
-                clickListener.onItemClick(adapterPosition, item)
+                clickListener.onItemClick(TypeItemClickStream.ClickSteam(adapterPosition, item))
             }
         }
     }

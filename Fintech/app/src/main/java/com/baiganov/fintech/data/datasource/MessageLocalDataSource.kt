@@ -21,6 +21,18 @@ class MessageLocalDataSource @Inject constructor(
         return messagesDao.deleteTopicMessages(topicTitle, streamId)
     }
 
+    fun deleteStreamMessages(
+        streamId: Int,
+    ): Completable {
+        return messagesDao.deleteStreamMessages(streamId)
+    }
+
+    fun getStreamMessages(
+        streamId: Int
+    ): Flowable<List<MessageEntity>> {
+        return messagesDao.getStreamMessages(streamId)
+    }
+
     fun getTopicMessages(
         topicTitle: String,
         streamId: Int

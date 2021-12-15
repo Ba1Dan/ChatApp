@@ -21,6 +21,7 @@ import moxy.InjectViewState
 import moxy.MvpPresenter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 @InjectViewState
 class StreamsPresenter @Inject constructor(
@@ -34,10 +35,20 @@ class StreamsPresenter @Inject constructor(
 
     private var isGettingAllStreams = true
 
-    var tabPosition: Int? = null
+    private var tabPosition by Delegates.notNull<Int>()
+
+    fun init(tabPosition: Int) {
+        this.tabPosition = tabPosition
+        getStreams(tabPosition)
+    }
 
     init {
         searchStreams()
+    }
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        searchTopics("")
     }
 
     override fun onDestroy() {
@@ -52,7 +63,7 @@ class StreamsPresenter @Inject constructor(
                 openStream(event.position, event.topics)
             }
             is Event.EventChannels.CloseStream -> {
-                closeStream(event.topics)
+                closeStream(event.position, event.topics)
             }
             is Event.EventChannels.SearchStreams -> {
                 searchTopics(event.searchQuery)
@@ -60,7 +71,7 @@ class StreamsPresenter @Inject constructor(
             is Event.EventChannels.CreateStream -> {
                 if (networkManager.isConnected().value) {
                     Log.d("networkManager", "Есть интернет интернета")
-//                    createStream(event.streamName, event.streamDescription)
+                    createStream(event.streamName, event.streamDescription)
                 } else {
                     Log.d("networkManager", "Нет интернета")
 
@@ -91,8 +102,12 @@ class StreamsPresenter @Inject constructor(
         viewState.render(State.Result(itemsOfRecycler))
     }
 
-    private fun closeStream(topicUI: List<TopicFingerPrint>) {
+    private fun closeStream(
+        position: Int,
+        topicUI: List<TopicFingerPrint>
+    ) {
         val topics = topicUI.map { it.topic }
+
 
         itemsOfRecycler = itemsOfRecycler.toMutableList().apply {
             removeAll { itemUi -> itemUi is TopicFingerPrint && itemUi.topic in topics }
@@ -114,17 +129,8 @@ class StreamsPresenter @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
-                    Log.d("networkManager", "No connection")
-                    if (networkManager.isConnected().value) {
-                        if (isGettingAllStreams) {
-                            getStreams(ChannelsPages.SUBSCRIBED.ordinal)
-                        }
-                    } else {
-                        //Нет подключения к инету
-                        viewState.render(State.Error("No connection"))
-                    }
                     val list = mapToFingerPrint(it)
-                    itemsOfRecycler = ArrayList(list)
+                    itemsOfRecycler = list
                     viewState.render(State.Result(itemsOfRecycler))
                 },
                 onError = {
@@ -135,26 +141,27 @@ class StreamsPresenter @Inject constructor(
     }
 
     private fun getStreams(type: Int) {
-        repository.getStreams(type)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                viewState.render(State.Loading())
-            }
-            .subscribeBy(
-                onComplete = {
-                    if (isGettingAllStreams) {
-                        getStreams(ChannelsPages.ALL_STREAMS.ordinal)
-                        isGettingAllStreams = false
-                    } else {
-                        Functions.EMPTY_ACTION
-                    }
-                },
-                onError = { exception ->
-                    viewState.render(State.Error(exception.message))
+        Log.d("networkManager", "type $type")
+        if (networkManager.isConnected().value) {
+            repository.getStreams(type)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    viewState.render(State.Loading())
                 }
-            )
-            .addTo(compositeDisposable)
+                .subscribeBy(
+                    onComplete = {
+                        Functions.EMPTY_ACTION//
+                    },
+                    onError = { exception ->
+                        viewState.render(State.Error(exception.message))
+                    }
+                )
+                .addTo(compositeDisposable)
+        } else {
+            //Нет подключения к инету
+            viewState.render(State.Error("No connection"))
+        }
     }
 
     private fun createStream(name: String, description: String) {

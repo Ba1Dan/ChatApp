@@ -41,6 +41,7 @@ class CreateStreamDialog : DialogFragment() {
                     DESCRIPTION_RESULT_KEY to inputDescription.text.toString(),
                 )
             )
+            dismiss()
         }
     }
 

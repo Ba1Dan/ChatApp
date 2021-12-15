@@ -13,6 +13,7 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
 import com.baiganov.fintech.presentation.ui.people.adapters.PersonAdapter
 import com.baiganov.fintech.util.State
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -54,7 +55,7 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
         rvUsers.adapter = adapterPerson
     }
 
-    override fun onItemClick(position: Int, item: ItemFingerPrint) {
+    override fun onItemClick(click: TypeItemClickStream) {
 
     }
 

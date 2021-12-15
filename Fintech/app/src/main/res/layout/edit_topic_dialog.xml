@@ -6,19 +6,26 @@
     android:orientation="vertical"
     android:padding="@dimen/padding_large">
 
-    <EditText
-        android:id="@+id/edit_message"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/message"
-        android:importantForAutofill="no"
-        style="@style/edit_style" />
+        android:text="@string/label_topic"
+        android:textColor="@color/white" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_edit"
+    <EditText
+        android:id="@+id/input_name"
+        style="@style/edit_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
-        android:text="@string/action_edit"
-        style="@style/button_style" />
+        android:hint="@string/input_topic"
+        android:importantForAutofill="no" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_edit"
+        style="@style/button_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:text="@string/action_edit" />
 </LinearLayout>

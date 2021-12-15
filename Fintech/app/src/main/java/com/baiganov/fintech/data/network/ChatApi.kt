@@ -23,7 +23,7 @@ interface ChatApi {
         @Query("num_before") numBefore: Int,
         @Query("num_after") numAfter: Int = 0,
         @Query("narrow") narrow: String,
-        @Query("apply_markdown") applyMarkdown: Boolean = false
+        @Query("apply_markdown") applyMarkdown: Boolean = true
     ): Single<MessagesResponse>
 
     @GET("users")
@@ -40,9 +40,28 @@ interface ChatApi {
         @Query("topic") topicTitle: String
     ): Completable
 
+    @POST("messages")
+    fun sendMessage(
+        @Query("type") type: String = "stream",
+        @Query("to") streamId: Int,
+        @Query("content") text: String,
+    ): Completable
+
+    @PATCH("messages/{msgId}")
+    fun changeMessageTopic(
+        @Path("msgId") id: Int,
+        @Query("topic") newTopic: String
+    ): Completable
+
     @POST("users/me/subscriptions")
     fun subscribeOnStreams(
         @Query("subscriptions") subscriptions: String,
+    ): Completable
+
+    @POST("mark_topic_as_read")
+    fun markTopicAsRead(
+        @Query("stream_id") streamId: Int,
+        @Query("topic_name") topicTitle: String
     ): Completable
 
     @Multipart

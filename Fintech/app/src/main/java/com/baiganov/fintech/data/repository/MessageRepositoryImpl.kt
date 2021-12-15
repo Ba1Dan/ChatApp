@@ -1,12 +1,15 @@
 package com.baiganov.fintech.data.repository
 
 import android.net.Uri
+import android.util.Log
+import androidx.core.text.HtmlCompat
 import com.baiganov.fintech.data.UriReader
 import com.baiganov.fintech.data.datasource.MessageLocalDataSource
 import com.baiganov.fintech.data.datasource.MessageRemoteDataSource
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.model.response.FileResponse
 import com.baiganov.fintech.data.model.response.Message
+import com.baiganov.fintech.di.NetworkModule
 import com.baiganov.fintech.domain.repository.MessageRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -15,6 +18,7 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.jsoup.Jsoup
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
@@ -25,7 +29,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     override fun loadMessages(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         anchor: Long,
         streamId: Int,
         numBefore: Int
@@ -34,16 +38,23 @@ class MessageRepositoryImpl @Inject constructor(
         return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
-                val messages = mapToEntity(it.messages)
+                topicTitle?.let { messageRemoteDataSource.markTopicAsRead(streamId, topicTitle) }
+                //Stream
 
-                messageLocalDataSource.deleteTopicMessages(topicTitle, streamId)
+                val messages = mapToEntity(it.messages)
+                //Topic else stream
+                topicTitle?.let {
+                    messageLocalDataSource.deleteTopicMessages(topicTitle, streamId)
+                        .andThen(messageLocalDataSource.saveMessages(messages))
+                } ?: messageLocalDataSource.deleteStreamMessages(streamId)
                     .andThen(messageLocalDataSource.saveMessages(messages))
             }
+
     }
 
     override fun updateMessage(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         anchor: Long,
         numBefore: Int
     ): Completable {
@@ -59,7 +70,7 @@ class MessageRepositoryImpl @Inject constructor(
 
     override fun loadNextMessages(
         streamTitle: String,
-        topicTitle: String,
+        topicTitle: String?,
         anchor: Long,
         numBefore: Int
     ): Completable {
@@ -73,11 +84,16 @@ class MessageRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
-        return messageRemoteDataSource.sendMessage(
+    override fun sendMessage(streamId: Int, message: String, topicTitle: String?): Completable {
+        return topicTitle?.let {
+            messageRemoteDataSource.sendMessage(
+                streamId = streamId,
+                message = message,
+                topicTitle = topicTitle
+            )
+        } ?: messageRemoteDataSource.sendMessage(
             streamId = streamId,
             message = message,
-            topicTitle = topicTitle
         )
     }
 
@@ -93,11 +109,16 @@ class MessageRepositoryImpl @Inject constructor(
         return messageRemoteDataSource.deleteMessage(messageId)
     }
 
-    override fun getMessagesFromDb(
+    override fun getTopicMessages(
         topicTitle: String,
         streamId: Int
     ): Flowable<List<MessageEntity>> =
         messageLocalDataSource.getTopicMessages(topicTitle, streamId)
+
+    override fun getStreamMessages(
+        streamId: Int
+    ): Flowable<List<MessageEntity>> =
+        messageLocalDataSource.getStreamMessages(streamId)
 
     override fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse> {
         val bytes = uriReader.readBytes(uri)

@@ -26,6 +26,7 @@ import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -77,13 +78,13 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.tabPosition = requireArguments().getInt(ARG_TAB_POSITION)
+        presenter.init(requireArguments().getInt(ARG_TAB_POSITION))
 
-        presenter.obtainEvent(
-            Event.EventChannels.SearchStreams(
-                INITIAL_QUERY
-            )
-        )
+//        presenter.obtainEvent(
+//            Event.EventChannels.SearchStreams(
+//                INITIAL_QUERY
+//            )
+//        )
 
         btnCreateStream.setOnClickListener {
             //show dialog
@@ -94,28 +95,40 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         rvStreams.adapter = adapterStreams
     }
 
-    override fun onItemClick(position: Int, item: ItemFingerPrint) {
-        when (item) {
-            is StreamFingerPrint -> {
-                if (item.isExpanded) {
-                    presenter.obtainEvent(
-                        Event.EventChannels.OpenStream(
-                            position,
-                            item.childTopics
-                        )
-                    )
-                } else {
-                    presenter.obtainEvent(
-                        Event.EventChannels.CloseStream(
-                            item.childTopics
-                        )
-                    )
+    override fun onItemClick(click: TypeItemClickStream) {
+        when (click) {
+            is TypeItemClickStream.OpenStream -> {
+                Toast.makeText(requireContext(), "открытие стрима", Toast.LENGTH_SHORT).show()
+                startActivity(ChatActivity.createIntent(requireContext(), click.stream))
+            }
+
+            is TypeItemClickStream.ClickSteam -> {
+                val item = click.item
+                val position = click.position
+                when (item) {
+                    is StreamFingerPrint -> {
+                        if (item.isExpanded) {
+                            presenter.obtainEvent(
+                                Event.EventChannels.OpenStream(
+                                    position,
+                                    item.childTopics
+                                )
+                            )
+                        } else {
+                            presenter.obtainEvent(
+                                Event.EventChannels.CloseStream(
+                                    position, item.childTopics
+                                )
+                            )
+                        }
+                    }
+                    is TopicFingerPrint -> {
+                        startActivity(ChatActivity.createIntent(requireContext(), item))
+                    }
                 }
             }
-            is TopicFingerPrint -> {
-                startActivity(ChatActivity.createIntent(requireContext(), item))
-            }
         }
+
     }
 
     override fun render(state: State<List<ItemFingerPrint>>) {

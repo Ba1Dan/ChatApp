@@ -46,6 +46,6 @@ class NetworkModule {
 
         private val contentType = "application/json".toMediaType()
         private const val READ_TIMEOUT_MILLIS = 0L
-        private const val BASE_URL = "https://tinkoff-android-fall21.zulipchat.com/api/v1/"
+        const val BASE_URL = "https://tinkoff-android-fall21.zulipchat.com/api/v1/"
     }
 }

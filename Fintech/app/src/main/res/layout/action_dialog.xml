@@ -16,73 +16,53 @@
 
     <TextView
         android:id="@+id/btn_edit"
+        style="@style/action_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/normal_margin"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/normal_margin"
-        android:drawablePadding="@dimen/padding_normal"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/normal_margin"
         android:text="@string/action_edit"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
         app:drawableStartCompat="@drawable/ic_edit_24" />
 
     <TextView
         android:id="@+id/btn_delete"
+        style="@style/action_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/normal_margin"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/normal_margin"
-        android:drawablePadding="@dimen/padding_normal"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/normal_margin"
         android:text="@string/action_delete"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
         app:drawableStartCompat="@drawable/ic_delete_24" />
 
     <TextView
         android:id="@+id/btn_add_reaction"
+        style="@style/action_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/normal_margin"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/normal_margin"
-        android:drawablePadding="@dimen/padding_normal"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/normal_margin"
         android:text="@string/action_add_reaction"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
         app:drawableStartCompat="@drawable/ic_emoji_24" />
 
     <TextView
         android:id="@+id/btn_copy"
+        style="@style/action_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/normal_margin"
         android:layout_marginEnd="@dimen/margin_large"
         android:layout_marginBottom="@dimen/normal_margin"
-        android:drawablePadding="@dimen/padding_normal"
         android:text="@string/action_copy"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
-        app:drawableStartCompat="@drawable/ic_emoji_24" />
+        app:drawableStartCompat="@drawable/ic_copy_24" />
 
     <TextView
         android:id="@+id/btn_edit_topic"
+        style="@style/action_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/normal_margin"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/normal_margin"
-        android:drawablePadding="@dimen/padding_normal"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/normal_margin"
         android:text="@string/action_edit_topic"
-        android:textColor="@color/white"
-        android:textSize="@dimen/normal_text_size"
-        app:drawableStartCompat="@drawable/ic_emoji_24" />
-
-
+        app:drawableStartCompat="@drawable/ic_edit_topic_24" />
 </LinearLayout>

@@ -8,6 +8,7 @@ import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.сustomview.MessageViewGroup
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.baiganov.fintech.util.formatDate
+import com.baiganov.fintech.util.parseHtml
 import com.bumptech.glide.RequestManager
 import org.jsoup.Jsoup
 
@@ -27,7 +28,7 @@ class InComingMessageViewHolder(
                 clickListener,
                 message.id
             )
-            text = Jsoup.parse(message.content).text()
+            text = parseHtml(message.content)
             author = message.senderFullName
             date = formatDate(message.timestamp)
 

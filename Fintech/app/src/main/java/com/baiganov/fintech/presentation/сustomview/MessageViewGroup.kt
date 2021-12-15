@@ -41,7 +41,7 @@ class MessageViewGroup @JvmOverloads constructor(
 
     private val addReactionButton: View
 
-    var text: String
+    var text: CharSequence
         get() = messageText.text.toString()
         set(value) {
             messageText.text = value

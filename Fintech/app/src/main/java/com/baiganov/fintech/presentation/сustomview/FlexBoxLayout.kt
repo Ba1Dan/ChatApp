@@ -2,6 +2,7 @@ package com.baiganov.fintech.presentation.сustomview
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.*
@@ -28,7 +29,7 @@ class FlexBoxLayout @JvmOverloads constructor(
             addEmojiViewByReaction(
                 reaction,
                 reactions.count { it.emojiCode == reaction.emojiCode },
-                reaction.userId == idUser,
+                idUser in reactions.filter { it.emojiCode == reaction.emojiCode}.map { it.userId },
                 clickMessage,
                 idMessage
             )

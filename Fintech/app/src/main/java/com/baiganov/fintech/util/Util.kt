@@ -1,5 +1,9 @@
 package com.baiganov.fintech.util
 
+import android.util.Log
+import androidx.core.text.HtmlCompat
+import com.baiganov.fintech.di.NetworkModule
+import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,4 +22,16 @@ fun formatDateByDay(timestamp: Long): String {
     val date = Date(timestamp * 1000L)
 
     return sdf.format(date)
+}
+
+fun parseHtml(content: String): CharSequence {
+    val doc = Jsoup.parse(content, NetworkModule.BASE_URL)
+    doc.select("a")?.forEach { e ->
+        Log.d("rpogjrtbngjuirthbyu", "abs ${e.absUrl("href")}")
+        e.attr("href", e.absUrl("href"))
+    }
+
+    doc.getElementsByTag("img")?.remove()
+
+    return HtmlCompat.fromHtml(doc.html(), HtmlCompat.FROM_HTML_MODE_COMPACT).trim()
 }

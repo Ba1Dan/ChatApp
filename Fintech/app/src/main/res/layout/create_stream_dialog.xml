@@ -14,44 +14,34 @@
 
     <EditText
         android:id="@+id/input_name"
+        style="@style/edit_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minWidth="200dp"
         android:layout_marginTop="@dimen/margin_medium"
-        android:autofillHints="@string/message"
-        android:backgroundTint="@color/white"
         android:hint="@string/input_name"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:textSize="@dimen/normal_text_size" />
+        android:importantForAutofill="no" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
         android:layout_marginTop="@dimen/margin_medium"
-        android:text="@string/label_description" />
+        android:text="@string/label_description"
+        android:textColor="@color/white" />
 
     <EditText
         android:id="@+id/input_description"
+        style="@style/edit_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
-        android:autofillHints="@string/message"
-        android:backgroundTint="@color/white"
         android:hint="@string/input_description"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:textSize="@dimen/normal_text_size" />
+        android:importantForAutofill="no" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_create_stream"
+        style="@style/button_style"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
-        android:backgroundTint="@color/green_dark"
-        android:text="@string/create"
-        android:textAllCaps="false" />
+        android:text="@string/action_edit" />
 </LinearLayout>
