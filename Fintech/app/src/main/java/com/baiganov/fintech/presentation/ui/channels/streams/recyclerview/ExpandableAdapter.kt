@@ -102,7 +102,6 @@ class ExpandableAdapter(private val clickListener: ItemClickListener) :
 
             itemView.setOnClickListener {
                 item.isExpanded = !item.isExpanded
-                Log.d("gett", "click open")
                 clickListener.onItemClick(TypeItemClickStream.ClickSteam(adapterPosition, item))
             }
 

@@ -35,7 +35,8 @@ class EditMessageDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val message: MessageEntity = requireArguments().getParcelable<MessageEntity>(ARGUMENT_MESSAGE) as MessageEntity
+        val message: MessageEntity =
+            requireArguments().getParcelable<MessageEntity>(ARGUMENT_MESSAGE) as MessageEntity
 
         editMessage.setText(parseHtml(message.content))
 
@@ -49,6 +50,8 @@ class EditMessageDialog : DialogFragment() {
             dismiss()
         }
     }
+
+    override fun getTheme() = R.style.RoundedCornersDialog
 
     companion object {
 

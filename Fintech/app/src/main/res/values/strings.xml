@@ -18,6 +18,7 @@
     <string name="status_offline">offline</string>
     <string name="no_result_found">No result found</string>
     <string name="title_topic_percent">#%1$s</string>
+    <string name="toast_file">Size of file is large</string>
 
     <string name="create_stream">Create stream</string>
     <string name="message">Message</string>
@@ -36,4 +37,6 @@
     <string name="action_edit_topic">Edit topic</string>
     <string name="btn_open">Open</string>
     <string name="hint_topic">#topic</string>
+    <string name="button_add">button add</string>
+    <string name="no_network_connection">No network connection</string>
 </resources>

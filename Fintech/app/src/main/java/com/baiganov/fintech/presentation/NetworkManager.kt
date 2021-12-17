@@ -5,6 +5,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
@@ -12,6 +14,10 @@ class NetworkManager @Inject constructor(context: Context) : ConnectivityManager
 
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val isNetworkAvailable = MutableStateFlow(false)
+
+    private val _isConnectedNetwork = MutableLiveData<Boolean>()
+    val isConnectedNetwork: LiveData<Boolean>
+        get() = _isConnectedNetwork
 
     fun isConnected(): MutableStateFlow<Boolean> {
         var isConnected = false
@@ -48,10 +54,12 @@ class NetworkManager @Inject constructor(context: Context) : ConnectivityManager
     override fun onAvailable(network: Network) {
         super.onAvailable(network)
         isNetworkAvailable.value = true
+        _isConnectedNetwork.postValue(true)
     }
 
     override fun onLost(network: Network) {
         super.onLost(network)
         isNetworkAvailable.value = false
+        _isConnectedNetwork.postValue(false)
     }
 }

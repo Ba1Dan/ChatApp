@@ -95,4 +95,6 @@ dependencies {
     implementation "com.github.moxy-community:moxy-androidx:$moxy_version"
     implementation "com.github.moxy-community:moxy-material:$moxy_version"
     implementation "com.github.moxy-community:moxy-ktx:$moxy_version"
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout"
 }

@@ -7,14 +7,21 @@
     android:background="@color/bg_light_black"
     tools:context=".presentation.ui.MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_chat"
+    <LinearLayout
+        android:id="@+id/toolbar_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#2A9D8F"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
-        tools:title="#general" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2A9D8F"
+            app:navigationIcon="@drawable/ic_arrow_back_24"
+            tools:title="#general" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_topic"
@@ -26,9 +33,17 @@
         android:textColor="#CCCCCC"
         android:textSize="20sp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_chat"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_group"
         tools:text="Topic: #testing"
         tools:visibility="visible" />
+
+    <include
+        android:id="@+id/notification"
+        layout="@layout/no_network_connection"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_chat"
@@ -107,7 +122,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/input_message"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/input_message"
-        app:srcCompat="@drawable/ic_add" />
+        app:srcCompat="@drawable/ic_add"
+        android:contentDescription="@string/button_add" />
 
     <include
         android:id="@+id/shimmer_messages"

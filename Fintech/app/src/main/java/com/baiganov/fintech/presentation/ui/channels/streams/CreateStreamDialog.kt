@@ -45,6 +45,8 @@ class CreateStreamDialog : DialogFragment() {
         }
     }
 
+    override fun getTheme() = R.style.RoundedCornersDialog
+
     companion object {
 
         const val CREATE_STREAM_REQUEST_KEY = "create_stream_request"

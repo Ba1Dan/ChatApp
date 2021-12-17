@@ -63,7 +63,7 @@ class StreamsPresenter @Inject constructor(
                 openStream(event.position, event.topics)
             }
             is Event.EventChannels.CloseStream -> {
-                closeStream(event.position, event.topics)
+                closeStream(event.topics)
             }
             is Event.EventChannels.SearchStreams -> {
                 searchTopics(event.searchQuery)
@@ -77,6 +77,9 @@ class StreamsPresenter @Inject constructor(
 
                     viewState.render(State.Error("No connection"))
                 }
+            }
+            is Event.EventChannels.GetStreams -> {
+                getStreams(tabPosition)
             }
         }
 
@@ -103,7 +106,6 @@ class StreamsPresenter @Inject constructor(
     }
 
     private fun closeStream(
-        position: Int,
         topicUI: List<TopicFingerPrint>
     ) {
         val topics = topicUI.map { it.topic }

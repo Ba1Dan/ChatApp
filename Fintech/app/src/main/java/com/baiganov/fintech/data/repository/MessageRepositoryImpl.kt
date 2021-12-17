@@ -1,15 +1,12 @@
 package com.baiganov.fintech.data.repository
 
 import android.net.Uri
-import android.util.Log
-import androidx.core.text.HtmlCompat
 import com.baiganov.fintech.data.UriReader
 import com.baiganov.fintech.data.datasource.MessageLocalDataSource
 import com.baiganov.fintech.data.datasource.MessageRemoteDataSource
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.model.response.FileResponse
 import com.baiganov.fintech.data.model.response.Message
-import com.baiganov.fintech.di.NetworkModule
 import com.baiganov.fintech.domain.repository.MessageRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -18,12 +15,11 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.jsoup.Jsoup
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
-    private val messageRemoteDataSource: MessageRemoteDataSource,
-    private val messageLocalDataSource: MessageLocalDataSource,
+    private val remoteDataSource: MessageRemoteDataSource,
+    private val localDataSource: MessageLocalDataSource,
     private val uriReader: UriReader
 ) : MessageRepository {
 
@@ -35,21 +31,26 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
-                topicTitle?.let { messageRemoteDataSource.markTopicAsRead(streamId, topicTitle) }
+                topicTitle?.let {
+                    remoteDataSource.markTopicAsRead(streamId, topicTitle)
+                } ?: remoteDataSource.markStreamAsRead(streamId)
                 //Stream
 
                 val messages = mapToEntity(it.messages)
                 //Topic else stream
                 topicTitle?.let {
-                    messageLocalDataSource.deleteTopicMessages(topicTitle, streamId)
-                        .andThen(messageLocalDataSource.saveMessages(messages))
-                } ?: messageLocalDataSource.deleteStreamMessages(streamId)
-                    .andThen(messageLocalDataSource.saveMessages(messages))
+                    localDataSource.deleteTopicMessages(topicTitle, streamId)
+                        .andThen(localDataSource.saveMessages(messages))
+                } ?: localDataSource.deleteStreamMessages(streamId)
+                    .andThen(localDataSource.saveMessages(messages))
             }
+    }
 
+    override fun editTopic(messageId: Int, newTopic: String): Completable {
+        return remoteDataSource.editTopic(messageId, newTopic)
     }
 
     override fun updateMessage(
@@ -59,12 +60,12 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
 
-                messageLocalDataSource.saveMessages(messages)
+                localDataSource.saveMessages(messages)
             }
     }
 
@@ -75,50 +76,45 @@ class MessageRepositoryImpl @Inject constructor(
         numBefore: Int
     ): Completable {
 
-        return messageRemoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
 
-                messageLocalDataSource.saveMessages(messages)
+                localDataSource.saveMessages(messages)
             }
     }
 
-    override fun sendMessage(streamId: Int, message: String, topicTitle: String?): Completable {
-        return topicTitle?.let {
-            messageRemoteDataSource.sendMessage(
-                streamId = streamId,
-                message = message,
-                topicTitle = topicTitle
-            )
-        } ?: messageRemoteDataSource.sendMessage(
+    override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
+        return remoteDataSource.sendMessage(
             streamId = streamId,
             message = message,
+            topicTitle = topicTitle
         )
     }
 
     override fun addReaction(messageId: Int, emojiName: String): Completable {
-        return messageRemoteDataSource.addReaction(messageId, emojiName)
+        return remoteDataSource.addReaction(messageId, emojiName)
     }
 
     override fun deleteReaction(messageId: Int, emojiName: String): Completable {
-        return messageRemoteDataSource.deleteReaction(messageId, emojiName)
+        return remoteDataSource.deleteReaction(messageId, emojiName)
     }
 
     override fun deleteMessage(messageId: Int): Completable {
-        return messageRemoteDataSource.deleteMessage(messageId)
+        return remoteDataSource.deleteMessage(messageId)
     }
 
     override fun getTopicMessages(
         topicTitle: String,
         streamId: Int
     ): Flowable<List<MessageEntity>> =
-        messageLocalDataSource.getTopicMessages(topicTitle, streamId)
+        localDataSource.getTopicMessages(topicTitle, streamId)
 
     override fun getStreamMessages(
         streamId: Int
     ): Flowable<List<MessageEntity>> =
-        messageLocalDataSource.getStreamMessages(streamId)
+        localDataSource.getStreamMessages(streamId)
 
     override fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse> {
         val bytes = uriReader.readBytes(uri)
@@ -128,13 +124,13 @@ class MessageRepositoryImpl @Inject constructor(
             val part = MultipartBody.Part.createFormData("file", name, body)
 
 
-            return messageRemoteDataSource.uploadFile(part)
+            return remoteDataSource.uploadFile(part)
         }
         return Single.just(null)
     }
 
     override fun editMessage(messageId: Int, content: String): Completable {
-        return messageRemoteDataSource.editMessage(messageId, content)
+        return remoteDataSource.editMessage(messageId, content)
     }
 
     private fun mapToEntity(list: List<Message>): List<MessageEntity> {
@@ -152,10 +148,5 @@ class MessageRepositoryImpl @Inject constructor(
                 topicName = message.topicName,
             )
         }
-    }
-
-    companion object {
-        private const val OPERATOR_STREAM = "stream"
-        private const val OPERATOR_TOPIC = "topic"
     }
 }

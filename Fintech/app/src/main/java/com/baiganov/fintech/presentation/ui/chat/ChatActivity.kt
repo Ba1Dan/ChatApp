@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.StreamEntity
+import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
@@ -54,6 +55,9 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     @Inject
     lateinit var presenterProvider: Provider<ChatPresenter>
 
+    @Inject
+    lateinit var networkManager: NetworkManager
+
     private val presenter: ChatPresenter by moxyPresenter { presenterProvider.get() }
     private val component by lazy { (application as App).component }
 
@@ -66,6 +70,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     private lateinit var rvChat: RecyclerView
     private lateinit var shimmer: ShimmerFrameLayout
     private lateinit var inputTopic: EditText
+    private lateinit var notification: TextView
 
     private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
     private val topicTitle: String? by lazy { intent.extras?.getString(ARG_TITLE_TOPIC) }
@@ -79,14 +84,20 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        networkManager.registerCallback()
+
         initViews()
         setupText()
         setupRecyclerView()
         presenter.init(streamTitle, streamId, topicTitle)
 
+        networkManager.isConnectedNetwork.observe(this, { isNetwork ->
+            notification.isVisible = !isNetwork
+            presenter.isConnected = isNetwork
+        })
+
         presenter.obtainEvent(
             Event.EventChat.LoadFirstMessages(
-                streamTitle = streamTitle,
                 streamId = streamId
             )
         )
@@ -100,7 +111,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
             val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
 
-            presenter.editMessage(id, content)
+            presenter.obtainEvent(Event.EventChat.EditMessage(id, content))
         }
 
         supportFragmentManager.setFragmentResultListener(
@@ -109,10 +120,9 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         ) { _, bundle ->
 
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
-            val content: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
+            val topic: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
 
-//            presenter.editMessage(id, content)
-            Toast.makeText(this, "edit topic", Toast.LENGTH_SHORT).show()
+            presenter.obtainEvent(Event.EventChat.EditTopic(id, topic))
         }
     }
 
@@ -124,7 +134,6 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                         Event.EventChat.AddReaction(
                             messageId = click.messageId,
                             emojiName = click.emoji,
-                            streamTitle = streamTitle,
                         )
                     )
                 }
@@ -135,7 +144,6 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             is TypeClick.DeleteMessage -> {
                 presenter.obtainEvent(
                     Event.EventChat.DeleteMessage(
-                        streamTitle = streamTitle,
                         streamId = streamId,
                         messageId = click.messageId,
                     )
@@ -150,8 +158,8 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                 Toast.makeText(this, "Message copied to clipboard", Toast.LENGTH_SHORT).show()
             }
             is TypeClick.EditTopic -> {
-                Log.d("xxxxx", "open dialog")
-                EditTopicDialog.newInstance(click.messageId, click.topicName).show(supportFragmentManager, null)
+                EditTopicDialog.newInstance(click.messageId, click.topicName)
+                    .show(supportFragmentManager, null)
             }
             else -> {
                 Log.d(javaClass.simpleName, "unknown type click")
@@ -179,9 +187,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             Event.EventChat.AddReaction(
                 messageId = messageId,
                 emojiName = emojiName,
-                streamTitle = streamTitle,
-
-                )
+            )
         )
     }
 
@@ -190,9 +196,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             Event.EventChat.DeleteReaction(
                 messageId = messageId,
                 emojiName = emojiName,
-                streamTitle = streamTitle,
-
-                )
+            )
         )
     }
 
@@ -233,6 +237,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         toolBarChat = findViewById(R.id.toolbar_chat)
         tvTopic = findViewById(R.id.tv_topic)
         shimmer = findViewById(R.id.shimmer_messages)
+        notification = findViewById(R.id.notification)
 
         topicTitle?.let {
             inputTopic.isVisible = false
@@ -266,12 +271,9 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
                         presenter.obtainEvent(
                             Event.EventChat.LoadNextMessages(
-                                streamTitle = streamTitle,
-
                                 anchor = messageId
                             )
                         )
-
                         isLoadNewPage = false
                     }
                 }
@@ -318,7 +320,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
         val getContentLauncher = registerUploadFileActivityLauncher()
         btnAddFile.setOnClickListener {
-            getContentLauncher.launch("*/*")
+            getContentLauncher.launch(ALL_TYPE)
         }
     }
 
@@ -335,7 +337,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
         getNameAndSize(contentResolver, uri) { name: String, size: Int ->
             if (size > MEGABYTES_25_IN_BYTES) {
-                Toast.makeText(this, "Big file", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.toast_file), Toast.LENGTH_SHORT).show()
             } else if (type != null) {
                 presenter.obtainEvent(
                     Event.EventChat.UploadFile(
@@ -376,6 +378,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         private const val ARG_STREAM_ID = "id_stream"
         private const val EMPTY_STRING = ""
         private const val MEGABYTES_25_IN_BYTES = 26_214_400
+        private const val ALL_TYPE = "*/*"
 
         fun createIntent(context: Context, item: TopicFingerPrint): Intent {
             return Intent(context, ChatActivity::class.java)

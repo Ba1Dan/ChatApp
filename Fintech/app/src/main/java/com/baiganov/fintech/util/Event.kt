@@ -8,29 +8,21 @@ sealed class Event {
     sealed class EventChat : Event() {
 
         class LoadFirstMessages(
-            val streamTitle: String,
-
             val streamId: Int
         ) : EventChat()
 
         class LoadNextMessages(
-            val streamTitle: String,
-
             val anchor: Long
         ) : EventChat()
 
         class AddReaction(
             val messageId: Int,
             val emojiName: String,
-            val streamTitle: String,
-
         ) : EventChat()
 
         class DeleteReaction(
             val messageId: Int,
             val emojiName: String,
-            val streamTitle: String,
-
         ) : EventChat()
 
         class SendMessage(
@@ -43,10 +35,12 @@ sealed class Event {
 
         class DeleteMessage(
             val messageId: Int,
-            val streamTitle: String,
             val streamId: Int,
-
         ) : EventChat()
+
+        class EditMessage(val messageId: Int, val content: String) : EventChat()
+
+        class EditTopic(val messageId: Int, val newTopic: String) : EventChat()
     }
 
     sealed class EventChannels : EventChat() {
@@ -62,13 +56,14 @@ sealed class Event {
         ) : EventChannels()
 
         class CloseStream(
-            val position: Int,
             val topics: List<TopicFingerPrint>
         ) : EventChannels()
 
         class SearchStreams(
             val searchQuery: String,
         ) : EventChannels()
+
+        object GetStreams : EventChannels()
 
     }
 

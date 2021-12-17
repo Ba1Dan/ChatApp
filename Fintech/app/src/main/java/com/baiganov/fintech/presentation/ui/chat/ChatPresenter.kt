@@ -30,6 +30,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
     private var streamId by Delegates.notNull<Int>()
     private var topicTitle: String? = null
 
+    var isConnected: Boolean = false
 
     fun init(streamTitle: String, streamId: Int, topicTitle: String?) {
         this.streamTitle = streamTitle
@@ -48,52 +49,78 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             is Event.EventChat.LoadFirstMessages -> {
                 topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
 
+                //TODO баг
                 loadMessage(
                     streamTitle,
                     topicTitle,
                     event.streamId
                 )
+
             }
 
             is Event.EventChat.LoadNextMessages -> {
-                loadNextMessages(
-                    streamTitle,
-                    topicTitle,
-                    event.anchor
-                )
+                if (isConnected) {
+                    loadNextMessages(
+                        streamTitle,
+                        topicTitle,
+                        event.anchor
+                    )
+                }
             }
 
             is Event.EventChat.AddReaction -> {
-                addReaction(
-                    event.messageId,
-                    event.emojiName
-                )
+                if (isConnected) {
+                    addReaction(
+                        event.messageId,
+                        event.emojiName
+                    )
+                }
             }
 
             is Event.EventChat.DeleteReaction -> {
-                deleteReaction(
-                    event.messageId,
-                    event.emojiName
-                )
+                if (isConnected) {
+                    deleteReaction(
+                        event.messageId,
+                        event.emojiName
+                    )
+                }
             }
 
             is Event.EventChat.SendMessage -> {
-                sendMessage(
-                    event.streamId,
-                    event.message,
-                    event.topicTitle,
-                )
+                if (isConnected) {
+                    sendMessage(
+                        event.streamId,
+                        event.message,
+                        event.topicTitle,
+                    )
+                }
             }
 
             is Event.EventChat.DeleteMessage -> {
-                deleteMessage(
-                    event.streamId,
-                    event.messageId
-                )
+                if (isConnected) {
+                    deleteMessage(
+                        event.streamId,
+                        event.messageId
+                    )
+                }
             }
 
             is Event.EventChat.UploadFile -> {
-                uploadFile(event.uri, event.type, event.name)
+                if (isConnected) {
+                    uploadFile(event.uri, event.type, event.name)
+                }
+            }
+
+            is Event.EventChat.EditMessage -> {
+                if (isConnected) {
+                    editMessage(event.messageId, event.content)
+                }
+            }
+
+            is Event.EventChat.EditTopic -> {
+                if (isConnected) {
+                    editTopic(event.messageId, event.newTopic)
+                }
             }
 
             else -> {
@@ -109,7 +136,8 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .subscribe(
                 { fileResponse ->
                     viewState.render(
-                        State.AddFile("[${fileResponse.uri.split("/").last()}](${fileResponse.uri})"
+                        State.AddFile(
+                            "[${fileResponse.uri.split("/").last()}](${fileResponse.uri})"
                         )
                     )
                 },
@@ -175,25 +203,19 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         message: String,
         _topicTitle: String
     ) {
-        var topic = ""
-        if (topicTitle != null) {
-            topic = topicTitle!!
-        } else {
-            if (_topicTitle.isEmpty()) {
-                viewState.render(State.Error("No input topic"))
-            } else {
-                topic = _topicTitle
-            }
-        }
-
+        val topic = checkContent(_topicTitle)
         messageRepository.sendMessage(streamId, message, topic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
+                    Log.d("network", "обновляем")
                     updateMessage(streamTitle, topic)
                 },
-                onError = { Log.d(javaClass.simpleName, "error send message ${it.message}") }
+                onError = {
+                    Log.d("network", "error send message ${it.message}")
+                    Log.d(javaClass.simpleName, "error send message ${it.message}")
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -316,8 +338,26 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .addTo(compositeDisposable)
     }
 
-    fun editMessage(messageId: Int, content: String) {
+    private fun editMessage(messageId: Int, content: String) {
         messageRepository.editMessage(messageId, content)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    updateMessage(streamTitle, topicTitle, messageId.toLong())
+                },
+                onError = {
+                    Log.d(
+                        javaClass.simpleName,
+                        "error delete reaction ${it.message}"
+                    )
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun editTopic(messageId: Int, newTopic: String) {
+        messageRepository.editTopic(messageId, newTopic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -358,10 +398,25 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .addTo(compositeDisposable)
     }
 
+    private fun checkContent(_topicTitle: String): String {
+        var topic = EMPTY_STRING
+        if (topicTitle != null) {
+            topic = topicTitle!!
+        } else {
+            if (_topicTitle.isEmpty()) {
+                viewState.render(State.Error("No input topic"))
+            } else {
+                topic = _topicTitle
+            }
+        }
+        return topic
+    }
+
     companion object {
 
         private const val INITIAL_PAGE_SIZE = 20
         private const val NUM_BEFORE_UPDATE = 1
         private const val DEFAULT_ANCHOR = 10000000000000000
+        private const val EMPTY_STRING = ""
     }
 }

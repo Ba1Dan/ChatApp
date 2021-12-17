@@ -28,9 +28,6 @@ class MessageRemoteDataSource @Inject constructor(
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
         return service.sendMessage(streamId = streamId, text = message, topicTitle = topicTitle)
     }
-    fun sendMessage(streamId: Int, message: String): Completable {
-        return service.sendMessage(streamId = streamId, text = message)
-    }
 
     fun addReaction(messageId: Int, emojiName: String): Completable {
         return service.addReaction(messageId, emojiName)
@@ -51,8 +48,15 @@ class MessageRemoteDataSource @Inject constructor(
     fun markTopicAsRead(streamId: Int, topicTitle: String): Completable =
         service.markTopicAsRead(streamId, topicTitle)
 
+    fun markStreamAsRead(streamId: Int): Completable =
+        service.markStreamAsRead(streamId)
+
     fun editMessage(messageId: Int, content: String): Completable {
         return service.editMessageText(messageId, content)
+    }
+
+    fun editTopic(messageId: Int, newTopic: String): Completable {
+        return service.editMessageTopic(messageId, newTopic)
     }
 
     private fun getNarrow(stream: String, topic: String?): String {

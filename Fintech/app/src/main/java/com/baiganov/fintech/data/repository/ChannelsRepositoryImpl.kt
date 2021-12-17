@@ -90,7 +90,6 @@ class ChannelsRepositoryImpl @Inject constructor(
                     .map { topicsResponse ->
                         stream.apply {
                             topics = topicsResponse.topics
-
                         }
                     }
             }

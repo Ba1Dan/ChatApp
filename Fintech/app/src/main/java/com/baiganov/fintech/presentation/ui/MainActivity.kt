@@ -1,7 +1,10 @@
 package com.baiganov.fintech.presentation.ui
 
 import android.os.Bundle
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.baiganov.fintech.App
@@ -18,15 +21,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var channelsFragment: ChannelsFragment
     private lateinit var peopleFragment: PeopleFragment
     private lateinit var profileFragment: ProfileFragment
+    private lateinit var notification: TextView
+
+    private val component by lazy {
+        (application as App).component
+    }
 
     @Inject
     lateinit var networkManager: NetworkManager
-
-    override fun onStart() {
-        super.onStart()
-        (application as App).component.inject(this)
-        networkManager.registerCallback()
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -34,10 +36,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
+        networkManager.registerCallback()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        notification = findViewById(R.id.notification)
 
         if (savedInstanceState == null) {
 
@@ -46,15 +51,27 @@ class MainActivity : AppCompatActivity() {
             profileFragment = ProfileFragment.newInstance()
 
             supportFragmentManager.commit {
-                add(R.id.main_fragment_container, channelsFragment, BottomNavigationPages.CHANNELS.name)
-                add(R.id.main_fragment_container, peopleFragment, BottomNavigationPages.CHANNELS.name)
-                add(R.id.main_fragment_container, profileFragment, BottomNavigationPages.CHANNELS.name)
+                add(
+                    R.id.main_fragment_container,
+                    channelsFragment,
+                    BottomNavigationPages.CHANNELS.name
+                )
+                add(
+                    R.id.main_fragment_container,
+                    peopleFragment,
+                    BottomNavigationPages.CHANNELS.name
+                )
+                add(
+                    R.id.main_fragment_container,
+                    profileFragment,
+                    BottomNavigationPages.CHANNELS.name
+                )
             }
 
             setFragment(BottomNavigationPages.CHANNELS)
         }
 
-        bottomNavigationView.setOnItemSelectedListener  { item ->
+        bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.channels_menu_item -> setFragment(BottomNavigationPages.CHANNELS)
                 R.id.people_menu_item -> setFragment(BottomNavigationPages.PEOPLE)
@@ -62,6 +79,9 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        networkManager.isConnectedNetwork.observe(this, { isNetwork ->
+            notification.isVisible = !isNetwork
+        })
     }
 
     private fun setFragment(page: BottomNavigationPages): Boolean {

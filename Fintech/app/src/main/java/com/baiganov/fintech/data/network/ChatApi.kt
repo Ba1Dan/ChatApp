@@ -40,15 +40,8 @@ interface ChatApi {
         @Query("topic") topicTitle: String
     ): Completable
 
-    @POST("messages")
-    fun sendMessage(
-        @Query("type") type: String = "stream",
-        @Query("to") streamId: Int,
-        @Query("content") text: String,
-    ): Completable
-
     @PATCH("messages/{msgId}")
-    fun changeMessageTopic(
+    fun editMessageTopic(
         @Path("msgId") id: Int,
         @Query("topic") newTopic: String
     ): Completable
@@ -62,6 +55,11 @@ interface ChatApi {
     fun markTopicAsRead(
         @Query("stream_id") streamId: Int,
         @Query("topic_name") topicTitle: String
+    ): Completable
+
+    @POST("mark_stream_as_read")
+    fun markStreamAsRead(
+        @Query("stream_id") streamId: Int,
     ): Completable
 
     @Multipart

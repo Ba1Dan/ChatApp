@@ -31,7 +31,7 @@ interface MessageRepository {
         numBefore: Int
     ): Completable
 
-    fun sendMessage(streamId: Int, message: String, topicTitle: String?): Completable
+    fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable
 
     fun addReaction(messageId: Int, emojiName: String): Completable
 
@@ -46,4 +46,6 @@ interface MessageRepository {
     fun uploadFile(uri: Uri, type: String, name: String): Single<FileResponse>
 
     fun editMessage(messageId: Int, content: String): Completable
+
+    fun editTopic(messageId: Int, newTopic: String): Completable
 }

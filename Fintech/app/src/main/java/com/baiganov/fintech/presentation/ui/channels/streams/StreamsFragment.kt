@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
@@ -44,6 +45,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     private lateinit var adapterStreams: ExpandableAdapter
     private lateinit var shimmer: ShimmerFrameLayout
     private lateinit var btnCreateStream: FloatingActionButton
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     @Inject
     lateinit var presenterProvider: Provider<StreamsPresenter>
@@ -73,6 +75,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         frameNotResult = view.findViewById(R.id.no_result_found)
         shimmer = view.findViewById(R.id.shimmer_streams)
         btnCreateStream = view.findViewById(R.id.btn_create_stream)
+        swipeRefreshLayout = view.findViewById(R.id.swipe_container)
         return view
     }
 
@@ -80,17 +83,14 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         super.onViewCreated(view, savedInstanceState)
         presenter.init(requireArguments().getInt(ARG_TAB_POSITION))
 
-//        presenter.obtainEvent(
-//            Event.EventChannels.SearchStreams(
-//                INITIAL_QUERY
-//            )
-//        )
-
         btnCreateStream.setOnClickListener {
-            //show dialog
             CreateStreamDialog.newInstance().show(parentFragmentManager, null)
         }
-        
+
+        swipeRefreshLayout.setOnRefreshListener {
+            presenter.obtainEvent(Event.EventChannels.GetStreams)
+        }
+
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
     }
@@ -98,7 +98,6 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     override fun onItemClick(click: TypeItemClickStream) {
         when (click) {
             is TypeItemClickStream.OpenStream -> {
-                Toast.makeText(requireContext(), "открытие стрима", Toast.LENGTH_SHORT).show()
                 startActivity(ChatActivity.createIntent(requireContext(), click.stream))
             }
 
@@ -117,7 +116,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                         } else {
                             presenter.obtainEvent(
                                 Event.EventChannels.CloseStream(
-                                    position, item.childTopics
+                                   item.childTopics
                                 )
                             )
                         }
@@ -135,7 +134,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         when (state) {
             is State.Result -> {
                 adapterStreams.dataOfList = state.data
-
+                swipeRefreshLayout.isRefreshing = false;
                 frameNotResult.isVisible = state.data.isEmpty()
 
                 shimmer.isVisible = false
