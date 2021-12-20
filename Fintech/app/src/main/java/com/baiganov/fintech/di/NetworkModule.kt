@@ -39,7 +39,7 @@ class NetworkModule {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(Json.asConverterFactory(contentType))
+            .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory(contentType))
             .client(client)
             .build().create(ChatApi::class.java)
 

@@ -125,6 +125,17 @@
         app:srcCompat="@drawable/ic_add"
         android:contentDescription="@string/button_add" />
 
+    <ProgressBar
+        android:id="@+id/pg_file"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_marginEnd="@dimen/normal_margin"
+        android:visibility="gone"
+        android:layout_marginBottom="@dimen/margin_small"
+        app:layout_constraintBottom_toBottomOf="@+id/input_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/input_message"/>
+
     <include
         android:id="@+id/shimmer_messages"
         layout="@layout/shimmer_chat"

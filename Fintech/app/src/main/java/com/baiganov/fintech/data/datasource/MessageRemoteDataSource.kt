@@ -20,9 +20,15 @@ class MessageRemoteDataSource @Inject constructor(
         topicName: String?,
         anchor: Long,
         numBefore: Int,
+        numAfter: Int
     ): Single<MessagesResponse> {
         val narrow = getNarrow(stream, topicName)
-        return service.getMessages(narrow = narrow, anchor = anchor, numBefore = numBefore)
+        return service.getMessages(
+            narrow = narrow,
+            anchor = anchor,
+            numBefore = numBefore,
+            numAfter = numAfter
+        )
     }
 
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {

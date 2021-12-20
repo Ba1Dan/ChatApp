@@ -6,6 +6,7 @@ import com.baiganov.fintech.data.db.entity.UserEntity
 import com.baiganov.fintech.data.model.response.User
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -16,6 +17,10 @@ class PeopleRepositoryImpl @Inject constructor(
 
     override fun getUsers() = localDataSource.getUsers()
 
+    override fun searchUser(name: String): Flowable<List<UserEntity>> = localDataSource.searchUsers(
+        "$name%"
+    )
+
     override fun loadUsers(): Completable {
         return peopleRemoteDataSource.getUsers()
             .flattenAsObservable { usersResponse ->
@@ -25,7 +30,7 @@ class PeopleRepositoryImpl @Inject constructor(
                 getStatus(user)
             }
             .toList()
-            .flatMapCompletable{ users ->
+            .flatMapCompletable { users ->
                 localDataSource.saveUsers(users)
             }
     }

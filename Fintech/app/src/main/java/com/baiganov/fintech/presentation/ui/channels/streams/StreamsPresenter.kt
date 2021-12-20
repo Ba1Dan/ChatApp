@@ -1,6 +1,5 @@
 package com.baiganov.fintech.presentation.ui.channels.streams
 
-import android.util.Log
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.presentation.NetworkManager
@@ -33,9 +32,8 @@ class StreamsPresenter @Inject constructor(
     private val compositeDisposable = CompositeDisposable()
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
 
-    private var isGettingAllStreams = true
-
     private var tabPosition by Delegates.notNull<Int>()
+    private var isLoading = true
 
     fun init(tabPosition: Int) {
         this.tabPosition = tabPosition
@@ -48,7 +46,7 @@ class StreamsPresenter @Inject constructor(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        searchTopics("")
+        searchTopics(INITIAL_QUERY)
     }
 
     override fun onDestroy() {
@@ -70,11 +68,8 @@ class StreamsPresenter @Inject constructor(
             }
             is Event.EventChannels.CreateStream -> {
                 if (networkManager.isConnected().value) {
-                    Log.d("networkManager", "Есть интернет интернета")
                     createStream(event.streamName, event.streamDescription)
                 } else {
-                    Log.d("networkManager", "Нет интернета")
-
                     viewState.render(State.Error("No connection"))
                 }
             }
@@ -82,11 +77,6 @@ class StreamsPresenter @Inject constructor(
                 getStreams(tabPosition)
             }
         }
-
-        if (!networkManager.isConnected().value) {
-            Log.d("networkManager", "Нет интернета")
-        }
-
     }
 
     private fun searchTopics(searchQuery: String) {
@@ -110,7 +100,6 @@ class StreamsPresenter @Inject constructor(
     ) {
         val topics = topicUI.map { it.topic }
 
-
         itemsOfRecycler = itemsOfRecycler.toMutableList().apply {
             removeAll { itemUi -> itemUi is TopicFingerPrint && itemUi.topic in topics }
         }
@@ -130,10 +119,14 @@ class StreamsPresenter @Inject constructor(
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = {
-                    val list = mapToFingerPrint(it)
-                    itemsOfRecycler = list
-                    viewState.render(State.Result(itemsOfRecycler))
+                onNext = {streams ->
+                    if (streams.isEmpty() && isLoading) {
+                        viewState.render(State.Loading)
+                    } else {
+                        val list = mapToFingerPrint(streams)
+                        itemsOfRecycler = list
+                        viewState.render(State.Result(itemsOfRecycler))
+                    }
                 },
                 onError = {
                     viewState.render(State.Error(it.message))
@@ -143,17 +136,17 @@ class StreamsPresenter @Inject constructor(
     }
 
     private fun getStreams(type: Int) {
-        Log.d("networkManager", "type $type")
         if (networkManager.isConnected().value) {
             repository.getStreams(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    viewState.render(State.Loading())
+                    viewState.render(State.Loading)
                 }
                 .subscribeBy(
                     onComplete = {
                         Functions.EMPTY_ACTION
+                        isLoading = false
                     },
                     onError = { exception ->
                         viewState.render(State.Error(exception.message))

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repository.MessageRepository
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.util.Event
@@ -21,14 +22,16 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 @InjectViewState
-class ChatPresenter @Inject constructor(private val messageRepository: MessageRepository) :
-    MvpPresenter<ChatView>() {
+class ChatPresenter @Inject constructor(
+    private val messageRepository: MessageRepository
+) : MvpPresenter<ChatView>() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private lateinit var streamTitle: String
     private var streamId by Delegates.notNull<Int>()
     private var topicTitle: String? = null
+    private var isLoading = true
 
     var isConnected: Boolean = false
 
@@ -49,7 +52,6 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             is Event.EventChat.LoadFirstMessages -> {
                 topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
 
-                //TODO баг
                 loadMessage(
                     streamTitle,
                     topicTitle,
@@ -133,6 +135,9 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         messageRepository.uploadFile(uri, type, name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                viewState.render(State.LoadingFile)
+            }
             .subscribe(
                 { fileResponse ->
                     viewState.render(
@@ -141,7 +146,10 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
                         )
                     )
                 },
-                { Log.d("upload_message", "error get messages from db  ${it.message}") }
+                {
+                    viewState.render(State.Error(it.message))
+                    Log.d("upload_message", "error = ${it.message}")
+                }
             )
             .addTo(compositeDisposable)
     }
@@ -159,13 +167,14 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
                                     messagesByDate.map { message -> MessageFingerPrint(message) }
                         }
 
-                    if (mess.isEmpty()) {
-                        viewState.render(State.Loading())
+                    if (mess.isEmpty() && isLoading) {
+                        viewState.render(State.Loading)
                     } else {
                         viewState.render(State.Result(mess))
                     }
                 },
                 onError = {
+                    viewState.render(State.Error(it.message))
                     Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
                 }
             )
@@ -177,18 +186,14 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { streamEntities ->
+                onNext = { messages ->
 
-                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
-                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
-                            listOf(DateDividerFingerPrint(date)) +
-                                    messagesByDate.map { message -> MessageFingerPrint(message) }
-                        }
 
-                    if (mess.isEmpty()) {
-                        viewState.render(State.Loading())
+                    if (messages.isEmpty() && isLoading) {
+                        viewState.render(State.Loading)
                     } else {
-                        viewState.render(State.Result(mess))
+                        val messagesFingerPrint = getMessagesByDivider(messages)
+                        viewState.render(State.Result(messagesFingerPrint))
                     }
                 },
                 onError = {
@@ -209,12 +214,11 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    Log.d("network", "обновляем")
                     updateMessage(streamTitle, topic)
                 },
                 onError = {
-                    Log.d("network", "error send message ${it.message}")
-                    Log.d(javaClass.simpleName, "error send message ${it.message}")
+                    viewState.render(State.Error("error send message"))
+                    Log.d(javaClass.simpleName, "${it.message}")
                 }
             )
             .addTo(compositeDisposable)
@@ -224,20 +228,23 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         streamTitle: String,
         topicTitle: String?,
         streamId: Int,
-        anchor: Long = DEFAULT_ANCHOR
+        anchor: Long = DEFAULT_ANCHOR,
+        numAfter: Int = NUM_AFTER
     ) {
         messageRepository.loadMessages(
             streamTitle,
             topicTitle,
             anchor,
             streamId,
-            INITIAL_PAGE_SIZE
+            INITIAL_PAGE_SIZE,
+            numAfter
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
                     Functions.EMPTY_ACTION
+                    isLoading = false
                 },
                 onError = { exception ->
                     viewState.render(State.Error(exception.message))
@@ -255,7 +262,8 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             streamTitle,
             topicTitle,
             anchor,
-            INITIAL_PAGE_SIZE
+            INITIAL_PAGE_SIZE,
+            NUM_AFTER
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -325,7 +333,8 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
                         streamTitle,
                         topicTitle,
                         streamId,
-                        messageId.toLong()
+                        messageId.toLong(),
+                        NUM_BEFORE_DELETE
                     )
                 },
                 onError = {
@@ -383,7 +392,8 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             streamTitle,
             topicTitle,
             anchor,
-            NUM_BEFORE_UPDATE
+            NUM_BEFORE_UPDATE,
+            NUM_AFTER
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -404,7 +414,7 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
             topic = topicTitle!!
         } else {
             if (_topicTitle.isEmpty()) {
-                viewState.render(State.Error("No input topic"))
+                viewState.render(State.Error("Enter topic"))
             } else {
                 topic = _topicTitle
             }
@@ -412,10 +422,40 @@ class ChatPresenter @Inject constructor(private val messageRepository: MessageRe
         return topic
     }
 
+    //if open stream then show date else show date and topicName
+    private fun getMessagesByDivider(messages: List<MessageEntity>): List<ItemFingerPrint> {
+        return topicTitle?.let {
+            messages.groupBy { formatDateByDay(it.timestamp) }
+                .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
+                    listOf(DateDividerFingerPrint(date)) +
+                            messagesByDate.map { message -> MessageFingerPrint(message) }
+                }
+        } ?: messages.groupBy { formatDateByDay(it.timestamp) }
+            .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
+                listOf(DateDividerFingerPrint(date)) +
+                        getMessagesByDateAndTopicName(messagesByDate)
+            }
+    }
+
+    private fun getMessagesByDateAndTopicName(messagesByDate: List<MessageEntity>): List<ItemFingerPrint> {
+        return messagesByDate.flatMapIndexed { i: Int, message: MessageEntity ->
+            if (i == 0 || messagesByDate[i - 1].topicName != message.topicName) {
+                listOf(
+                    DateDividerFingerPrint(message.topicName),
+                    MessageFingerPrint(message)
+                )
+            } else {
+                listOf(MessageFingerPrint(message))
+            }
+        }
+    }
+
     companion object {
 
         private const val INITIAL_PAGE_SIZE = 20
         private const val NUM_BEFORE_UPDATE = 1
+        private const val NUM_AFTER = 0
+        private const val NUM_BEFORE_DELETE = 100
         private const val DEFAULT_ANCHOR = 10000000000000000
         private const val EMPTY_STRING = ""
     }

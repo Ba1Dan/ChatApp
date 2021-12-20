@@ -6,11 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
@@ -27,6 +27,7 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
     private lateinit var adapterPerson: PersonAdapter
     private lateinit var rvUsers: RecyclerView
     private lateinit var shimmer: ShimmerFrameLayout
+    private lateinit var searchView: SearchView
 
     @Inject
     lateinit var presenterProvider: Provider<PeoplePresenter>
@@ -42,10 +43,10 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_people, container, false)
         rvUsers = view.findViewById(R.id.rv_users)
         shimmer = view.findViewById(R.id.shimmer_people)
+        searchView = view.findViewById(R.id.search_view)
         return view
     }
 
@@ -53,6 +54,19 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
         super.onViewCreated(view, savedInstanceState)
         adapterPerson = PersonAdapter(this)
         rvUsers.adapter = adapterPerson
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                presenter.searchUsers(p0.orEmpty())
+                return true
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                presenter.searchUsers(p0.orEmpty())
+                return true
+            }
+        })
     }
 
     override fun onItemClick(click: TypeItemClickStream) {
@@ -60,7 +74,6 @@ class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
     }
 
     override fun render(state: State<List<UserFingerPrint>>) {
-
         when (state) {
             is State.Result -> {
                 adapterPerson.listOfUser = state.data

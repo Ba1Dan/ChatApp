@@ -16,8 +16,7 @@ import javax.inject.Inject
 class ProfilePresenter @Inject constructor(
     private val repository: ProfileRepository,
     private val networkManager: NetworkManager
-) :
-    MvpPresenter<ProfileView>() {
+) : MvpPresenter<ProfileView>() {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -33,7 +32,7 @@ class ProfilePresenter @Inject constructor(
 
     private fun loadProfile() {
         if (networkManager.isConnected().value) {
-            viewState.render(State.Loading())
+            viewState.render(State.Loading)
             repository.loadProfile()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

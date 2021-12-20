@@ -21,7 +21,7 @@ interface ChatApi {
     fun getMessages(
         @Query("anchor") anchor: Long,
         @Query("num_before") numBefore: Int,
-        @Query("num_after") numAfter: Int = 0,
+        @Query("num_after") numAfter: Int,
         @Query("narrow") narrow: String,
         @Query("apply_markdown") applyMarkdown: Boolean = true
     ): Single<MessagesResponse>

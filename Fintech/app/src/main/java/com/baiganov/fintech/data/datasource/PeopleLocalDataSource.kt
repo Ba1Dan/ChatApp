@@ -11,4 +11,6 @@ class PeopleLocalDataSource @Inject constructor(
     fun getUsers() = usersDao.getUsers()
 
     fun saveUsers(users: List<UserEntity>) = usersDao.saveUsers(users)
+
+    fun searchUsers(name: String) = usersDao.searchUsers(name)
 }

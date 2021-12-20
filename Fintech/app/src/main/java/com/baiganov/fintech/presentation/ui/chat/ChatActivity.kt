@@ -8,10 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
@@ -24,14 +21,12 @@ import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
+import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
-import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
-import com.baiganov.fintech.presentation.model.MessageFingerPrint
-import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Companion.MESSAGE_ID_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Companion.NEW_CONTENT_RESULT_KEY
@@ -39,9 +34,10 @@ import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog.Compan
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.NEW_TOPIC_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.REQUEST_KEY_EDIT_TOPIC
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
+import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.baiganov.fintech.util.Event
 import com.baiganov.fintech.util.State
-import com.baiganov.fintech.presentation.сustomview.OnClickMessage
 import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -61,6 +57,13 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     private val presenter: ChatPresenter by moxyPresenter { presenterProvider.get() }
     private val component by lazy { (application as App).component }
 
+    private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
+    private val topicTitle: String? by lazy { intent.extras?.getString(ARG_TITLE_TOPIC) }
+    private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
+
+    private var positionRecyclerView: TypeScroll = TypeScroll.DOWN
+    private var isLoadNewPage = true
+
     private lateinit var adapter: MessageAdapter
     private lateinit var toolBarChat: Toolbar
     private lateinit var tvTopic: TextView
@@ -71,13 +74,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     private lateinit var shimmer: ShimmerFrameLayout
     private lateinit var inputTopic: EditText
     private lateinit var notification: TextView
-
-    private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
-    private val topicTitle: String? by lazy { intent.extras?.getString(ARG_TITLE_TOPIC) }
-    private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
-
-    private var positionRecyclerView: TypeScroll = TypeScroll.DOWN
-    private var isLoadNewPage = true
+    private lateinit var pgFile: ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         component.inject(this)
@@ -103,27 +100,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         )
 
         setClickListener()
-
-        supportFragmentManager.setFragmentResultListener(
-            REQUEST_KEY_EDIT_MESSAGE,
-            this
-        ) { _, bundle ->
-            val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
-            val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
-
-            presenter.obtainEvent(Event.EventChat.EditMessage(id, content))
-        }
-
-        supportFragmentManager.setFragmentResultListener(
-            REQUEST_KEY_EDIT_TOPIC,
-            this
-        ) { _, bundle ->
-
-            val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
-            val topic: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
-
-            presenter.obtainEvent(Event.EventChat.EditTopic(id, topic))
-        }
+        setFragmentResultListener()
     }
 
     override fun sendData(click: TypeClick) {
@@ -148,14 +125,10 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                         messageId = click.messageId,
                     )
                 )
-                Toast.makeText(this, "deleted message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.deleted_message), Toast.LENGTH_SHORT).show()
             }
             is TypeClick.Copy -> {
-                val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText(null, click.message.content)
-                clipBoard.setPrimaryClip(clip)
-
-                Toast.makeText(this, "Message copied to clipboard", Toast.LENGTH_SHORT).show()
+                copyMessage(click.message.content)
             }
             is TypeClick.EditTopic -> {
                 EditTopicDialog.newInstance(click.messageId, click.topicName)
@@ -204,6 +177,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         when (state) {
             is State.Result -> {
                 shimmer.isVisible = false
+
                 adapter.messages = state.data
 
                 if (positionRecyclerView == TypeScroll.DOWN) {
@@ -222,7 +196,13 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             }
 
             is State.AddFile -> {
+                pgFile.isVisible = false
                 inputMessage.append(state.uri)
+            }
+
+            is State.LoadingFile -> {
+
+                pgFile.isVisible = true
             }
         }
     }
@@ -238,6 +218,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         tvTopic = findViewById(R.id.tv_topic)
         shimmer = findViewById(R.id.shimmer_messages)
         notification = findViewById(R.id.notification)
+        pgFile = findViewById(R.id.pg_file)
 
         topicTitle?.let {
             inputTopic.isVisible = false
@@ -367,6 +348,37 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                 callback(name, size)
             }
 
+    }
+
+    private fun copyMessage(message: String) {
+        val clipBoard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(null, message)
+        clipBoard.setPrimaryClip(clip)
+
+        Toast.makeText(this, getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setFragmentResultListener() {
+        supportFragmentManager.setFragmentResultListener(
+            REQUEST_KEY_EDIT_MESSAGE,
+            this
+        ) { _, bundle ->
+            val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
+            val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
+
+            presenter.obtainEvent(Event.EventChat.EditMessage(id, content))
+        }
+
+        supportFragmentManager.setFragmentResultListener(
+            REQUEST_KEY_EDIT_TOPIC,
+            this
+        ) { _, bundle ->
+
+            val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
+            val topic: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
+
+            presenter.obtainEvent(Event.EventChat.EditTopic(id, topic))
+        }
     }
 
     companion object {

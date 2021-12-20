@@ -39,4 +39,7 @@
     <string name="hint_topic">#topic</string>
     <string name="button_add">button add</string>
     <string name="no_network_connection">No network connection</string>
+
+    <string name="deleted_message">"Deleted message"</string>
+    <string name="copied_to_clipboard">"Message copied to clipboard"</string>
 </resources>

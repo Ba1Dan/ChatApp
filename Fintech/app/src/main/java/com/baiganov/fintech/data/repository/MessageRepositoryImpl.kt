@@ -28,10 +28,11 @@ class MessageRepositoryImpl @Inject constructor(
         topicTitle: String?,
         anchor: Long,
         streamId: Int,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable {
 
-        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore, numAfter)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 topicTitle?.let {
@@ -57,10 +58,11 @@ class MessageRepositoryImpl @Inject constructor(
         streamTitle: String,
         topicTitle: String?,
         anchor: Long,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable {
 
-        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore, numAfter)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)
@@ -73,10 +75,11 @@ class MessageRepositoryImpl @Inject constructor(
         streamTitle: String,
         topicTitle: String?,
         anchor: Long,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable {
 
-        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore)
+        return remoteDataSource.loadMessages(streamTitle, topicTitle, anchor, numBefore, numAfter)
             .subscribeOn(Schedulers.io())
             .flatMapCompletable {
                 val messages = mapToEntity(it.messages)

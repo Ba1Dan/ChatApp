@@ -14,21 +14,24 @@ interface MessageRepository {
         topicTitle: String?,
         anchor: Long,
         streamId: Int,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable
 
     fun updateMessage(
         streamTitle: String,
         topicTitle: String?,
         anchor: Long,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable
 
     fun loadNextMessages(
         streamTitle: String,
         topicTitle: String?,
         anchor: Long,
-        numBefore: Int
+        numBefore: Int,
+        numAfter: Int
     ): Completable
 
     fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable
