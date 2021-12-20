@@ -1,4 +1,4 @@
-package com.baiganov.fintech.data.db
+package com.baiganov.fintech.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

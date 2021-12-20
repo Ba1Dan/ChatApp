@@ -1,6 +1,6 @@
 package com.baiganov.fintech.data.datasource
 
-import com.baiganov.fintech.data.db.MessagesDao
+import com.baiganov.fintech.data.db.dao.MessagesDao
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import io.reactivex.Completable
 import io.reactivex.Flowable

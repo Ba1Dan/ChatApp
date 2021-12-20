@@ -1,11 +1,11 @@
 package com.baiganov.fintech.presentation.model
 
-import com.baiganov.fintech.data.model.response.UsersResponse
+import com.baiganov.fintech.data.db.entity.UserEntity
 
-class UserToUserFingerPrintMapper : (UsersResponse) -> (List<UserFingerPrint>) {
+class UserToUserFingerPrintMapper : (List<UserEntity>) -> (List<UserFingerPrint>) {
 
-    override fun invoke(response: UsersResponse): List<UserFingerPrint> {
-        return response.users.map { user ->
+    override fun invoke(users: List<UserEntity>): List<UserFingerPrint> {
+        return users.map { user ->
             UserFingerPrint(user)
         }
     }

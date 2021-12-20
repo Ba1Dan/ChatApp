@@ -1,9 +1,12 @@
 package com.baiganov.fintech.domain.repository
 
-import com.baiganov.fintech.data.model.response.UsersResponse
-import io.reactivex.Single
+import com.baiganov.fintech.data.db.entity.UserEntity
+import io.reactivex.Completable
+import io.reactivex.Flowable
 
 interface PeopleRepository {
 
-    fun getUsers(): Single<UsersResponse>
+    fun getUsers(): Flowable<List<UserEntity>>
+
+    fun loadUsers(): Completable
 }

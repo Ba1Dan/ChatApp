@@ -45,18 +45,24 @@ class PersonAdapter(private val clickListener: ItemClickListener) :
 
         private val tvName: TextView = itemView.findViewById(R.id.user_name)
         private val tvEmail: TextView = itemView.findViewById(R.id.user_email)
-        private val isOnline: View = itemView.findViewById(R.id.online_icon)
+        private val isOnline: View = itemView.findViewById(R.id.status_icon)
         private val ivAvatar: ShapeableImageView = itemView.findViewById(R.id.user_avatar)
 
         override fun bind(item: UserFingerPrint) {
             tvName.text = item.user.fullName
             tvEmail.text = item.user.email
-            Glide.with(itemView.context).load(item.user.avatarUrl).into(ivAvatar)
-            if (item.user.isActive) {
-                isOnline.setBackgroundResource(R.drawable.bg_online_view)
-            } else {
-                isOnline.setBackgroundResource(R.drawable.bg_offline_view)
+            when(item.user.status) {
+                "idle" -> {
+                    isOnline.setBackgroundResource(R.drawable.bg_idle_view)
+                }
+                "offline" -> {
+                    isOnline.setBackgroundResource(R.drawable.bg_offline_view)
+                }
+                "online" -> {
+                    isOnline.setBackgroundResource(R.drawable.bg_online_view)
+                }
             }
+            Glide.with(itemView.context).load(item.user.avatarUrl).into(ivAvatar)
         }
     }
 }

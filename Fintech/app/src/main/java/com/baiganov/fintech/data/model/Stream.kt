@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 data class Stream(
     @SerialName("stream_id") val id: Int,
     @SerialName("name") val name: String,
-
 ) {
     var topics: List<Topic> = emptyList()
     var isSubscribed: Boolean = false

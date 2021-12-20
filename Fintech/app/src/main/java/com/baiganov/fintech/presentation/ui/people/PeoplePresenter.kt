@@ -1,11 +1,13 @@
 package com.baiganov.fintech.presentation.ui.people
 
+import android.util.Log
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.internal.functions.Functions
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -18,13 +20,13 @@ class PeoplePresenter @Inject constructor(
     private val repository: PeopleRepository,
     private val userToUserFingerPrintMapper: UserToUserFingerPrintMapper,
     private val networkManager: NetworkManager
-) :
-    MvpPresenter<PeopleView>() {
+) : MvpPresenter<PeopleView>() {
 
     private val compositeDisposable = CompositeDisposable()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        loadUsers()
         getUsers()
     }
 
@@ -33,21 +35,37 @@ class PeoplePresenter @Inject constructor(
         compositeDisposable.dispose()
     }
 
-    private fun getUsers() {
-        if (networkManager.isConnected().value) {
-            viewState.render(State.Loading())
-            repository.getUsers()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(userToUserFingerPrintMapper)
-                .subscribeBy(
-                    onSuccess = { users ->
-                        viewState.render(State.Result(users))
-                    },
-                    onError = { viewState.render(State.Error(it.message)) }
-                )
-                .addTo(compositeDisposable)
-        }
+    private fun loadUsers() {
+        repository.loadUsers()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                viewState.render(State.Loading())
+            }
+            .subscribeBy(
+                onComplete = {
+                    Functions.EMPTY_ACTION
+                },
+                onError = { exception ->
+                    viewState.render(State.Error(exception.message))
+                }
+            )
+            .addTo(compositeDisposable)
+    }
 
+    private fun getUsers() {
+        repository.getUsers()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map(userToUserFingerPrintMapper)
+            .subscribeBy(
+                onNext = { users ->
+                    viewState.render(State.Result(users.sortedBy { it.user.fullName }))
+                },
+                onError = {
+                    viewState.render(State.Error(it.message))
+                }
+            )
+            .addTo(compositeDisposable)
     }
 }

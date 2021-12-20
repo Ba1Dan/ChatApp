@@ -1,7 +1,8 @@
 package com.baiganov.fintech.data.datasource
 
-import com.baiganov.fintech.data.network.ChatApi
+import com.baiganov.fintech.data.model.response.UserPresenceResponse
 import com.baiganov.fintech.data.model.response.UsersResponse
+import com.baiganov.fintech.data.network.ChatApi
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -11,5 +12,9 @@ class PeopleRemoteDataSource @Inject constructor(
 
     fun getUsers(): Single<UsersResponse> {
         return service.getUsers()
+    }
+
+    fun getUserPresence(userId: String): Single<UserPresenceResponse> {
+        return service.getUserPresence(userId)
     }
 }

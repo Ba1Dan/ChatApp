@@ -153,7 +153,7 @@ class StreamsPresenter @Inject constructor(
                 }
                 .subscribeBy(
                     onComplete = {
-                        Functions.EMPTY_ACTION//
+                        Functions.EMPTY_ACTION
                     },
                     onError = { exception ->
                         viewState.render(State.Error(exception.message))
@@ -161,7 +161,6 @@ class StreamsPresenter @Inject constructor(
                 )
                 .addTo(compositeDisposable)
         } else {
-            //Нет подключения к инету
             viewState.render(State.Error("No connection"))
         }
     }

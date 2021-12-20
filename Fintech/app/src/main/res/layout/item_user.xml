@@ -18,7 +18,7 @@
         app:srcCompat="@mipmap/ic_launcher" />
 
     <View
-        android:id="@+id/online_icon"
+        android:id="@+id/status_icon"
         android:layout_width="@dimen/size_online_view"
         android:layout_height="@dimen/size_online_view"
         android:background="@drawable/bg_online_view"

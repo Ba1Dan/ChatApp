@@ -32,6 +32,11 @@ interface ChatApi {
     @GET("users/me")
     fun getOwnUser(): Single<User>
 
+    @GET("users/{user_id_or_email}/presence")
+    fun getUserPresence(
+        @Path("user_id_or_email") id: String
+    ): Single<UserPresenceResponse>
+
     @POST("messages")
     fun sendMessage(
         @Query("type") type: String = "stream",

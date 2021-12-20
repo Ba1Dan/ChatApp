@@ -10,4 +10,7 @@ data class User(
     @SerialName("email") val email: String,
     @SerialName("full_name") val fullName: String,
     @SerialName("is_active") val isActive: Boolean,
-)
+    @SerialName("is_bot") val isBot: Boolean,
+) {
+    var status: String = ""
+}
