@@ -11,8 +11,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.data.model.response.Message
-import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
 import com.baiganov.fintech.util.parseHtml
 
 class EditMessageDialog : DialogFragment() {

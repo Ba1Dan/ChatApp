@@ -23,6 +23,14 @@
 
         <include layout="@layout/shimmer_outgoing_message" />
 
+        <include layout="@layout/shimmer_incoming_message" />
+
+        <include layout="@layout/shimmer_outgoing_message" />
+
+        <include layout="@layout/shimmer_incoming_message" />
+
+        <include layout="@layout/shimmer_outgoing_message" />
+
     </LinearLayout>
 
 </com.facebook.shimmer.ShimmerFrameLayout>

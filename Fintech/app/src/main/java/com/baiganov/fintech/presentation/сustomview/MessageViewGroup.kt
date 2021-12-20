@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.*
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.model.response.Reaction
+import com.baiganov.fintech.data.model.Reaction
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.bumptech.glide.Glide
@@ -91,13 +91,13 @@ class MessageViewGroup @JvmOverloads constructor(
         flexBox.setReactions(reactions, clickListener, idMessage)
     }
 
-    fun addReactionByButton(clickListener: OnClickMessage, position: Int, item: ItemFingerPrint) {
+    fun addReactionByButton(clickListener: OnClickMessage, position: Int) {
         addReactionButton.setOnClickListener {
             clickListener.onItemClick(TypeClick.OpenBottomSheet(position))
         }
     }
 
-    fun setAvatar(glide: RequestManager, avatarUrl: String) {
+    fun setAvatar(avatarUrl: String) {
         Glide.with(avatarView.context).load(avatarUrl).into(avatarView)
     }
 

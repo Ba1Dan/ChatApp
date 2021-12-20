@@ -1,4 +1,4 @@
-package com.baiganov.fintech.data.model.response
+package com.baiganov.fintech.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,6 +11,4 @@ data class User(
     @SerialName("full_name") val fullName: String,
     @SerialName("is_active") val isActive: Boolean,
     @SerialName("is_bot") val isBot: Boolean,
-) {
-    var status: String = ""
-}
+)

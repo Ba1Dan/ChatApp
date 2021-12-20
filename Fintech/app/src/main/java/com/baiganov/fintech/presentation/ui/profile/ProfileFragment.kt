@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.data.model.response.User
+import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.util.State
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter

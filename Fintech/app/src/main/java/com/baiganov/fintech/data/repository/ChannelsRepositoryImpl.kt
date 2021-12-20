@@ -3,9 +3,9 @@ package com.baiganov.fintech.data.repository
 import com.baiganov.fintech.data.datasource.ChannelsLocalDataSource
 import com.baiganov.fintech.data.datasource.ChannelsRemoteDataSource
 import com.baiganov.fintech.data.db.entity.StreamEntity
-import com.baiganov.fintech.data.model.response.Subscription
+import com.baiganov.fintech.data.model.Subscription
 import com.baiganov.fintech.domain.repository.ChannelsRepository
-import com.baiganov.fintech.data.model.response.TopicsResponse
+import com.baiganov.fintech.data.model.TopicsResponse
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
 import io.reactivex.Completable
 import io.reactivex.Flowable

@@ -42,7 +42,8 @@
                 android:src="@drawable/ic_search_27"
                 app:layout_constraintBottom_toBottomOf="@id/search"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/search" />
+                app:layout_constraintTop_toTopOf="@id/search"
+                android:contentDescription="@string/desc_search_icon" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

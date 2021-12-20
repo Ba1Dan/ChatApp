@@ -5,8 +5,8 @@ import com.baiganov.fintech.data.UriReader
 import com.baiganov.fintech.data.datasource.MessageLocalDataSource
 import com.baiganov.fintech.data.datasource.MessageRemoteDataSource
 import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.data.model.response.FileResponse
-import com.baiganov.fintech.data.model.response.Message
+import com.baiganov.fintech.data.model.FileResponse
+import com.baiganov.fintech.data.model.Message
 import com.baiganov.fintech.domain.repository.MessageRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable

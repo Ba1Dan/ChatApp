@@ -3,7 +3,7 @@ package com.baiganov.fintech.data.repository
 import com.baiganov.fintech.data.datasource.PeopleLocalDataSource
 import com.baiganov.fintech.data.datasource.PeopleRemoteDataSource
 import com.baiganov.fintech.data.db.entity.UserEntity
-import com.baiganov.fintech.data.model.response.User
+import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable

@@ -20,16 +20,24 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideOkHttpClient(): OkHttpClient {
-        val loggingInterceptor =
-            HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-        val authInterceptor = AuthInterceptor()
-
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor, loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
             .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.SECONDS)
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthInterceptor(): AuthInterceptor {
+        return AuthInterceptor()
+    }
+
+    @Singleton
+    @Provides
+    fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
     }
 
     @ExperimentalSerializationApi
@@ -39,12 +47,13 @@ class NetworkModule {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory(contentType))
+            .addConverterFactory(json.asConverterFactory(contentType))
             .client(client)
             .build().create(ChatApi::class.java)
 
     companion object {
 
+        private val json = Json { ignoreUnknownKeys = true }
         private val contentType = "application/json".toMediaType()
         private const val READ_TIMEOUT_MILLIS = 20L
         const val BASE_URL = "https://tinkoff-android-fall21.zulipchat.com/api/v1/"

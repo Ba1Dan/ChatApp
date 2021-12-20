@@ -14,7 +14,6 @@ import org.jsoup.Jsoup
 
 class InComingMessageViewHolder(
     private val clickListener: OnClickMessage,
-    private val glide: RequestManager,
     itemView: View
 ) : BaseViewHolder<MessageFingerPrint>(itemView) {
 
@@ -32,8 +31,8 @@ class InComingMessageViewHolder(
             author = message.senderFullName
             date = formatDate(message.timestamp)
 
-            addReactionByButton(clickListener, message.id, item)
-            setAvatar(glide, item.message.avatarUrl)
+            addReactionByButton(clickListener, message.id)
+            setAvatar(item.message.avatarUrl)
         }
 
         itemView.setOnLongClickListener {

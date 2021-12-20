@@ -44,5 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
-        android:text="@string/create_stream" />
+        android:text="@string/create_stream"
+        android:textColor="#e8f5e9" />
 </LinearLayout>

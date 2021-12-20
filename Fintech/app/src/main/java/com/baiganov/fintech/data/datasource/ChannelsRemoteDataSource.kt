@@ -1,13 +1,12 @@
 package com.baiganov.fintech.data.datasource
 
-import com.baiganov.fintech.data.model.response.AllStreamsResponse
-import com.baiganov.fintech.data.model.response.SubscribedStreamsResponse
-import com.baiganov.fintech.data.model.response.Subscription
-import com.baiganov.fintech.data.model.response.TopicsResponse
+import com.baiganov.fintech.data.model.AllStreamsResponse
+import com.baiganov.fintech.data.model.SubscribedStreamsResponse
+import com.baiganov.fintech.data.model.Subscription
+import com.baiganov.fintech.data.model.TopicsResponse
 import com.baiganov.fintech.data.network.ChatApi
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import javax.inject.Inject

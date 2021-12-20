@@ -2,14 +2,13 @@ package com.baiganov.fintech.presentation.сustomview
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.MyUser
 import android.widget.LinearLayout
-import com.baiganov.fintech.data.model.response.Reaction
+import com.baiganov.fintech.data.model.Reaction
 
 class FlexBoxLayout @JvmOverloads constructor(
     context: Context,

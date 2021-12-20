@@ -51,18 +51,25 @@ class PersonAdapter(private val clickListener: ItemClickListener) :
         override fun bind(item: UserFingerPrint) {
             tvName.text = item.user.fullName
             tvEmail.text = item.user.email
-            when(item.user.status) {
-                "idle" -> {
+            when (item.user.status) {
+                STATUS_IDLE -> {
                     isOnline.setBackgroundResource(R.drawable.bg_idle_view)
                 }
-                "offline" -> {
+                STATUS_OFFLINE -> {
                     isOnline.setBackgroundResource(R.drawable.bg_offline_view)
                 }
-                "online" -> {
+                STATUS_ONLINE -> {
                     isOnline.setBackgroundResource(R.drawable.bg_online_view)
                 }
             }
             Glide.with(itemView.context).load(item.user.avatarUrl).into(ivAvatar)
         }
+    }
+
+    companion object {
+
+        private const val STATUS_IDLE = "idle"
+        private const val STATUS_OFFLINE = "offline"
+        private const val STATUS_ONLINE = "online"
     }
 }

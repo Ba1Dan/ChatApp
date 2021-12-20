@@ -5,7 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.baiganov.fintech.data.db.entity.MessageEntity.Companion.MESSAGES_TABLE
-import com.baiganov.fintech.data.model.response.Reaction
+import com.baiganov.fintech.data.model.Reaction
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 

@@ -1,8 +1,8 @@
 package com.baiganov.fintech.data.datasource
 
-import com.baiganov.fintech.data.model.response.FileResponse
-import com.baiganov.fintech.data.model.response.MessagesResponse
-import com.baiganov.fintech.data.model.response.Narrow
+import com.baiganov.fintech.data.model.FileResponse
+import com.baiganov.fintech.data.model.MessagesResponse
+import com.baiganov.fintech.data.model.Narrow
 import com.baiganov.fintech.data.network.ChatApi
 import io.reactivex.Completable
 import io.reactivex.Single

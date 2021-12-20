@@ -5,20 +5,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.baiganov.fintech.R
+import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.DateDividerViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.InComingMessageViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.OutGoingMessageViewHolder
-import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.сustomview.OnClickMessage
-import com.bumptech.glide.RequestManager
 
 class MessageAdapter(
-    private val clickListener: OnClickMessage,
-    private val glide: RequestManager
+    private val clickListener: OnClickMessage
 ) : RecyclerView.Adapter<BaseViewHolder<ItemFingerPrint>>() {
 
-    private val differ = AsyncListDiffer(this, MessageDiffUtil());
+    private val differ = AsyncListDiffer(this, MessageDiffUtil())
 
     var messages: List<ItemFingerPrint>
         set(value) = differ.submitList(value)
@@ -32,7 +30,6 @@ class MessageAdapter(
             R.layout.incoming_message -> {
                 InComingMessageViewHolder(
                     clickListener,
-                    glide,
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.incoming_message, parent, false),
 
