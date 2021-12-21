@@ -1,5 +1,8 @@
 package com.baiganov.fintech.presentation.ui.chat.dialog
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +20,12 @@ class EditMessageDialog : DialogFragment() {
 
     private lateinit var editMessage: EditText
     private lateinit var btnEdit: Button
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return dialog
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,8 +57,6 @@ class EditMessageDialog : DialogFragment() {
             dismiss()
         }
     }
-
-    override fun getTheme() = R.style.RoundedCornersDialog
 
     companion object {
 

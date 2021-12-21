@@ -1,5 +1,8 @@
 package com.baiganov.fintech.presentation.ui.channels.streams
 
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +19,12 @@ class CreateStreamDialog : DialogFragment() {
     private lateinit var inputName: EditText
     private lateinit var inputDescription: EditText
     private lateinit var btnCreate: Button
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        return dialog
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,8 +53,6 @@ class CreateStreamDialog : DialogFragment() {
             dismiss()
         }
     }
-
-    override fun getTheme() = R.style.RoundedCornersDialog
 
     companion object {
 

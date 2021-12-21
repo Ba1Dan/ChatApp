@@ -124,7 +124,7 @@ class MessageRepositoryImpl @Inject constructor(
 
         bytes?.let {
             val body = bytes.toRequestBody(type.toMediaType())
-            val part = MultipartBody.Part.createFormData("file", name, body)
+            val part = MultipartBody.Part.createFormData(NAME_FILE, name, body)
 
 
             return remoteDataSource.uploadFile(part)
@@ -151,5 +151,9 @@ class MessageRepositoryImpl @Inject constructor(
                 topicName = message.topicName,
             )
         }
+    }
+
+    companion object {
+        private const val NAME_FILE = "file"
     }
 }
