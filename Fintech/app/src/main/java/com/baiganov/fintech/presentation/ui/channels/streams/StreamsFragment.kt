@@ -2,30 +2,27 @@ package com.baiganov.fintech.presentation.ui.channels.streams
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
-import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter.Companion.INITIAL_QUERY
-import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.ExpandableAdapter
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
 import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.CREATE_STREAM_REQUEST_KEY
 import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.DESCRIPTION_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.NAME_RESULT_KEY
+import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.ExpandableAdapter
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
-import com.baiganov.fintech.presentation.ui.chat.dialog.EditMessageDialog
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
 import com.baiganov.fintech.util.Event
@@ -36,6 +33,8 @@ import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import javax.inject.Inject
 import javax.inject.Provider
+import androidx.recyclerview.widget.DividerItemDecoration
+
 
 class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
     SearchQueryListener {
@@ -93,6 +92,19 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
 
         adapterStreams = ExpandableAdapter(this)
         rvStreams.adapter = adapterStreams
+
+        rvStreams.addItemDecoration(
+            DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            ).apply {
+                setDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.shape_line
+                    )!!
+                )
+            })
     }
 
     override fun onItemClick(click: TypeItemClickStream) {
@@ -116,7 +128,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                         } else {
                             presenter.obtainEvent(
                                 Event.EventChannels.CloseStream(
-                                   item.childTopics
+                                    item.childTopics
                                 )
                             )
                         }
@@ -134,7 +146,7 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
         when (state) {
             is State.Result -> {
                 adapterStreams.dataOfList = state.data
-                swipeRefreshLayout.isRefreshing = false;
+                swipeRefreshLayout.isRefreshing = false
                 frameNotResult.isVisible = state.data.isEmpty()
 
                 shimmer.isVisible = false
@@ -149,6 +161,9 @@ class StreamsFragment : MvpAppCompatFragment(), StreamsView, ItemClickListener,
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                 frameNotResult.isVisible = false
                 shimmer.isVisible = false
+            }
+            else -> {
+
             }
         }
     }
