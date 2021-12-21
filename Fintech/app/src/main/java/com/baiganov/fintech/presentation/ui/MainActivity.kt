@@ -2,7 +2,6 @@ package com.baiganov.fintech.presentation.ui
 
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,14 +13,12 @@ import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.ui.channels.ChannelsFragment
 import com.baiganov.fintech.presentation.ui.people.PeopleFragment
 import com.baiganov.fintech.presentation.ui.profile.ProfileFragment
+import com.baiganov.fintech.util.BottomNavigationPages
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var channelsFragment: ChannelsFragment
-    private lateinit var peopleFragment: PeopleFragment
-    private lateinit var profileFragment: ProfileFragment
     private lateinit var notification: TextView
 
     private val component by lazy {
@@ -45,47 +42,11 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         notification = findViewById(R.id.notification)
 
-//        if (savedInstanceState == null) {
-//
-//            channelsFragment = ChannelsFragment.newInstance()
-//            peopleFragment = PeopleFragment.newInstance()
-//            profileFragment = ProfileFragment.newInstance()
-//
-//            supportFragmentManager.commit {
-//                add(
-//                    R.id.main_fragment_container,
-//                    channelsFragment,
-//                    BottomNavigationPages.CHANNELS.name
-//                )
-//                add(
-//                    R.id.main_fragment_container,
-//                    peopleFragment,
-//                    BottomNavigationPages.CHANNELS.name
-//                )
-//                add(
-//                    R.id.main_fragment_container,
-//                    profileFragment,
-//                    BottomNavigationPages.CHANNELS.name
-//                )
-//            }
-//
-//            setFragment(BottomNavigationPages.CHANNELS)
-//        }
-
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 add(R.id.main_fragment_container, ChannelsFragment.newInstance(), BottomNavigationPages.CHANNELS.name)
             }
         }
-
-//        bottomNavigationView.setOnItemSelectedListener { item ->
-//            when (item.itemId) {
-//                R.id.channels_menu_item -> setFragment(BottomNavigationPages.CHANNELS)
-//                R.id.people_menu_item -> setFragment(BottomNavigationPages.PEOPLE)
-//                R.id.profile_menu_item -> setFragment(BottomNavigationPages.PROFILE)
-//                else -> false
-//            }
-//        }
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {

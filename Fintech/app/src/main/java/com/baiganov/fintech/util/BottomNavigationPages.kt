@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.ui
+package com.baiganov.fintech.util
 
 enum class BottomNavigationPages {
     CHANNELS,

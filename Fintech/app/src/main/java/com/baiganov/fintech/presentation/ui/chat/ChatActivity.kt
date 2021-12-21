@@ -233,7 +233,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
     private fun setupRecyclerView() {
         (rvChat.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        adapter = MessageAdapter(this, Glide.with(this@ChatActivity))
+        adapter = MessageAdapter(this)
         rvChat.adapter = adapter
 
         rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
