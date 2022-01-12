@@ -78,7 +78,6 @@ class EmojiView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-
         textPaint.getTextBounds(
             reactionCount.toString(),
             0,
@@ -99,7 +98,6 @@ class EmojiView @JvmOverloads constructor(
 
         setMeasuredDimension(totalWidth, totalHeight)
     }
-
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         textCoordinate.x = (w - reactionCountBounds.width() - paddingEnd).toFloat()
