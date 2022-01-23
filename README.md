@@ -15,6 +15,10 @@ A mobile application where you send/edit/delete messages, add/remove reactions o
   <img src="https://user-images.githubusercontent.com/53014698/150684539-1305b37a-edd9-468b-82cf-be3c74b733ce.jpg" width="25%"/>
 </p>
 
+<p align="center">
+<img src="https://user-images.githubusercontent.com/53014698/150684952-a3d00f77-765b-4c0b-acc0-c834ac78bbf1.mp4" width="15%"/>
+</p>
+
 # Tech stack
 - MVP + [Moxy](https://github.com/Arello-Mobile/Moxy)
 - [Dagger2](https://dagger.dev)
