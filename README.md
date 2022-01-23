@@ -16,7 +16,7 @@ A mobile application where you send/edit/delete messages, add/remove reactions o
 </p>
 
 <p align="center">
-<img src="https://user-images.githubusercontent.com/53014698/150684952-a3d00f77-765b-4c0b-acc0-c834ac78bbf1.mp4" width="15%"/>
+  <img src="https://user-images.githubusercontent.com/53014698/150685392-3deda4a4-6e25-42f0-bdf1-379651c8e885.gif" width="15%"/>
 </p>
 
 # Tech stack
