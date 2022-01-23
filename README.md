@@ -5,6 +5,11 @@ A mobile application where you send/edit/delete messages, add/remove reactions o
 
 # Screenshots
 <p align="center">
+  <img src="https://user-images.githubusercontent.com/53014698/150685392-3deda4a4-6e25-42f0-bdf1-379651c8e885.gif" width="20%"/>
+  <img src="https://user-images.githubusercontent.com/53014698/150687500-3b892d5f-d27c-4163-902e-64a42a44fd06.gif" width="20%"/>
+</p>
+
+<p align="center">
   <img src="https://user-images.githubusercontent.com/53014698/150684502-2ff624e4-d8aa-4027-b7ff-7511d7b2be11.jpg" width="20%"/>
   <img src="https://user-images.githubusercontent.com/53014698/150684514-eda16e7d-e104-4cb5-b574-5aaf6a7ebc71.jpg" width="20%"/>
   <img src="https://user-images.githubusercontent.com/53014698/150684518-e0ffe5ea-3a0a-43d2-b5f5-b1d4ab67bd5a.jpg" width="20%"/>
@@ -15,10 +20,7 @@ A mobile application where you send/edit/delete messages, add/remove reactions o
   <img src="https://user-images.githubusercontent.com/53014698/150684539-1305b37a-edd9-468b-82cf-be3c74b733ce.jpg" width="20%"/>
 </p>
 
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/53014698/150685392-3deda4a4-6e25-42f0-bdf1-379651c8e885.gif" width="20%"/>
-  <img src="https://user-images.githubusercontent.com/53014698/150687500-3b892d5f-d27c-4163-902e-64a42a44fd06.gif" width="20%"/>
-</p>
+
 
 # Tech stack
 - MVP + [Moxy](https://github.com/Arello-Mobile/Moxy)
