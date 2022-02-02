@@ -1,4 +1,4 @@
-<h1 align="center">Zulip</h1>
+<h1 align="center">ChatApp</h1>
 
 # General info
 A mobile application where you send/edit/delete messages, add/remove reactions on messages, create streams/topics
