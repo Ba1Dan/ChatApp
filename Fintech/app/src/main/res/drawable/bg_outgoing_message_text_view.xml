@@ -3,7 +3,7 @@
     android:shape="rectangle">
     <corners android:radius="@dimen/message_bg_corners_radius" />
     <gradient
-        android:endColor="#006153"
-        android:startColor="#2A9D8F" />
+        android:endColor="@color/green_end_gradient"
+        android:startColor="@color/green" />
 
 </shape>

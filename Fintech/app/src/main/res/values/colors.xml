@@ -12,6 +12,7 @@
     <color name="grey">#1C1C1C</color>
     <color name="green">#2A9D8F</color>
     <color name="green_dark">#219653</color>
+    <color name="background">#555555</color>
 
     <color name="color_hint">#CCCCCC</color>
     <color name="light_grey_text_date">#999999</color>
@@ -20,4 +21,6 @@
     <color name="text_lime">#4AB54D</color>
     <color name="yellow">#E9C46A</color>
     <color name="red">#F44336</color>
+    <color name="orange">#FF9800</color>
+    <color name="green_end_gradient">#006153</color>
 </resources>

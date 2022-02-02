@@ -15,7 +15,7 @@
 
     <EditText
         android:id="@+id/input_name"
-        style="@style/edit_style"
+        style="@style/editStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
@@ -24,7 +24,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_edit"
-        style="@style/button_style"
+        style="@style/buttonStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_medium"
