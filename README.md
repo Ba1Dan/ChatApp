@@ -2,7 +2,7 @@
 
 # General info
 A mobile application where you send/edit/delete messages, add/remove reactions on messages, create streams/topics
-
+[API](https://zulip.com/api/)
 # Screenshots
 <p align="center">
   <img src="https://user-images.githubusercontent.com/53014698/150685392-3deda4a4-6e25-42f0-bdf1-379651c8e885.gif" width="20%"/>
