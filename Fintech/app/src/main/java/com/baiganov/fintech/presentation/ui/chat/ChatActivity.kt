@@ -11,8 +11,10 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -20,6 +22,7 @@ import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.presentation.ViewModelFactory
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
@@ -35,27 +38,23 @@ import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.NEW_TOPIC_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.REQUEST_KEY_EDIT_TOPIC
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
-import com.baiganov.fintech.presentation.сustomview.OnClickMessage
-import com.baiganov.fintech.util.Event
+import com.baiganov.fintech.presentation.view.OnClickMessage
 import com.baiganov.fintech.util.State
-import com.bumptech.glide.Glide
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import moxy.MvpAppCompatActivity
-import moxy.ktx.moxyPresenter
 import javax.inject.Inject
-import javax.inject.Provider
 
-class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, ChatView {
-
-    @Inject
-    lateinit var presenterProvider: Provider<ChatPresenter>
+class ChatActivity : AppCompatActivity(), OnClickMessage, OnResultListener {
 
     @Inject
     lateinit var networkManager: NetworkManager
 
-    private val presenter: ChatPresenter by moxyPresenter { presenterProvider.get() }
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
     private val component by lazy { (application as App).component }
+
+    private lateinit var viewModel: ChatViewModel
 
     private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
     private val topicTitle: String? by lazy { intent.extras?.getString(ARG_TITLE_TOPIC) }
@@ -82,23 +81,22 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         setContentView(R.layout.activity_chat)
 
         networkManager.registerCallback()
-
+        viewModel = ViewModelProvider(this, viewModelFactory)[ChatViewModel::class.java]
         initViews()
         setupText()
         setupRecyclerView()
-        presenter.init(streamTitle, streamId, topicTitle)
+        viewModel.init(streamTitle, streamId, topicTitle)
 
-        networkManager.isConnectedNetwork.observe(this, { isNetwork ->
+        networkManager.isConnectedNetwork.observe(this) { isNetwork ->
             notification.isVisible = !isNetwork
-            presenter.isConnected = isNetwork
-        })
+            viewModel.isConnected = isNetwork
+        }
 
-        presenter.obtainEvent(
-            Event.EventChat.LoadFirstMessages(
-                streamId = streamId
-            )
-        )
+        viewModel.loadMessage(streamId = streamId)
 
+        viewModel.state.observe(this) { state ->
+            render(state)
+        }
         setClickListener()
         setFragmentResultListener()
     }
@@ -107,24 +105,14 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         when (click) {
             is TypeClick.AddReaction -> {
                 click.messageId?.let {
-                    presenter.obtainEvent(
-                        Event.EventChat.AddReaction(
-                            messageId = click.messageId,
-                            emojiName = click.emoji,
-                        )
-                    )
+                    addReaction(click.messageId, click.emoji)
                 }
             }
             is TypeClick.EditMessage -> {
                 EditMessageDialog.newInstance(click.message).show(supportFragmentManager, null)
             }
             is TypeClick.DeleteMessage -> {
-                presenter.obtainEvent(
-                    Event.EventChat.DeleteMessage(
-                        streamId = streamId,
-                        messageId = click.messageId,
-                    )
-                )
+                viewModel.deleteMessage(streamId, click.messageId)
                 Toast.makeText(this, getString(R.string.deleted_message), Toast.LENGTH_SHORT).show()
             }
             is TypeClick.Copy -> {
@@ -155,25 +143,15 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         }
     }
 
-    override fun addReaction(messageId: Int, emojiName: String, position: Int) {
-        presenter.obtainEvent(
-            Event.EventChat.AddReaction(
-                messageId = messageId,
-                emojiName = emojiName,
-            )
-        )
+    override fun addReaction(messageId: Int, emojiName: String) {
+        viewModel.addReaction(messageId, emojiName)
     }
 
-    override fun deleteReaction(messageId: Int, emojiName: String, position: Int) {
-        presenter.obtainEvent(
-            Event.EventChat.DeleteReaction(
-                messageId = messageId,
-                emojiName = emojiName,
-            )
-        )
+    override fun deleteReaction(messageId: Int, emojiName: String) {
+        viewModel.deleteReaction(messageId, emojiName)
     }
 
-    override fun render(state: State<List<ItemFingerPrint>>) {
+    private fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
                 shimmer.isVisible = false
@@ -250,10 +228,8 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                         val messageId =
                             adapter.messages.first { uiItem -> uiItem is MessageFingerPrint }.id.toLong()
 
-                        presenter.obtainEvent(
-                            Event.EventChat.LoadNextMessages(
-                                anchor = messageId
-                            )
+                        viewModel.loadNextMessages(
+                            anchor = messageId
                         )
                         isLoadNewPage = false
                     }
@@ -264,12 +240,10 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
 
     private fun setClickListener() {
         btnSend.setOnClickListener {
-            presenter.obtainEvent(
-                Event.EventChat.SendMessage(
-                    topicTitle = inputTopic.text.toString(),
-                    streamId = streamId,
-                    message = inputMessage.text.toString()
-                )
+            viewModel.sendMessage(
+                streamId,
+                inputMessage.text.toString(),
+                inputTopic.text.toString(),
             )
             positionRecyclerView = TypeScroll.DOWN
             inputMessage.setText(EMPTY_STRING)
@@ -320,13 +294,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             if (size > MEGABYTES_25_IN_BYTES) {
                 Toast.makeText(this, getString(R.string.toast_file), Toast.LENGTH_SHORT).show()
             } else if (type != null) {
-                presenter.obtainEvent(
-                    Event.EventChat.UploadFile(
-                        name = name,
-                        uri = uri,
-                        type = type
-                    )
-                )
+                viewModel.uploadFile(uri, type, name)
             }
         }
     }
@@ -366,7 +334,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
             val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
 
-            presenter.obtainEvent(Event.EventChat.EditMessage(id, content))
+            viewModel.editMessage(id, content)
         }
 
         supportFragmentManager.setFragmentResultListener(
@@ -377,7 +345,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
             val topic: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
 
-            presenter.obtainEvent(Event.EventChat.EditTopic(id, topic))
+            viewModel.editTopic(id, topic)
         }
     }
 

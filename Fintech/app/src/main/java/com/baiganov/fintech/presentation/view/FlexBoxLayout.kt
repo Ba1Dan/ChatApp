@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.сustomview
+package com.baiganov.fintech.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet

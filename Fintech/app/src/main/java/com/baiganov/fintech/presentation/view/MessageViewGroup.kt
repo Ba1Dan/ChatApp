@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.сustomview
+package com.baiganov.fintech.presentation.view
 
 import android.content.Context
 import android.text.method.LinkMovementMethod
@@ -11,10 +11,8 @@ import android.widget.TextView
 import androidx.core.view.*
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.model.Reaction
-import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import com.google.android.material.imageview.ShapeableImageView
 
 class MessageViewGroup @JvmOverloads constructor(
