@@ -3,7 +3,6 @@ package com.baiganov.fintech.presentation.ui.people
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
-import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter
 import com.baiganov.fintech.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -35,7 +34,7 @@ class PeoplePresenter @Inject constructor(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         loadUsers()
-        searchUsers(StreamsPresenter.INITIAL_QUERY)
+        searchUsers("")
     }
 
     override fun onDestroy() {
