@@ -10,7 +10,7 @@ import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
-import com.baiganov.fintech.util.State
+import com.baiganov.fintech.presentation.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions

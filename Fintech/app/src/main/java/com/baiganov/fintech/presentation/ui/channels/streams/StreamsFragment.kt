@@ -5,21 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
+import com.baiganov.fintech.databinding.FragmentStreamsBinding
 import com.baiganov.fintech.presentation.ViewModelFactory
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.base.BaseFragment
 import com.baiganov.fintech.presentation.ui.channels.SearchQueryListener
 import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.CREATE_STREAM_REQUEST_KEY
 import com.baiganov.fintech.presentation.ui.channels.streams.CreateStreamDialog.Companion.DESCRIPTION_RESULT_KEY
@@ -28,25 +27,24 @@ import com.baiganov.fintech.presentation.ui.channels.streams.recyclerview.Expand
 import com.baiganov.fintech.presentation.ui.chat.ChatActivity
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
-import com.baiganov.fintech.util.State
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import moxy.MvpAppCompatFragment
+import com.baiganov.fintech.presentation.util.State
 import javax.inject.Inject
 
-class StreamsFragment : MvpAppCompatFragment(), ItemClickListener,
+class StreamsFragment : BaseFragment<FragmentStreamsBinding>(), ItemClickListener,
     SearchQueryListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private lateinit var rvStreams: RecyclerView
-    private lateinit var frameNotResult: LinearLayout
     private lateinit var adapterStreams: ExpandableAdapter
-    private lateinit var shimmer: ShimmerFrameLayout
-    private lateinit var btnCreateStream: FloatingActionButton
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var viewModel: StreamsViewModel
+
+    override fun getBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentStreamsBinding {
+        return FragmentStreamsBinding.inflate(inflater, container, false)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,35 +61,22 @@ class StreamsFragment : MvpAppCompatFragment(), ItemClickListener,
         (context.applicationContext as App).component.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_streams, container, false)
-        rvStreams = view.findViewById(R.id.rv_stream)
-        frameNotResult = view.findViewById(R.id.no_result_found)
-        shimmer = view.findViewById(R.id.shimmer_streams)
-        btnCreateStream = view.findViewById(R.id.btn_create_stream)
-        swipeRefreshLayout = view.findViewById(R.id.swipe_container)
-        return view
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.init(requireArguments().getInt(ARG_TAB_POSITION))
 
-        btnCreateStream.setOnClickListener {
+        binding.btnCreateStream.setOnClickListener {
             CreateStreamDialog.newInstance().show(parentFragmentManager, null)
         }
 
-        swipeRefreshLayout.setOnRefreshListener {
+        binding.swipeContainer.setOnRefreshListener {
             viewModel.getStreams(requireArguments().getInt(ARG_TAB_POSITION))
         }
 
         adapterStreams = ExpandableAdapter(this)
-        rvStreams.adapter = adapterStreams
+        binding.rvStreams.adapter = adapterStreams
 
-        rvStreams.addItemDecoration(
+        binding.rvStreams.addItemDecoration(
             DividerItemDecoration(
                 requireContext(),
                 DividerItemDecoration.VERTICAL
@@ -108,7 +93,7 @@ class StreamsFragment : MvpAppCompatFragment(), ItemClickListener,
             render(state)
         }
 
-        viewModel.searchTopics( StreamsViewModel.INITIAL_QUERY)
+        viewModel.searchTopics(StreamsViewModel.INITIAL_QUERY)
     }
 
     override fun onItemClick(click: TypeItemClickStream) {
@@ -141,21 +126,21 @@ class StreamsFragment : MvpAppCompatFragment(), ItemClickListener,
         when (state) {
             is State.Result -> {
                 adapterStreams.dataOfList = state.data
-                swipeRefreshLayout.isRefreshing = false
-                frameNotResult.isVisible = state.data.isEmpty()
+                binding.swipeContainer.isRefreshing = false
+                binding.noResultFound.root.isVisible = state.data.isEmpty()
 
-                shimmer.isVisible = false
+                binding.shimmerStreams.root.isVisible = false
             }
             is State.Loading -> {
-                frameNotResult.isVisible = false
+                binding.noResultFound.root.isVisible = false
                 if (adapterStreams.itemCount == 0) {
-                    shimmer.isVisible = true
+                    binding.shimmerStreams.root.isVisible = true
                 }
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                frameNotResult.isVisible = false
-                shimmer.isVisible = false
+                binding.noResultFound.root.isVisible = false
+                binding.shimmerStreams.root.isVisible = false
             }
             else -> {
 

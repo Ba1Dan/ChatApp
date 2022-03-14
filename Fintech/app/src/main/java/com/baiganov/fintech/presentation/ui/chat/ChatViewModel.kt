@@ -10,8 +10,8 @@ import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
-import com.baiganov.fintech.util.State
-import com.baiganov.fintech.util.formatDateByDay
+import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.presentation.util.formatDateByDay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions

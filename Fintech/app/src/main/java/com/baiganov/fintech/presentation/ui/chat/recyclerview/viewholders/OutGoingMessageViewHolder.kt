@@ -10,8 +10,8 @@ import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.view.FlexBoxLayout
 import com.baiganov.fintech.presentation.view.OnClickMessage
-import com.baiganov.fintech.util.formatDate
-import com.baiganov.fintech.util.parseHtml
+import com.baiganov.fintech.presentation.util.formatDate
+import com.baiganov.fintech.presentation.util.parseHtml
 
 class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) :
     BaseViewHolder<MessageFingerPrint>(itemView) {

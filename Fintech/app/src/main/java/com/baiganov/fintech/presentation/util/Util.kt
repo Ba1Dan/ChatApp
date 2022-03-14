@@ -1,4 +1,4 @@
-package com.baiganov.fintech.util
+package com.baiganov.fintech.presentation.util
 
 import android.util.Log
 import androidx.core.text.HtmlCompat

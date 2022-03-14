@@ -7,8 +7,8 @@ import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.view.MessageViewGroup
 import com.baiganov.fintech.presentation.view.OnClickMessage
-import com.baiganov.fintech.util.formatDate
-import com.baiganov.fintech.util.parseHtml
+import com.baiganov.fintech.presentation.util.formatDate
+import com.baiganov.fintech.presentation.util.parseHtml
 
 class InComingMessageViewHolder(
     private val clickListener: OnClickMessage,
