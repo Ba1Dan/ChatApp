@@ -10,7 +10,7 @@ import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.DateDividerViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.InComingMessageViewHolder
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders.OutGoingMessageViewHolder
-import com.baiganov.fintech.presentation.сustomview.OnClickMessage
+import com.baiganov.fintech.presentation.view.OnClickMessage
 
 class MessageAdapter(
     private val clickListener: OnClickMessage

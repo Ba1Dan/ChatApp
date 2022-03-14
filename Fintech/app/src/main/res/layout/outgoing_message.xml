@@ -42,7 +42,7 @@
     </LinearLayout>
 
 
-    <com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
+    <com.baiganov.fintech.presentation.view.FlexBoxLayout
         android:id="@+id/flexbox_reactions_outgoing"
         android:layout_width="230dp"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:id="@+id/add_reaction_button_outgoing"
             layout="@layout/add_emoji_button" />
 
-    </com.baiganov.fintech.presentation.сustomview.FlexBoxLayout>
+    </com.baiganov.fintech.presentation.view.FlexBoxLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

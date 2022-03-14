@@ -1,22 +1,17 @@
 package com.baiganov.fintech.presentation.ui.chat.recyclerview.viewholders
 
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import com.baiganov.fintech.R
-import com.baiganov.fintech.di.NetworkModule
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.TypeClick
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.BaseViewHolder
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
-import com.baiganov.fintech.presentation.сustomview.FlexBoxLayout
-import com.baiganov.fintech.presentation.сustomview.OnClickMessage
-import com.baiganov.fintech.util.formatDate
-import com.baiganov.fintech.util.parseHtml
-import org.jsoup.Jsoup
-import java.util.*
+import com.baiganov.fintech.presentation.view.FlexBoxLayout
+import com.baiganov.fintech.presentation.view.OnClickMessage
+import com.baiganov.fintech.presentation.util.formatDate
+import com.baiganov.fintech.presentation.util.parseHtml
 
 class OutGoingMessageViewHolder(itemView: View, private val clickListener: OnClickMessage) :
     BaseViewHolder<MessageFingerPrint>(itemView) {

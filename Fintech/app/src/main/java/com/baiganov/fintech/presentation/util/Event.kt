@@ -1,4 +1,4 @@
-package com.baiganov.fintech.util
+package com.baiganov.fintech.presentation.util
 
 import android.net.Uri
 import com.baiganov.fintech.presentation.model.TopicFingerPrint

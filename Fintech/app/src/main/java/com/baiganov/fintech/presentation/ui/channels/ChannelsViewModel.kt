@@ -1,23 +1,27 @@
 package com.baiganov.fintech.presentation.ui.channels
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repository.ChannelsRepository
-import com.baiganov.fintech.util.Event
-import com.baiganov.fintech.util.State
+import com.baiganov.fintech.presentation.util.Event
+import com.baiganov.fintech.presentation.util.State
 import io.reactivex.disposables.CompositeDisposable
-import moxy.InjectViewState
-import moxy.MvpPresenter
 import javax.inject.Inject
 
-@InjectViewState
-class ChannelsPresenter @Inject constructor(
+class ChannelsViewModel @Inject constructor(
     private val repository: ChannelsRepository,
-) : MvpPresenter<ChannelsView>() {
+) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
+    private val _state: MutableLiveData<State<String>> = MutableLiveData()
 
-    override fun onDestroy() {
-        super.onDestroy()
+    val state: LiveData<State<String>>
+        get() = _state
+
+    override fun onCleared() {
+        super.onCleared()
         compositeDisposable.dispose()
     }
 
@@ -32,7 +36,7 @@ class ChannelsPresenter @Inject constructor(
         }
     }
 
-    private fun searchTopics(searchQuery: String) {
-        viewState.render(State.Result(searchQuery))
+    fun searchTopics(searchQuery: String) {
+        _state.value = State.Result(searchQuery)
     }
 }

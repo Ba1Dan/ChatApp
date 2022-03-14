@@ -2,36 +2,39 @@ package com.baiganov.fintech.presentation.ui.chat
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
-import com.baiganov.fintech.util.Event
-import com.baiganov.fintech.util.State
-import com.baiganov.fintech.util.formatDateByDay
+import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
+import com.baiganov.fintech.presentation.util.State
+import com.baiganov.fintech.presentation.util.formatDateByDay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import moxy.InjectViewState
-import moxy.MvpPresenter
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-@InjectViewState
-class ChatPresenter @Inject constructor(
+class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository
-) : MvpPresenter<ChatView>() {
+) : ViewModel() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private val _state: MutableLiveData<State<List<ItemFingerPrint>>> = MutableLiveData()
 
     private lateinit var streamTitle: String
     private var streamId by Delegates.notNull<Int>()
     private var topicTitle: String? = null
     private var isLoading = true
+
+    val state: LiveData<State<List<ItemFingerPrint>>>
+        get() = _state
 
     var isConnected: Boolean = false
 
@@ -41,169 +44,28 @@ class ChatPresenter @Inject constructor(
         this.streamId = streamId
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.dispose()
-    }
-
-    fun obtainEvent(event: Event.EventChat) {
-
-        when (event) {
-            is Event.EventChat.LoadFirstMessages -> {
-                topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
-
-                loadMessage(
-                    streamTitle,
-                    topicTitle,
-                    event.streamId
-                )
-
-            }
-
-            is Event.EventChat.LoadNextMessages -> {
-                if (isConnected) {
-                    loadNextMessages(
-                        streamTitle,
-                        topicTitle,
-                        event.anchor
-                    )
-                }
-            }
-
-            is Event.EventChat.AddReaction -> {
-                if (isConnected) {
-                    addReaction(
-                        event.messageId,
-                        event.emojiName
-                    )
-                }
-            }
-
-            is Event.EventChat.DeleteReaction -> {
-                if (isConnected) {
-                    deleteReaction(
-                        event.messageId,
-                        event.emojiName
-                    )
-                }
-            }
-
-            is Event.EventChat.SendMessage -> {
-                if (isConnected) {
-                    sendMessage(
-                        event.streamId,
-                        event.message,
-                        event.topicTitle,
-                    )
-                }
-            }
-
-            is Event.EventChat.DeleteMessage -> {
-                if (isConnected) {
-                    deleteMessage(
-                        event.streamId,
-                        event.messageId
-                    )
-                }
-            }
-
-            is Event.EventChat.UploadFile -> {
-                if (isConnected) {
-                    uploadFile(event.uri, event.type, event.name)
-                }
-            }
-
-            is Event.EventChat.EditMessage -> {
-                if (isConnected) {
-                    editMessage(event.messageId, event.content)
-                }
-            }
-
-            is Event.EventChat.EditTopic -> {
-                if (isConnected) {
-                    editTopic(event.messageId, event.newTopic)
-                }
-            }
-
-            else -> {
-                Log.d(javaClass.simpleName, "unknown type event")
-            }
-        }
-    }
-
-    private fun uploadFile(uri: Uri, type: String, name: String) {
+    fun uploadFile(uri: Uri, type: String, name: String) {
         messageRepository.uploadFile(uri, type, name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                viewState.render(State.LoadingFile)
+                _state.value = State.LoadingFile
             }
             .subscribe(
                 { fileResponse ->
-                    viewState.render(
+                    _state.value =
                         State.AddFile(
                             "[${fileResponse.uri.split("/").last()}](${fileResponse.uri})"
                         )
-                    )
                 },
                 {
-                    viewState.render(State.Error(it.message))
-                    Log.d("upload_message", "error = ${it.message}")
+                    _state.value = State.Error(it.message)
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
-        messageRepository.getTopicMessages(topicTitle, streamId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { streamEntities ->
-
-                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
-                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
-                            listOf(DateDividerFingerPrint(date)) +
-                                    messagesByDate.map { message -> MessageFingerPrint(message) }
-                        }
-
-                    if (mess.isEmpty() && isLoading) {
-                        viewState.render(State.Loading)
-                    } else {
-                        viewState.render(State.Result(mess))
-                    }
-                },
-                onError = {
-                    viewState.render(State.Error(it.message))
-                    Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
-                }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    private fun getStreamMessages(streamId: Int) {
-        messageRepository.getStreamMessages(streamId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { messages ->
-
-
-                    if (messages.isEmpty() && isLoading) {
-                        viewState.render(State.Loading)
-                    } else {
-                        val messagesFingerPrint = getMessagesByDivider(messages)
-                        viewState.render(State.Result(messagesFingerPrint))
-                    }
-                },
-                onError = {
-                    Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
-                }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    private fun sendMessage(
+    fun sendMessage(
         streamId: Int,
         message: String,
         _topicTitle: String
@@ -217,20 +79,19 @@ class ChatPresenter @Inject constructor(
                     updateMessage(streamTitle, topic)
                 },
                 onError = {
-                    viewState.render(State.Error("error send message"))
+                    _state.value = (State.Error("error send message"))
                     Log.d(javaClass.simpleName, "${it.message}")
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun loadMessage(
-        streamTitle: String,
-        topicTitle: String?,
+    fun loadMessage(
         streamId: Int,
         anchor: Long = DEFAULT_ANCHOR,
         numAfter: Int = NUM_AFTER
     ) {
+        topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
         messageRepository.loadMessages(
             streamTitle,
             topicTitle,
@@ -247,15 +108,13 @@ class ChatPresenter @Inject constructor(
                     isLoading = false
                 },
                 onError = { exception ->
-                    viewState.render(State.Error(exception.message))
+                    _state.value = (State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun loadNextMessages(
-        streamTitle: String,
-        topicTitle: String?,
+    fun loadNextMessages(
         anchor: Long
     ) {
         messageRepository.loadNextMessages(
@@ -272,13 +131,13 @@ class ChatPresenter @Inject constructor(
                     Functions.EMPTY_ACTION
                 },
                 onError = { exception ->
-                    viewState.render(State.Error(exception.message))
+                    _state.value = (State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun addReaction(
+    fun addReaction(
         messageId: Int,
         emojiName: String
     ) {
@@ -299,7 +158,7 @@ class ChatPresenter @Inject constructor(
             .addTo(compositeDisposable)
     }
 
-    private fun deleteReaction(
+    fun deleteReaction(
         messageId: Int,
         emojiName: String
     ) {
@@ -320,7 +179,7 @@ class ChatPresenter @Inject constructor(
             .addTo(compositeDisposable)
     }
 
-    private fun deleteMessage(
+    fun deleteMessage(
         streamId: Int,
         messageId: Int,
     ) {
@@ -330,8 +189,6 @@ class ChatPresenter @Inject constructor(
             .subscribeBy(
                 onComplete = {
                     loadMessage(
-                        streamTitle,
-                        topicTitle,
                         streamId,
                         messageId.toLong(),
                         NUM_BEFORE_DELETE
@@ -347,7 +204,7 @@ class ChatPresenter @Inject constructor(
             .addTo(compositeDisposable)
     }
 
-    private fun editMessage(messageId: Int, content: String) {
+    fun editMessage(messageId: Int, content: String) {
         messageRepository.editMessage(messageId, content)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -365,7 +222,7 @@ class ChatPresenter @Inject constructor(
             .addTo(compositeDisposable)
     }
 
-    private fun editTopic(messageId: Int, newTopic: String) {
+    fun editTopic(messageId: Int, newTopic: String) {
         messageRepository.editTopic(messageId, newTopic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -378,6 +235,52 @@ class ChatPresenter @Inject constructor(
                         javaClass.simpleName,
                         "error delete reaction ${it.message}"
                     )
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
+        messageRepository.getTopicMessages(topicTitle, streamId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { streamEntities ->
+
+                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
+                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
+                            listOf(DateDividerFingerPrint(date)) +
+                                    messagesByDate.map { message -> MessageFingerPrint(message) }
+                        }
+
+                    if (mess.isEmpty() && isLoading) {
+                        _state.value = State.Loading
+                    } else {
+                        _state.value = State.Result(mess)
+                    }
+                },
+                onError = {
+                    _state.value = State.Error(it.message)
+                }
+            )
+            .addTo(compositeDisposable)
+    }
+
+    private fun getStreamMessages(streamId: Int) {
+        messageRepository.getStreamMessages(streamId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { messages ->
+                    if (messages.isEmpty() && isLoading) {
+                        _state.value = (State.Loading)
+                    } else {
+                        val messagesFingerPrint = getMessagesByDivider(messages)
+                        _state.value = (State.Result(messagesFingerPrint))
+                    }
+                },
+                onError = {
+                    Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
                 }
             )
             .addTo(compositeDisposable)
@@ -402,7 +305,7 @@ class ChatPresenter @Inject constructor(
                     Functions.EMPTY_ACTION
                 },
                 onError = { exception ->
-                    viewState.render(State.Error(exception.message))
+                    _state.value = (State.Error(exception.message))
                 }
             )
             .addTo(compositeDisposable)
@@ -414,7 +317,7 @@ class ChatPresenter @Inject constructor(
             topic = topicTitle!!
         } else {
             if (_topicTitle.isEmpty()) {
-                viewState.render(State.Error("Enter topic"))
+                _state.value = (State.Error("Enter topic"))
             } else {
                 topic = _topicTitle
             }

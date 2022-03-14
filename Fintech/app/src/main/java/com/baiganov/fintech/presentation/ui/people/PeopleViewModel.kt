@@ -1,10 +1,13 @@
 package com.baiganov.fintech.presentation.ui.people
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
-import com.baiganov.fintech.presentation.ui.channels.streams.StreamsPresenter
-import com.baiganov.fintech.util.State
+import com.baiganov.fintech.presentation.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions
@@ -12,17 +15,18 @@ import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import moxy.InjectViewState
-import moxy.MvpPresenter
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@InjectViewState
-class PeoplePresenter @Inject constructor(
+class PeopleViewModel @Inject constructor(
     private val repository: PeopleRepository,
     private val userToUserFingerPrintMapper: UserToUserFingerPrintMapper,
     private val networkManager: NetworkManager
-) : MvpPresenter<PeopleView>() {
+) : ViewModel() {
+
+    private val _state: MutableLiveData<State<List<UserFingerPrint>>> = MutableLiveData()
+    val state: LiveData<State<List<UserFingerPrint>>>
+        get() = _state
 
     private val compositeDisposable = CompositeDisposable()
     private val searchSubject: PublishSubject<String> = PublishSubject.create()
@@ -32,14 +36,8 @@ class PeoplePresenter @Inject constructor(
         searchUsers()
     }
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
-        loadUsers()
-        searchUsers(StreamsPresenter.INITIAL_QUERY)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onCleared() {
+        super.onCleared()
         compositeDisposable.dispose()
     }
 
@@ -47,12 +45,12 @@ class PeoplePresenter @Inject constructor(
         searchSubject.onNext(searchQuery)
     }
 
-    private fun loadUsers() {
+    fun loadUsers() {
         repository.loadUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                viewState.render(State.Loading)
+                _state.value = State.Loading
             }
             .subscribeBy(
                 onComplete = {
@@ -60,7 +58,7 @@ class PeoplePresenter @Inject constructor(
                     isLoading = false
                 },
                 onError = { exception ->
-                    viewState.render(State.Error(exception.message))
+                    _state.value = State.Error(exception.message)
                 }
             )
             .addTo(compositeDisposable)
@@ -81,13 +79,13 @@ class PeoplePresenter @Inject constructor(
             .subscribeBy(
                 onNext = {users ->
                     if (isLoading && users.isEmpty()) {
-                        viewState.render(State.Loading)
+                        _state.value = State.Loading
                     } else {
-                        viewState.render(State.Result(users.sortedBy { it.user.fullName }))
+                        _state.value = State.Result(users.sortedBy { it.user.fullName })
                     }
                 },
                 onError = {
-                    viewState.render(State.Error(it.message))
+                    _state.value = State.Error(it.message)
                 }
             )
             .addTo(compositeDisposable)

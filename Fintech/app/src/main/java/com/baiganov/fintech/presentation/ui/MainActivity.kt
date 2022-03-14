@@ -13,7 +13,7 @@ import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.ui.channels.ChannelsFragment
 import com.baiganov.fintech.presentation.ui.people.PeopleFragment
 import com.baiganov.fintech.presentation.ui.profile.ProfileFragment
-import com.baiganov.fintech.util.BottomNavigationPages
+import com.baiganov.fintech.presentation.util.BottomNavigationPages
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
@@ -57,9 +57,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        networkManager.isConnectedNetwork.observe(this, { isNetwork ->
+        networkManager.isConnectedNetwork.observe(this) { isNetwork ->
             notification.isVisible = !isNetwork
-        })
+        }
     }
 
     private fun setFragment(page: BottomNavigationPages): Boolean {

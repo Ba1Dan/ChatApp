@@ -8,83 +8,84 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
-import com.baiganov.fintech.R
+import com.baiganov.fintech.databinding.FragmentPeopleBinding
+import com.baiganov.fintech.presentation.ViewModelFactory
 import com.baiganov.fintech.presentation.model.UserFingerPrint
+import com.baiganov.fintech.presentation.ui.base.BaseFragment
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.TypeItemClickStream
 import com.baiganov.fintech.presentation.ui.people.adapters.PersonAdapter
-import com.baiganov.fintech.util.State
-import com.facebook.shimmer.ShimmerFrameLayout
-import moxy.MvpAppCompatFragment
-import moxy.ktx.moxyPresenter
+import com.baiganov.fintech.presentation.util.State
 import javax.inject.Inject
-import javax.inject.Provider
 
-class PeopleFragment : MvpAppCompatFragment(), PeopleView, ItemClickListener {
-
-    private lateinit var adapterPerson: PersonAdapter
-    private lateinit var rvUsers: RecyclerView
-    private lateinit var shimmer: ShimmerFrameLayout
-    private lateinit var searchView: SearchView
+class PeopleFragment : BaseFragment<FragmentPeopleBinding>(), ItemClickListener {
 
     @Inject
-    lateinit var presenterProvider: Provider<PeoplePresenter>
+    lateinit var viewModelFactory: ViewModelFactory
 
-    private val presenter: PeoplePresenter by moxyPresenter { presenterProvider.get() }
+    private lateinit var adapterPerson: PersonAdapter
+    private lateinit var viewModel: PeopleViewModel
+
+    override fun getBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentPeopleBinding {
+        return FragmentPeopleBinding.inflate(inflater, container, false)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (context.applicationContext as App).component.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_people, container, false)
-        rvUsers = view.findViewById(R.id.rv_users)
-        shimmer = view.findViewById(R.id.shimmer_people)
-        searchView = view.findViewById(R.id.search_view)
-        return view
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory)[PeopleViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapterPerson = PersonAdapter(this)
-        rvUsers.adapter = adapterPerson
+        binding.rvUsers.adapter = adapterPerson
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                presenter.searchUsers(p0.orEmpty())
+                viewModel.searchUsers(p0.orEmpty())
                 return true
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                presenter.searchUsers(p0.orEmpty())
+                viewModel.searchUsers(p0.orEmpty())
                 return true
             }
         })
+
+        viewModel.loadUsers()
+        viewModel.searchUsers("")
+        viewModel.state.observe(viewLifecycleOwner) {
+            render(it)
+        }
     }
 
     override fun onItemClick(click: TypeItemClickStream) {
 
     }
 
-    override fun render(state: State<List<UserFingerPrint>>) {
+    private fun render(state: State<List<UserFingerPrint>>) {
         when (state) {
             is State.Result -> {
                 adapterPerson.listOfUser = state.data
-                shimmer.isVisible = false
+                binding.shimmer.root.isVisible = false
             }
             is State.Loading -> {
-                shimmer.isVisible = true
+                binding.shimmer.root.isVisible = true
             }
             is State.Error -> {
                 Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
-                shimmer.isVisible = false
+                binding.shimmer.root.isVisible = false
             }
         }
     }

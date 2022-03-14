@@ -7,55 +7,48 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.viewpager2.widget.ViewPager2
+import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.util.Event
-import com.baiganov.fintech.util.State
-import com.google.android.material.tabs.TabLayout
+import com.baiganov.fintech.databinding.FragmentChannelsBinding
+import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.ui.base.BaseFragment
+import com.baiganov.fintech.presentation.util.State
 import com.google.android.material.tabs.TabLayoutMediator
-import moxy.MvpAppCompatFragment
-import moxy.ktx.moxyPresenter
 import javax.inject.Inject
-import javax.inject.Provider
 
-class ChannelsFragment : MvpAppCompatFragment(), ChannelsView {
+class ChannelsFragment : BaseFragment<FragmentChannelsBinding>() {
 
     @Inject
-    lateinit var presenterProvider: Provider<ChannelsPresenter>
+    lateinit var viewModelFactory: ViewModelFactory
 
-    private val presenter: ChannelsPresenter by moxyPresenter { presenterProvider.get() }
+    private lateinit var viewModel: ChannelsViewModel
 
-    private lateinit var viewPagerChannels: ViewPager2
-    private lateinit var tabLayoutChannels: TabLayout
-    private lateinit var searchView: SearchView
+    override fun getBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentChannelsBinding {
+        return FragmentChannelsBinding.inflate(inflater, container, false)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (context.applicationContext as App).component.inject(this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_channels, container, false)
-
-        viewPagerChannels = view.findViewById(R.id.view_pager_channels)
-        tabLayoutChannels = view.findViewById(R.id.tab_layout_channels)
-        searchView = view.findViewById(R.id.search)
-
-        return view
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this, viewModelFactory)[ChannelsViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewPagerChannels.apply {
+        binding.viewPagerChannels.apply {
             adapter = ChannelsViewPagerAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
             offscreenPageLimit = ChannelsPages.values().size - 1
         }
 
-        TabLayoutMediator(tabLayoutChannels, viewPagerChannels) { tab, position ->
+        TabLayoutMediator(binding.tabLayoutChannels, binding.viewPagerChannels) { tab, position ->
             tab.text = getString(
                 when (position) {
                     ChannelsPages.SUBSCRIBED.ordinal -> R.string.tab_title_subscribed_streams
@@ -65,24 +58,28 @@ class ChannelsFragment : MvpAppCompatFragment(), ChannelsView {
             )
         }.attach()
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                presenter.obtainEvent(Event.EventChannels.SearchStreams(p0.orEmpty()))
+                viewModel.searchTopics(p0.orEmpty())
                 return true
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                presenter.obtainEvent(Event.EventChannels.SearchStreams(p0.orEmpty()))
+                viewModel.searchTopics(p0.orEmpty())
                 return true
             }
         })
+
+        viewModel.state.observe(viewLifecycleOwner) {
+            render(it)
+        }
     }
 
-    override fun render(state: State<String>) {
+    private fun render(state: State<String>) {
         when (state) {
             is State.Result -> {
-                val fragment = childFragmentManager.findFragmentByTag("f${viewPagerChannels.currentItem}")
+                val fragment = childFragmentManager.findFragmentByTag("f${binding.viewPagerChannels.currentItem}")
 
                 fragment?.let {
                     (it as SearchQueryListener).search(state.data)

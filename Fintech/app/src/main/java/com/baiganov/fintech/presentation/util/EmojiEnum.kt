@@ -1,4 +1,4 @@
-package com.baiganov.fintech.util
+package com.baiganov.fintech.presentation.util
 
 @Suppress("unused")
 enum class EmojiEnum(val unicodeCodePoint: Int, val nameInZulip: String) {

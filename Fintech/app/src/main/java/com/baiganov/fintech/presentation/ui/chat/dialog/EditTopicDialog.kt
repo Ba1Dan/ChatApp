@@ -13,7 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.baiganov.fintech.R
-import com.baiganov.fintech.util.parseHtml
+import com.baiganov.fintech.presentation.util.parseHtml
 
 class EditTopicDialog : DialogFragment() {
 

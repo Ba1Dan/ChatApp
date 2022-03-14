@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation.сustomview
+package com.baiganov.fintech.presentation.view
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -131,9 +131,9 @@ class EmojiView @JvmOverloads constructor(
 
     fun updateEmojiViewOnClick(onClickMessage: OnClickMessage, emojiName: String, idMessage: Int) {
         if (isSelected) {
-            onClickMessage.addReaction(idMessage, emojiName, -1)
+            onClickMessage.addReaction(idMessage, emojiName)
         } else {
-            onClickMessage.deleteReaction(idMessage, emojiName, -1)
+            onClickMessage.deleteReaction(idMessage, emojiName)
         }
     }
 

@@ -1,45 +1,51 @@
 package com.baiganov.fintech.presentation.ui.profile
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.domain.repository.ProfileRepository
 import com.baiganov.fintech.presentation.NetworkManager
-import com.baiganov.fintech.util.State
+import com.baiganov.fintech.presentation.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import moxy.InjectViewState
-import moxy.MvpPresenter
 import javax.inject.Inject
 
-@InjectViewState
-class ProfilePresenter @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val repository: ProfileRepository,
     private val networkManager: NetworkManager
-) : MvpPresenter<ProfileView>() {
+) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
+    private val _state: MutableLiveData<State<User>> = MutableLiveData()
+    val state: LiveData<State<User>>
+        get() = _state
 
-    override fun onFirstViewAttach() {
-        super.onFirstViewAttach()
+    init {
         loadProfile()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onCleared() {
+        super.onCleared()
         compositeDisposable.dispose()
     }
 
     private fun loadProfile() {
         if (networkManager.isConnected().value) {
-            viewState.render(State.Loading)
+
             repository.loadProfile()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    _state.value = State.Loading
+                }
                 .subscribeBy(
-                    onSuccess = { viewState.render(State.Result(it)) },
+                    onSuccess = { _state.value = State.Result(it) },
                     onError = {
-                        viewState.render(State.Error(it.message))
+                        _state.value = State.Error(it.message)
                     }
                 )
                 .addTo(compositeDisposable)

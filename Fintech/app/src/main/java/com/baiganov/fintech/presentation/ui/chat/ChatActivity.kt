@@ -7,22 +7,28 @@ import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.StreamEntity
+import com.baiganov.fintech.databinding.ActivityChatBinding
 import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.presentation.ViewModelFactory
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
+import com.baiganov.fintech.presentation.ui.base.BaseActivity
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.ActionDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.EmojiBottomSheetDialog
 import com.baiganov.fintech.presentation.ui.chat.bottomsheet.OnResultListener
@@ -35,28 +41,24 @@ import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.NEW_TOPIC_RESULT_KEY
 import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companion.REQUEST_KEY_EDIT_TOPIC
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
-import com.baiganov.fintech.presentation.сustomview.OnClickMessage
-import com.baiganov.fintech.util.Event
-import com.baiganov.fintech.util.State
-import com.bumptech.glide.Glide
+import com.baiganov.fintech.presentation.view.OnClickMessage
+import com.baiganov.fintech.presentation.util.State
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import moxy.MvpAppCompatActivity
-import moxy.ktx.moxyPresenter
 import javax.inject.Inject
-import javax.inject.Provider
 
-class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, ChatView {
-
-    @Inject
-    lateinit var presenterProvider: Provider<ChatPresenter>
+class ChatActivity : BaseActivity<ActivityChatBinding>(), OnClickMessage, OnResultListener {
 
     @Inject
     lateinit var networkManager: NetworkManager
 
-    private val presenter: ChatPresenter by moxyPresenter { presenterProvider.get() }
-    private val component by lazy { (application as App).component }
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
 
+    private lateinit var adapter: MessageAdapter
+    private lateinit var viewModel: ChatViewModel
+
+    private val component by lazy { (application as App).component }
     private val streamTitle: String by lazy { intent.extras?.getString(ARG_TITLE_STREAM)!! }
     private val topicTitle: String? by lazy { intent.extras?.getString(ARG_TITLE_TOPIC) }
     private val streamId: Int by lazy { intent.extras?.getInt(ARG_STREAM_ID)!! }
@@ -64,41 +66,30 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     private var positionRecyclerView: TypeScroll = TypeScroll.DOWN
     private var isLoadNewPage = true
 
-    private lateinit var adapter: MessageAdapter
-    private lateinit var toolBarChat: Toolbar
-    private lateinit var tvTopic: TextView
-    private lateinit var btnSend: FloatingActionButton
-    private lateinit var inputMessage: EditText
-    private lateinit var btnAddFile: ImageButton
-    private lateinit var rvChat: RecyclerView
-    private lateinit var shimmer: ShimmerFrameLayout
-    private lateinit var inputTopic: EditText
-    private lateinit var notification: TextView
-    private lateinit var pgFile: ProgressBar
+    override fun getBinding(inflater: LayoutInflater): ActivityChatBinding {
+        return ActivityChatBinding.inflate(inflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
 
+        component.inject(this)
         networkManager.registerCallback()
-
-        initViews()
+        viewModel = ViewModelProvider(this, viewModelFactory)[ChatViewModel::class.java]
         setupText()
         setupRecyclerView()
-        presenter.init(streamTitle, streamId, topicTitle)
+        viewModel.init(streamTitle, streamId, topicTitle)
 
-        networkManager.isConnectedNetwork.observe(this, { isNetwork ->
-            notification.isVisible = !isNetwork
-            presenter.isConnected = isNetwork
-        })
+        networkManager.isConnectedNetwork.observe(this) { isNetwork ->
+            binding.notification.root.isVisible = !isNetwork
+            viewModel.isConnected = isNetwork
+        }
 
-        presenter.obtainEvent(
-            Event.EventChat.LoadFirstMessages(
-                streamId = streamId
-            )
-        )
+        viewModel.loadMessage(streamId = streamId)
 
+        viewModel.state.observe(this) { state ->
+            render(state)
+        }
         setClickListener()
         setFragmentResultListener()
     }
@@ -107,24 +98,14 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         when (click) {
             is TypeClick.AddReaction -> {
                 click.messageId?.let {
-                    presenter.obtainEvent(
-                        Event.EventChat.AddReaction(
-                            messageId = click.messageId,
-                            emojiName = click.emoji,
-                        )
-                    )
+                    addReaction(click.messageId, click.emoji)
                 }
             }
             is TypeClick.EditMessage -> {
                 EditMessageDialog.newInstance(click.message).show(supportFragmentManager, null)
             }
             is TypeClick.DeleteMessage -> {
-                presenter.obtainEvent(
-                    Event.EventChat.DeleteMessage(
-                        streamId = streamId,
-                        messageId = click.messageId,
-                    )
-                )
+                viewModel.deleteMessage(streamId, click.messageId)
                 Toast.makeText(this, getString(R.string.deleted_message), Toast.LENGTH_SHORT).show()
             }
             is TypeClick.Copy -> {
@@ -155,94 +136,65 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
         }
     }
 
-    override fun addReaction(messageId: Int, emojiName: String, position: Int) {
-        presenter.obtainEvent(
-            Event.EventChat.AddReaction(
-                messageId = messageId,
-                emojiName = emojiName,
-            )
-        )
+    override fun addReaction(messageId: Int, emojiName: String) {
+        viewModel.addReaction(messageId, emojiName)
     }
 
-    override fun deleteReaction(messageId: Int, emojiName: String, position: Int) {
-        presenter.obtainEvent(
-            Event.EventChat.DeleteReaction(
-                messageId = messageId,
-                emojiName = emojiName,
-            )
-        )
+    override fun deleteReaction(messageId: Int, emojiName: String) {
+        viewModel.deleteReaction(messageId, emojiName)
     }
 
-    override fun render(state: State<List<ItemFingerPrint>>) {
+    private fun render(state: State<List<ItemFingerPrint>>) {
         when (state) {
             is State.Result -> {
-                shimmer.isVisible = false
+                binding.shimmerMessages.root.isVisible = false
 
                 adapter.messages = state.data
 
                 if (positionRecyclerView == TypeScroll.DOWN) {
-                    rvChat.smoothScrollToPosition(state.data.size)
+                    binding.rvChat.smoothScrollToPosition(state.data.size)
                 }
                 isLoadNewPage = true
             }
 
             is State.Loading -> {
-                shimmer.isVisible = true
+                binding.shimmerMessages.root.isVisible = true
             }
 
             is State.Error -> {
-                shimmer.isVisible = false
+                binding.shimmerMessages.root.isVisible = false
                 Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
             }
 
             is State.AddFile -> {
-                pgFile.isVisible = false
-                inputMessage.append(state.uri)
+                binding.pgFile.isVisible = false
+                binding.inputMessage.append(state.uri)
             }
 
             is State.LoadingFile -> {
 
-                pgFile.isVisible = true
+                binding.pgFile.isVisible = true
             }
         }
     }
 
-    private fun initViews() {
-        rvChat = findViewById(R.id.rv_chat)
-
-        btnSend = findViewById(R.id.btn_send)
-        inputMessage = findViewById(R.id.input_message)
-        inputTopic = findViewById(R.id.input_topic)
-        btnAddFile = findViewById(R.id.btn_add_file)
-        toolBarChat = findViewById(R.id.toolbar_chat)
-        tvTopic = findViewById(R.id.tv_topic)
-        shimmer = findViewById(R.id.shimmer_messages)
-        notification = findViewById(R.id.notification)
-        pgFile = findViewById(R.id.pg_file)
-
-        topicTitle?.let {
-            inputTopic.isVisible = false
-            tvTopic.isVisible = true
-        }
-    }
-
     private fun setupText() {
-        toolBarChat.title = this.getString(R.string.title_topic_percent, streamTitle)
-        tvTopic.text = this.getString(R.string.title_topic, topicTitle)
+        binding.toolbarChat.title = this.getString(R.string.title_topic_percent, streamTitle)
+        binding.tvTopic.text = this.getString(R.string.title_topic, topicTitle)
     }
 
     private fun setupRecyclerView() {
-        (rvChat.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        (binding.rvChat.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         adapter = MessageAdapter(this)
-        rvChat.adapter = adapter
+        binding.rvChat.adapter = adapter
 
-        rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.rvChat.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     val position: Int =
-                        (rvChat.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        (binding.rvChat.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
                     positionRecyclerView = TypeScroll.TOP
 
@@ -250,10 +202,8 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
                         val messageId =
                             adapter.messages.first { uiItem -> uiItem is MessageFingerPrint }.id.toLong()
 
-                        presenter.obtainEvent(
-                            Event.EventChat.LoadNextMessages(
-                                anchor = messageId
-                            )
+                        viewModel.loadNextMessages(
+                            anchor = messageId
                         )
                         isLoadNewPage = false
                     }
@@ -263,19 +213,17 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
     }
 
     private fun setClickListener() {
-        btnSend.setOnClickListener {
-            presenter.obtainEvent(
-                Event.EventChat.SendMessage(
-                    topicTitle = inputTopic.text.toString(),
-                    streamId = streamId,
-                    message = inputMessage.text.toString()
-                )
+        binding.btnSend.setOnClickListener {
+            viewModel.sendMessage(
+                streamId,
+                binding.inputMessage.text.toString(),
+                binding.inputTopic.text.toString(),
             )
             positionRecyclerView = TypeScroll.DOWN
-            inputMessage.setText(EMPTY_STRING)
+            binding.inputMessage.setText(EMPTY_STRING)
         }
 
-        inputMessage.addTextChangedListener(object : TextWatcher {
+        binding.inputMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -283,11 +231,11 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
                     if (s.toString().isEmpty()) {
-                        btnAddFile.visibility = View.VISIBLE
-                        btnSend.visibility = View.GONE
+                        binding.btnAddFile.visibility = View.VISIBLE
+                        binding.btnSend.visibility = View.GONE
                     } else {
-                        btnSend.visibility = View.VISIBLE
-                        btnAddFile.visibility = View.GONE
+                        binding.btnSend.visibility = View.VISIBLE
+                        binding.btnAddFile.visibility = View.GONE
                     }
                 }
             }
@@ -297,10 +245,10 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             }
         })
 
-        toolBarChat.setNavigationOnClickListener { finish() }
+        binding.toolbarChat.setNavigationOnClickListener { finish() }
 
         val getContentLauncher = registerUploadFileActivityLauncher()
-        btnAddFile.setOnClickListener {
+        binding.btnAddFile.setOnClickListener {
             getContentLauncher.launch(ALL_TYPE)
         }
     }
@@ -320,13 +268,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             if (size > MEGABYTES_25_IN_BYTES) {
                 Toast.makeText(this, getString(R.string.toast_file), Toast.LENGTH_SHORT).show()
             } else if (type != null) {
-                presenter.obtainEvent(
-                    Event.EventChat.UploadFile(
-                        name = name,
-                        uri = uri,
-                        type = type
-                    )
-                )
+                viewModel.uploadFile(uri, type, name)
             }
         }
     }
@@ -366,7 +308,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
             val content: String = bundle.getString(NEW_CONTENT_RESULT_KEY).orEmpty()
 
-            presenter.obtainEvent(Event.EventChat.EditMessage(id, content))
+            viewModel.editMessage(id, content)
         }
 
         supportFragmentManager.setFragmentResultListener(
@@ -377,7 +319,7 @@ class ChatActivity : MvpAppCompatActivity(), OnClickMessage, OnResultListener, C
             val id: Int = bundle.getInt(MESSAGE_ID_RESULT_KEY)
             val topic: String = bundle.getString(NEW_TOPIC_RESULT_KEY).orEmpty()
 
-            presenter.obtainEvent(Event.EventChat.EditTopic(id, topic))
+            viewModel.editTopic(id, topic)
         }
     }
 
