@@ -6,20 +6,28 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-class ChannelsLocalDataSource @Inject constructor(private val streamsDao: StreamsDao) {
+interface ChannelsLocalDataSource {
 
-    fun getSubscribedStreams(streamId: Int): List<StreamEntity> {
-        return streamsDao.getSubscribedStreams(streamId)
-    }
+    fun getSubscribedStreams(streamId: Int): List<StreamEntity>
+    fun saveStreams(streams: List<StreamEntity>): Completable
+    fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>>
+    fun searchAllStreams(searchQuery: String): Flowable<List<StreamEntity>>
 
-    fun saveStreams(streams: List<StreamEntity>): Completable =
-        streamsDao.saveStreams(streams)
+    class Base @Inject constructor(private val streamsDao: StreamsDao) : ChannelsLocalDataSource{
 
-    fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>> {
-        return streamsDao.searchSubscribedStreams(searchQuery)
-    }
+        override fun getSubscribedStreams(streamId: Int): List<StreamEntity> {
+            return streamsDao.getSubscribedStreams(streamId)
+        }
 
-    fun searchAllStreams(searchQuery: String): Flowable<List<StreamEntity>> {
-        return streamsDao.searchAllStreams(searchQuery)
+        override fun saveStreams(streams: List<StreamEntity>): Completable =
+            streamsDao.saveStreams(streams)
+
+        override fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>> {
+            return streamsDao.searchSubscribedStreams(searchQuery)
+        }
+
+        override fun searchAllStreams(searchQuery: String): Flowable<List<StreamEntity>> {
+            return streamsDao.searchAllStreams(searchQuery)
+        }
     }
 }
