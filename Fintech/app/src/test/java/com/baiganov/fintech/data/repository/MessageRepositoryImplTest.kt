@@ -8,12 +8,15 @@ import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.model.FileResponse
 import com.baiganov.fintech.data.model.Message
 import com.baiganov.fintech.data.model.MessagesResponse
+import com.baiganov.fintech.data.model.Reaction
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.MultipartBody
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import kotlin.math.sign
 
 class MessageRepositoryImplTest {
 
@@ -30,37 +33,52 @@ class MessageRepositoryImplTest {
 
     @Test
     fun `get messages`() {
-        repository.loadMessages("", "", 0L, 0, 0, 0).subscribe()
-        repository.getTopicMessages("1", 0).test().assertValue { messages -> messages.isNotEmpty() }
+        repository.loadMessages("", "topic", 0L, 0, 0, 0).subscribe()
+        repository.getTopicMessages("topic", 0).test().assertValue { messages -> messages.isNotEmpty() }
         repository.getStreamMessages(1).test().assertValue { messages -> messages.isEmpty() }
     }
 
     @Test
     fun `edit messages`() {
-        repository.loadMessages("", "", 0L, 0, 0, 0).subscribe()
+        repository.loadMessages("", "topic", 0L, 0, 0, 0).subscribe()
 
         repository.editMessage(0, "new content").subscribe()
-        repository.loadMessages("", "", 0L, 0, 0, 0).subscribe()
-        repository.getTopicMessages("1", 0).test()
-            .assertValue { messages -> messages.filter { it.id == 0 }[0].content == "new content" }
+        repository.loadMessages("", "topic", 0L, 0, 0, 0).subscribe()
+        repository.getTopicMessages("topic", 0).test().assertValue { it.filter { it.id == 0 }[0].content == "new content"}
+    }
+
+    @Test
+    fun `send message`() {
+        repository.sendMessage(0, "message", "topic").subscribe()
+        repository.loadMessages("", "topic", 0L, 0, 0, 0).subscribe()
+        repository.getTopicMessages("topic", 0).test().assertValue { it.size == 2}
+    }
+
+    @Test
+    fun `add reactions`() {
+        repository.addReaction(0, "emoji")
+        repository.loadMessages("", "topic", 0L, 0, 0, 0).subscribe()
+        repository.getTopicMessages("topic", 0).test().assertValue { messages -> messages.filter { it.id == 0 }[0].reactions.size == 2}
     }
 
     inner class MessageLocalDataSourceTest : MessageLocalDataSource {
 
-        private val data = mutableListOf<MessageEntity>()
+        private var data = mutableListOf<MessageEntity>()
 
         override fun saveMessages(messages: List<MessageEntity>): Completable {
             data.addAll(messages)
+            println("saveMessages " + data.size)
             return Completable.complete()
         }
 
         override fun deleteTopicMessages(topicTitle: String, streamId: Int): Completable {
-            data.filter { messageEntity -> messageEntity.topicName != topicTitle && messageEntity.streamId != streamId }
+            data.removeAll { messageEntity -> messageEntity.topicName == topicTitle && messageEntity.streamId == streamId }
+
             return Completable.complete()
         }
 
         override fun deleteStreamMessages(streamId: Int): Completable {
-            data.filter { messageEntity -> messageEntity.streamId != streamId }
+            data.removeAll { messageEntity -> messageEntity.streamId == streamId }
             return Completable.complete()
         }
 
@@ -82,18 +100,19 @@ class MessageRepositoryImplTest {
 
     inner class MessageRemoteDataSourceTest : MessageRemoteDataSource {
 
+        private var id = 0
         private val messages = mutableListOf(
             Message(
                 "",
                 "",
-                0,
-                mutableListOf(),
+                id++,
+                mutableListOf(Reaction("code", "name", 0)),
                 "",
                 "",
                 0,
                 0L,
                 0,
-                "1"
+                "topic"
             )
         )
 
@@ -112,10 +131,13 @@ class MessageRepositoryImplTest {
         }
 
         override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
+            messages.add(Message("", message, id++, mutableListOf(), "", "",0, 0L, 0, topicTitle))
             return Completable.complete()
         }
 
         override fun addReaction(messageId: Int, emojiName: String): Completable {
+            val message = messages.find { message -> message.id == messageId }
+            message?.reactions?.add(Reaction("code", emojiName, 0))
             return Completable.complete()
         }
 
@@ -134,7 +156,7 @@ class MessageRepositoryImplTest {
                 val changedMessage = Message(
                     message.avatarUrl,
                     content,
-                    message.id,
+                    messageId,
                     message.reactions,
                     message.senderEmail,
                     message.senderFullName,
@@ -143,6 +165,7 @@ class MessageRepositoryImplTest {
                     message.streamId,
                     message.topicName
                 )
+                messages.remove(message)
                 messages.add(changedMessage)
             }
             return Completable.complete()
