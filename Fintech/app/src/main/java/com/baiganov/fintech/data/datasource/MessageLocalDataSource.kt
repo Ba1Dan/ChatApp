@@ -6,37 +6,42 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import javax.inject.Inject
 
-class MessageLocalDataSource @Inject constructor(
-    private val messagesDao: MessagesDao
-) {
+interface MessageLocalDataSource {
 
-    fun saveMessages(messages: List<MessageEntity>): Completable {
-        return messagesDao.saveMessages(messages)
-    }
+    fun saveMessages(messages: List<MessageEntity>): Completable
+    fun deleteTopicMessages(topicTitle: String, streamId: Int): Completable
+    fun deleteStreamMessages(streamId: Int): Completable
+    fun getStreamMessages(streamId: Int): Flowable<List<MessageEntity>>
+    fun getTopicMessages(topicTitle: String, streamId: Int): Flowable<List<MessageEntity>>
 
-    fun deleteTopicMessages(
-        topicTitle: String,
-        streamId: Int,
-    ): Completable {
-        return messagesDao.deleteTopicMessages(topicTitle, streamId)
-    }
+    class Base @Inject constructor(
+        private val messagesDao: MessagesDao
+    ) : MessageLocalDataSource {
 
-    fun deleteStreamMessages(
-        streamId: Int,
-    ): Completable {
-        return messagesDao.deleteStreamMessages(streamId)
-    }
+        override fun saveMessages(messages: List<MessageEntity>): Completable {
+            return messagesDao.saveMessages(messages)
+        }
 
-    fun getStreamMessages(
-        streamId: Int
-    ): Flowable<List<MessageEntity>> {
-        return messagesDao.getStreamMessages(streamId)
-    }
+        override fun deleteTopicMessages(
+            topicTitle: String,
+            streamId: Int,
+        ): Completable {
+            return messagesDao.deleteTopicMessages(topicTitle, streamId)
+        }
 
-    fun getTopicMessages(
-        topicTitle: String,
-        streamId: Int
-    ): Flowable<List<MessageEntity>> {
-        return messagesDao.getTopicMessages(topicTitle, streamId)
+        override fun deleteStreamMessages(streamId: Int): Completable {
+            return messagesDao.deleteStreamMessages(streamId)
+        }
+
+        override fun getStreamMessages(streamId: Int): Flowable<List<MessageEntity>> {
+            return messagesDao.getStreamMessages(streamId)
+        }
+
+        override fun getTopicMessages(
+            topicTitle: String,
+            streamId: Int
+        ): Flowable<List<MessageEntity>> {
+            return messagesDao.getTopicMessages(topicTitle, streamId)
+        }
     }
 }

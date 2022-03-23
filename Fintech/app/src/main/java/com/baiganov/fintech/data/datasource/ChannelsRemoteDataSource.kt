@@ -11,23 +11,30 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import javax.inject.Inject
 
-class ChannelsRemoteDataSource @Inject constructor(
-    private val service: ChatApi
-) {
+interface ChannelsRemoteDataSource  {
 
-    fun getAllStreams(): Single<AllStreamsResponse> {
-        return service.getStreams()
-    }
+    fun getAllStreams(): Single<AllStreamsResponse>
+    fun getSubscribedStreams(): Single<SubscribedStreamsResponse>
+    fun getTopics(streamId: Int): Single<TopicsResponse>
+    fun createStream(subscription: Subscription): Completable
 
-    fun getSubscribedStreams(): Single<SubscribedStreamsResponse> {
-        return service.getSubscribedStreams()
-    }
+    class Base @Inject constructor(
+        private val service: ChatApi
+    ) : ChannelsRemoteDataSource {
+        override fun getAllStreams(): Single<AllStreamsResponse> {
+            return service.getStreams()
+        }
 
-    fun getTopics(streamId: Int): Single<TopicsResponse> {
-        return service.getTopics(streamId)
-    }
+        override fun getSubscribedStreams(): Single<SubscribedStreamsResponse> {
+            return service.getSubscribedStreams()
+        }
 
-    fun createStream(subscription: Subscription): Completable {
-        return service.subscribeOnStreams(Json.encodeToString(serializer(), listOf(subscription)))
+        override fun getTopics(streamId: Int): Single<TopicsResponse> {
+            return service.getTopics(streamId)
+        }
+
+        override fun createStream(subscription: Subscription): Completable {
+            return service.subscribeOnStreams(Json.encodeToString(serializer(), listOf(subscription)))
+        }
     }
 }

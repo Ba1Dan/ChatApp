@@ -23,9 +23,10 @@ A mobile application where you send/edit/delete messages, add/remove reactions o
 
 
 # Tech stack
-- MVP + [Moxy](https://github.com/Arello-Mobile/Moxy)
+- MVVM
 - [Dagger2](https://dagger.dev)
 - [RxJava2](https://reactivex.io/documentation)
 - [Room](https://developer.android.com/training/data-storage/room)
 - [Retrofit](https://square.github.io/retrofit/)
+- [ViewBinding](https://developer.android.com/topic/libraries/view-binding)
 

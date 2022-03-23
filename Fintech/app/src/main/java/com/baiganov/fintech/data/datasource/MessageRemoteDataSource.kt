@@ -11,9 +11,7 @@ import kotlinx.serialization.serializer
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
-class MessageRemoteDataSource @Inject constructor(
-    private val service: ChatApi
-) {
+interface MessageRemoteDataSource {
 
     fun loadMessages(
         stream: String,
@@ -21,66 +19,97 @@ class MessageRemoteDataSource @Inject constructor(
         anchor: Long,
         numBefore: Int,
         numAfter: Int
-    ): Single<MessagesResponse> {
-        val narrow = getNarrow(stream, topicName)
-        return service.getMessages(
-            narrow = narrow,
-            anchor = anchor,
-            numBefore = numBefore,
-            numAfter = numAfter
-        )
-    }
+    ): Single<MessagesResponse>
 
-    fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
-        return service.sendMessage(streamId = streamId, text = message, topicTitle = topicTitle)
-    }
+    fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable
 
-    fun addReaction(messageId: Int, emojiName: String): Completable {
-        return service.addReaction(messageId, emojiName)
-    }
+    fun addReaction(messageId: Int, emojiName: String): Completable
 
-    fun deleteReaction(messageId: Int, emojiName: String): Completable {
-        return service.deleteReaction(messageId, emojiName)
-    }
+    fun deleteReaction(messageId: Int, emojiName: String): Completable
 
-    fun deleteMessage(messageId: Int): Completable {
-        return service.deleteMessage(messageId)
-    }
+    fun deleteMessage(messageId: Int): Completable
 
-    fun uploadFile(part: MultipartBody.Part): Single<FileResponse> {
-        return service.uploadFile(part)
-    }
+    fun editMessage(messageId: Int, content: String): Completable
 
-    fun markTopicAsRead(streamId: Int, topicTitle: String): Completable =
-        service.markTopicAsRead(streamId, topicTitle)
+    fun uploadFile(part: MultipartBody.Part): Single<FileResponse>
 
-    fun markStreamAsRead(streamId: Int): Completable =
-        service.markStreamAsRead(streamId)
+    fun markTopicAsRead(streamId: Int, topicTitle: String): Completable
 
-    fun editMessage(messageId: Int, content: String): Completable {
-        return service.editMessageText(messageId, content)
-    }
+    fun markStreamAsRead(streamId: Int): Completable
 
-    fun editTopic(messageId: Int, newTopic: String): Completable {
-        return service.editMessageTopic(messageId, newTopic)
-    }
+    fun editTopic(messageId: Int, newTopic: String): Completable
 
-    private fun getNarrow(stream: String, topic: String?): String {
-        return Json.encodeToString(
-            serializer(),
-            topic?.let {
-                listOf(
-                    Narrow(OPERATOR_STREAM, stream),
-                    Narrow(OPERATOR_TOPIC, topic)
-                )
-            } ?: listOf(
-                Narrow(OPERATOR_STREAM, stream),
+    class Base @Inject constructor(
+        private val service: ChatApi
+    ) : MessageRemoteDataSource {
+
+        override fun loadMessages(
+            stream: String,
+            topicName: String?,
+            anchor: Long,
+            numBefore: Int,
+            numAfter: Int
+        ): Single<MessagesResponse> {
+            val narrow = getNarrow(stream, topicName)
+            return service.getMessages(
+                narrow = narrow,
+                anchor = anchor,
+                numBefore = numBefore,
+                numAfter = numAfter
             )
-        )
-    }
+        }
 
-    companion object {
-        private const val OPERATOR_STREAM = "stream"
-        private const val OPERATOR_TOPIC = "topic"
+        override fun sendMessage(streamId: Int, message: String, topicTitle: String): Completable {
+            return service.sendMessage(streamId = streamId, text = message, topicTitle = topicTitle)
+        }
+
+        override fun addReaction(messageId: Int, emojiName: String): Completable {
+            return service.addReaction(messageId, emojiName)
+        }
+
+        override fun deleteReaction(messageId: Int, emojiName: String): Completable {
+            return service.deleteReaction(messageId, emojiName)
+        }
+
+        override fun deleteMessage(messageId: Int): Completable {
+            return service.deleteMessage(messageId)
+        }
+
+        override fun uploadFile(part: MultipartBody.Part): Single<FileResponse> {
+            return service.uploadFile(part)
+        }
+
+        override fun markTopicAsRead(streamId: Int, topicTitle: String): Completable =
+            service.markTopicAsRead(streamId, topicTitle)
+
+        override fun markStreamAsRead(streamId: Int): Completable =
+            service.markStreamAsRead(streamId)
+
+        override fun editMessage(messageId: Int, content: String): Completable {
+            return service.editMessageText(messageId, content)
+        }
+
+        override fun editTopic(messageId: Int, newTopic: String): Completable {
+            return service.editMessageTopic(messageId, newTopic)
+        }
+
+        private fun getNarrow(stream: String, topic: String?): String {
+            return Json.encodeToString(
+                serializer(),
+                topic?.let {
+                    listOf(
+                        Narrow(OPERATOR_STREAM, stream),
+                        Narrow(OPERATOR_TOPIC, topic)
+                    )
+                } ?: listOf(
+                    Narrow(OPERATOR_STREAM, stream),
+                )
+            )
+        }
+
+        companion object {
+            private const val OPERATOR_STREAM = "stream"
+            private const val OPERATOR_TOPIC = "topic"
+        }
     }
 }
