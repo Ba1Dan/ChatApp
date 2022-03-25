@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.domain.repository.MessageRepository
+import com.baiganov.fintech.domain.usecase.*
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
@@ -22,7 +23,17 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 class ChatViewModel @Inject constructor(
-    private val messageRepository: MessageRepository
+    private val sendMessageUseCase: SendMessageUseCase,
+    private val getMessageUseCase: GetMessageUseCase,
+    private val loadMessageUseCase: LoadMessageUseCase,
+    private val loadNextMessagesUseCase: LoadNextMessagesUseCase,
+    private val addReactionUseCase: AddReactionUseCase,
+    private val deleteReactionUseCase: DeleteReactionUseCase,
+    private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val editMessageUseCase: EditMessageUseCase,
+    private val editTopicUseCase: EditTopicUseCase,
+    private val uploadFileUseCase: UploadFileUseCase,
+    private val updateMessageUseCase: UpdateMessageUseCase
 ) : ViewModel() {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -45,7 +56,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun uploadFile(uri: Uri, type: String, name: String) {
-        messageRepository.uploadFile(uri, type, name)
+        uploadFileUseCase.execute(uri, type, name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -71,7 +82,7 @@ class ChatViewModel @Inject constructor(
         _topicTitle: String
     ) {
         val topic = checkContent(_topicTitle)
-        messageRepository.sendMessage(streamId, message, topic)
+        sendMessageUseCase.execute(streamId, message, topic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -91,8 +102,9 @@ class ChatViewModel @Inject constructor(
         anchor: Long = DEFAULT_ANCHOR,
         numAfter: Int = NUM_AFTER
     ) {
-        topicTitle?.let { getMessagesFromDb(it, streamId) } ?: getStreamMessages(streamId)
-        messageRepository.loadMessages(
+        getMessages(topicTitle, streamId)
+
+        loadMessageUseCase.execute(
             streamTitle,
             topicTitle,
             anchor,
@@ -117,7 +129,7 @@ class ChatViewModel @Inject constructor(
     fun loadNextMessages(
         anchor: Long
     ) {
-        messageRepository.loadNextMessages(
+        loadNextMessagesUseCase.execute(
             streamTitle,
             topicTitle,
             anchor,
@@ -141,7 +153,7 @@ class ChatViewModel @Inject constructor(
         messageId: Int,
         emojiName: String
     ) {
-        messageRepository.addReaction(messageId, emojiName)
+        addReactionUseCase.execute(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -149,10 +161,7 @@ class ChatViewModel @Inject constructor(
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
                 onError = {
-                    Log.d(
-                        javaClass.simpleName,
-                        "error add reaction ${it.message}"
-                    )
+                    _state.value = (State.Error("error add reaction"))
                 }
             )
             .addTo(compositeDisposable)
@@ -162,7 +171,7 @@ class ChatViewModel @Inject constructor(
         messageId: Int,
         emojiName: String
     ) {
-        messageRepository.deleteReaction(messageId, emojiName)
+        deleteReactionUseCase.execute(messageId, emojiName)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -170,10 +179,7 @@ class ChatViewModel @Inject constructor(
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
                 onError = {
-                    Log.d(
-                        javaClass.simpleName,
-                        "error delete reaction ${it.message}"
-                    )
+                    _state.value = (State.Error("error delete reaction"))
                 }
             )
             .addTo(compositeDisposable)
@@ -183,7 +189,7 @@ class ChatViewModel @Inject constructor(
         streamId: Int,
         messageId: Int,
     ) {
-        messageRepository.deleteMessage(messageId)
+        deleteMessageUseCase.execute(messageId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -195,17 +201,14 @@ class ChatViewModel @Inject constructor(
                     )
                 },
                 onError = {
-                    Log.d(
-                        javaClass.simpleName,
-                        "error delete reaction ${it.message}"
-                    )
+                    _state.value = (State.Error("error delete message"))
                 }
             )
             .addTo(compositeDisposable)
     }
 
     fun editMessage(messageId: Int, content: String) {
-        messageRepository.editMessage(messageId, content)
+        editMessageUseCase.execute(messageId, content)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -213,17 +216,14 @@ class ChatViewModel @Inject constructor(
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
                 onError = {
-                    Log.d(
-                        javaClass.simpleName,
-                        "error delete reaction ${it.message}"
-                    )
+                    _state.value = (State.Error("error edit message"))
                 }
             )
             .addTo(compositeDisposable)
     }
 
     fun editTopic(messageId: Int, newTopic: String) {
-        messageRepository.editTopic(messageId, newTopic)
+        editTopicUseCase.execute(messageId, newTopic)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -231,56 +231,26 @@ class ChatViewModel @Inject constructor(
                     updateMessage(streamTitle, topicTitle, messageId.toLong())
                 },
                 onError = {
-                    Log.d(
-                        javaClass.simpleName,
-                        "error delete reaction ${it.message}"
-                    )
+                    _state.value = (State.Error("error edit topic"))
                 }
             )
             .addTo(compositeDisposable)
     }
 
-    private fun getMessagesFromDb(topicTitle: String, streamId: Int) {
-        messageRepository.getTopicMessages(topicTitle, streamId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { streamEntities ->
-
-                    val mess = streamEntities.groupBy { formatDateByDay(it.timestamp) }
-                        .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
-                            listOf(DateDividerFingerPrint(date)) +
-                                    messagesByDate.map { message -> MessageFingerPrint(message) }
-                        }
-
-                    if (mess.isEmpty() && isLoading) {
-                        _state.value = State.Loading
-                    } else {
-                        _state.value = State.Result(mess)
-                    }
-                },
-                onError = {
-                    _state.value = State.Error(it.message)
-                }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    private fun getStreamMessages(streamId: Int) {
-        messageRepository.getStreamMessages(streamId)
+    private fun getMessages(topicTitle: String?, streamId: Int) {
+        getMessageUseCase.execute(topicTitle, streamId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { messages ->
                     if (messages.isEmpty() && isLoading) {
-                        _state.value = (State.Loading)
+                        _state.value = State.Loading
                     } else {
-                        val messagesFingerPrint = getMessagesByDivider(messages)
-                        _state.value = (State.Result(messagesFingerPrint))
+                        _state.value = State.Result(messages)
                     }
                 },
                 onError = {
-                    Log.d(javaClass.simpleName, "error get messages from db  ${it.message}")
+                    _state.value = State.Error(it.message)
                 }
             )
             .addTo(compositeDisposable)
@@ -291,7 +261,7 @@ class ChatViewModel @Inject constructor(
         topicTitle: String?,
         anchor: Long = DEFAULT_ANCHOR
     ) {
-        messageRepository.updateMessage(
+        updateMessageUseCase.execute(
             streamTitle,
             topicTitle,
             anchor,
@@ -325,36 +295,7 @@ class ChatViewModel @Inject constructor(
         return topic
     }
 
-    //if open stream then show date else show date and topicName
-    private fun getMessagesByDivider(messages: List<MessageEntity>): List<ItemFingerPrint> {
-        return topicTitle?.let {
-            messages.groupBy { formatDateByDay(it.timestamp) }
-                .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
-                    listOf(DateDividerFingerPrint(date)) +
-                            messagesByDate.map { message -> MessageFingerPrint(message) }
-                }
-        } ?: messages.groupBy { formatDateByDay(it.timestamp) }
-            .flatMap { (date: String, messagesByDate: List<MessageEntity>) ->
-                listOf(DateDividerFingerPrint(date)) +
-                        getMessagesByDateAndTopicName(messagesByDate)
-            }
-    }
-
-    private fun getMessagesByDateAndTopicName(messagesByDate: List<MessageEntity>): List<ItemFingerPrint> {
-        return messagesByDate.flatMapIndexed { i: Int, message: MessageEntity ->
-            if (i == 0 || messagesByDate[i - 1].topicName != message.topicName) {
-                listOf(
-                    DateDividerFingerPrint(message.topicName),
-                    MessageFingerPrint(message)
-                )
-            } else {
-                listOf(MessageFingerPrint(message))
-            }
-        }
-    }
-
     companion object {
-
         private const val INITIAL_PAGE_SIZE = 20
         private const val NUM_BEFORE_UPDATE = 1
         private const val NUM_AFTER = 0

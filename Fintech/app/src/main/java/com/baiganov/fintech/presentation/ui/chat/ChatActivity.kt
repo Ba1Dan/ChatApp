@@ -180,7 +180,11 @@ class ChatActivity : BaseActivity<ActivityChatBinding>(), OnClickMessage, OnResu
 
     private fun setupText() {
         binding.toolbarChat.title = this.getString(R.string.title_topic_percent, streamTitle)
-        binding.tvTopic.text = this.getString(R.string.title_topic, topicTitle)
+        topicTitle?.let {
+            binding.toolbarChat.isVisible = false
+            binding.tvTopic.isVisible = true
+            binding.tvTopic.text = this.getString(R.string.title_topic, topicTitle)
+        }
     }
 
     private fun setupRecyclerView() {
