@@ -1,4 +1,4 @@
-package com.baiganov.fintech.domain.usecase
+package com.baiganov.fintech.domain.usecase.chat
 
 import com.baiganov.fintech.domain.repository.MessageRepository
 import com.baiganov.fintech.presentation.ui.chat.ChatViewModel

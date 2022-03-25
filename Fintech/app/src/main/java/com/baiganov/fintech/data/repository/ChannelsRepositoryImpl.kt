@@ -18,39 +18,21 @@ class ChannelsRepositoryImpl @Inject constructor(
     private val localDataSource: ChannelsLocalDataSource
 ) : ChannelsRepository {
 
-    override fun getStreams(type: Int): Completable {
-        return getStreamsByTabPosition(type)
+    override fun searchSubscribedStreams(
+        searchQuery: String,
+    ): Flowable<List<StreamEntity>> {
+        return localDataSource.searchSubscribedStreams("$searchQuery%")
     }
 
-    override fun searchStreams(searchQuery: String, type: Int?): Flowable<List<StreamEntity>> =
-        when (type) {
-            ChannelsPages.SUBSCRIBED.ordinal -> localDataSource.searchSubscribedStreams("$searchQuery%")
-            ChannelsPages.ALL_STREAMS.ordinal -> localDataSource.searchAllStreams("$searchQuery%")
-            else -> throw IllegalStateException("Undefined StreamsFragment tabPosition: $type")
-        }
+    override fun searchAllStreams(searchQuery: String): Flowable<List<StreamEntity>> {
+        return localDataSource.searchAllStreams("$searchQuery%")
+    }
 
     override fun createStream(name: String, description: String): Completable {
         return remoteDataSource.createStream(Subscription(name, description))
     }
 
-    private fun getTopics(streamId: Int): Single<TopicsResponse> {
-        return remoteDataSource.getTopics(streamId)
-    }
-
-    private fun getSubscribedStreamsFromDb(streamId: Int): List<StreamEntity> {
-        return localDataSource.getSubscribedStreams(streamId)
-    }
-
-    private fun saveStreams(streams: List<StreamEntity>): Completable =
-        localDataSource.saveStreams(streams)
-
-    private fun getStreamsByTabPosition(type: Int): Completable = when (type) {
-        ChannelsPages.SUBSCRIBED.ordinal -> getSubscribedStreams()
-        ChannelsPages.ALL_STREAMS.ordinal -> getAllStreams()
-        else -> throw IllegalStateException("Undefined StreamsFragment tabPosition: $type")
-    }
-
-    private fun getAllStreams(): Completable {
+    override fun getAllStreams(): Completable {
         return remoteDataSource.getAllStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
@@ -79,7 +61,7 @@ class ChannelsRepositoryImpl @Inject constructor(
             }
     }
 
-    private fun getSubscribedStreams(): Completable {
+    override fun getSubscribedStreams(): Completable {
         return remoteDataSource.getSubscribedStreams()
             .subscribeOn(Schedulers.io())
             .flattenAsObservable { streamResponse ->
@@ -106,4 +88,16 @@ class ChannelsRepositoryImpl @Inject constructor(
                 saveStreams(entities)
             }
     }
+
+    private fun getTopics(streamId: Int): Single<TopicsResponse> {
+        return remoteDataSource.getTopics(streamId)
+    }
+
+    private fun getSubscribedStreamsFromDb(streamId: Int): List<StreamEntity> {
+        return localDataSource.getSubscribedStreams(streamId)
+    }
+
+    private fun saveStreams(streams: List<StreamEntity>): Completable =
+        localDataSource.saveStreams(streams)
+
 }

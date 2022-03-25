@@ -1,4 +1,4 @@
-package com.baiganov.fintech.domain.usecase
+package com.baiganov.fintech.domain.usecase.chat
 
 import android.net.Uri
 import com.baiganov.fintech.data.model.FileResponse

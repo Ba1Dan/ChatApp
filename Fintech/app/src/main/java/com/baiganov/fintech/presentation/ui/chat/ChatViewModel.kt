@@ -5,14 +5,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.data.db.entity.MessageEntity
-import com.baiganov.fintech.domain.repository.MessageRepository
-import com.baiganov.fintech.domain.usecase.*
+import com.baiganov.fintech.domain.usecase.chat.*
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
-import com.baiganov.fintech.presentation.model.MessageFingerPrint
-import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.util.State
-import com.baiganov.fintech.presentation.util.formatDateByDay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.internal.functions.Functions

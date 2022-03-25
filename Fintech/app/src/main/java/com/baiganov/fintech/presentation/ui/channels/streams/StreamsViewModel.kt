@@ -3,8 +3,10 @@ package com.baiganov.fintech.presentation.ui.channels.streams
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
+import com.baiganov.fintech.domain.usecase.channels.CreateStreamUseCase
+import com.baiganov.fintech.domain.usecase.channels.GetStreamsUseCase
+import com.baiganov.fintech.domain.usecase.channels.SearchStreamsUseCase
 import com.baiganov.fintech.presentation.NetworkManager
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
@@ -23,8 +25,10 @@ import javax.inject.Inject
 import kotlin.properties.Delegates
 
 class StreamsViewModel @Inject constructor(
-    private val repository: ChannelsRepository,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val searchStreamsUseCase: SearchStreamsUseCase,
+    private val getStreamsUseCase: GetStreamsUseCase,
+    private val createStreamUseCase: CreateStreamUseCase
 ) : ViewModel() {
 
     private var itemsOfRecycler: List<ItemFingerPrint> = mutableListOf()
@@ -83,7 +87,7 @@ class StreamsViewModel @Inject constructor(
 
     fun getStreams(type: Int) {
         if (networkManager.isConnected().value) {
-            repository.getStreams(type)
+            getStreamsUseCase.execute(type)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
@@ -105,7 +109,7 @@ class StreamsViewModel @Inject constructor(
     }
 
     fun createStream(name: String, description: String) {
-        repository.createStream(name, description)
+        createStreamUseCase.execute(name, description)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -119,21 +123,13 @@ class StreamsViewModel @Inject constructor(
             .addTo(compositeDisposable)
     }
 
-    private fun mapToFingerPrint(list: List<StreamEntity>): List<StreamFingerPrint> {
-        return list.map { stream ->
-            StreamFingerPrint(
-                stream
-            )
-        }
-    }
-
     private fun searchStreams() {
         searchSubject
             .subscribeOn(Schedulers.io())
             .distinctUntilChanged()
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
-                repository.searchStreams(searchQuery, tabPosition)
+                searchStreamsUseCase.execute(searchQuery, tabPosition)
                     .subscribeOn(Schedulers.io())
                     .toObservable()
             }
@@ -143,8 +139,7 @@ class StreamsViewModel @Inject constructor(
                     if (streams.isEmpty() && isLoading) {
                         _state.value = State.Loading
                     } else {
-                        val list = mapToFingerPrint(streams)
-                        itemsOfRecycler = list
+                        itemsOfRecycler = streams
                         _state.value = State.Result(itemsOfRecycler)
                     }
                 },
