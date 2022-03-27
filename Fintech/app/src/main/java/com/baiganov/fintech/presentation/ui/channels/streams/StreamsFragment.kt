@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.databinding.FragmentStreamsBinding
-import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.util.ViewModelFactory
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint

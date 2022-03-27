@@ -3,10 +3,10 @@ package com.baiganov.fintech.presentation.ui.people
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.domain.repository.PeopleRepository
-import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.domain.usecase.people.LoadUsersUseCase
+import com.baiganov.fintech.domain.usecase.people.SearchUsersUseCase
+import com.baiganov.fintech.presentation.util.NetworkManager
 import com.baiganov.fintech.presentation.model.UserFingerPrint
-import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
 import com.baiganov.fintech.presentation.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class PeopleViewModel @Inject constructor(
-    private val repository: PeopleRepository,
-    private val userToUserFingerPrintMapper: UserToUserFingerPrintMapper,
+    private val searchUsersUseCase: SearchUsersUseCase,
+    private val loadUsersUseCase: LoadUsersUseCase,
     private val networkManager: NetworkManager
 ) : ViewModel() {
 
@@ -46,8 +46,7 @@ class PeopleViewModel @Inject constructor(
     }
 
     fun loadUsers() {
-        repository.loadUsers()
-            .subscribeOn(Schedulers.io())
+        loadUsersUseCase.execute()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 _state.value = State.Loading
@@ -70,12 +69,9 @@ class PeopleViewModel @Inject constructor(
             .distinctUntilChanged()
             .debounce(500, TimeUnit.MILLISECONDS, Schedulers.io())
             .switchMap { searchQuery ->
-                repository.searchUser(searchQuery)
-                    .subscribeOn(Schedulers.io())
-                    .toObservable()
+                searchUsersUseCase.execute(searchQuery)
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .map(userToUserFingerPrintMapper)
             .subscribeBy(
                 onNext = {users ->
                     if (isLoading && users.isEmpty()) {

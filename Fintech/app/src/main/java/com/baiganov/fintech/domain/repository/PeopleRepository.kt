@@ -6,8 +6,6 @@ import io.reactivex.Flowable
 
 interface PeopleRepository {
 
-    fun getUsers(): Flowable<List<UserEntity>>
-
     fun loadUsers(): Completable
 
     fun searchUser(name: String): Flowable<List<UserEntity>>

@@ -25,17 +25,6 @@ class ChannelsViewModel @Inject constructor(
         compositeDisposable.dispose()
     }
 
-    fun obtainEvent(event: Event.EventChannels) {
-        when (event) {
-            is Event.EventChannels.SearchStreams -> {
-                searchTopics(event.searchQuery)
-            }
-            else -> {
-                Log.d(javaClass.simpleName, "Unknown event")
-            }
-        }
-    }
-
     fun searchTopics(searchQuery: String) {
         _state.value = State.Result(searchQuery)
     }

@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
 import com.baiganov.fintech.databinding.FragmentPeopleBinding
-import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.util.ViewModelFactory
 import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.ui.base.BaseFragment
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.ItemClickListener

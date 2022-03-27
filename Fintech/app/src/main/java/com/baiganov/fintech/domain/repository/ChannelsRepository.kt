@@ -6,9 +6,13 @@ import io.reactivex.Flowable
 
 interface ChannelsRepository {
 
-    fun getStreams(type: Int): Completable
+    fun getSubscribedStreams(): Completable
 
-    fun searchStreams(searchQuery: String, type: Int?): Flowable<List<StreamEntity>>
+    fun getAllStreams(): Completable
+
+    fun searchSubscribedStreams(searchQuery: String): Flowable<List<StreamEntity>>
+
+    fun searchAllStreams(searchQuery: String): Flowable<List<StreamEntity>>
 
     fun createStream(name: String, description: String): Completable
 }

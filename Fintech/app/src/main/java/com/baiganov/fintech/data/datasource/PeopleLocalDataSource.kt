@@ -8,8 +8,6 @@ class PeopleLocalDataSource @Inject constructor(
     private val usersDao: UsersDao
 ) {
 
-    fun getUsers() = usersDao.getUsers()
-
     fun saveUsers(users: List<UserEntity>) = usersDao.saveUsers(users)
 
     fun searchUsers(name: String) = usersDao.searchUsers(name)

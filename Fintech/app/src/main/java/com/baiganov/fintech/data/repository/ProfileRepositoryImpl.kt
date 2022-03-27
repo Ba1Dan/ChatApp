@@ -4,6 +4,7 @@ import com.baiganov.fintech.data.datasource.ProfileRemoteDataSource
 import com.baiganov.fintech.domain.repository.ProfileRepository
 import com.baiganov.fintech.data.model.User
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
@@ -11,6 +12,6 @@ class ProfileRepositoryImpl @Inject constructor(
 ) : ProfileRepository {
 
     override fun loadProfile(): Single<User> {
-        return profileRemoteDataSource.loadProfile()
+        return profileRemoteDataSource.loadProfile().subscribeOn(Schedulers.io())
     }
 }

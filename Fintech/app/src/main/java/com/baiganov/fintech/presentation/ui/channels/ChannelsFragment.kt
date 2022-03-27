@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.databinding.FragmentChannelsBinding
-import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.util.ViewModelFactory
 import com.baiganov.fintech.presentation.ui.base.BaseFragment
 import com.baiganov.fintech.presentation.util.State
 import com.google.android.material.tabs.TabLayoutMediator
