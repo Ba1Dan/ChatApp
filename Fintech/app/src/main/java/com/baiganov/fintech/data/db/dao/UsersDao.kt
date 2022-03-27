@@ -14,9 +14,6 @@ interface UsersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveUser(user: UserEntity): Completable
 
-    @Query("SELECT * FROM users_table")
-    fun getUsers(): Flowable<List<UserEntity>>
-
     @Query("SELECT * FROM users_table WHERE full_name LIKE :name")
     fun searchUsers(name: String): Flowable<List<UserEntity>>
 }

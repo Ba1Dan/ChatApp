@@ -12,8 +12,6 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,8 +21,8 @@ import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.databinding.ActivityChatBinding
-import com.baiganov.fintech.presentation.NetworkManager
-import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.util.NetworkManager
+import com.baiganov.fintech.presentation.util.ViewModelFactory
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint
@@ -43,8 +41,6 @@ import com.baiganov.fintech.presentation.ui.chat.dialog.EditTopicDialog.Companio
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.MessageAdapter
 import com.baiganov.fintech.presentation.view.OnClickMessage
 import com.baiganov.fintech.presentation.util.State
-import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import javax.inject.Inject
 
 class ChatActivity : BaseActivity<ActivityChatBinding>(), OnClickMessage, OnResultListener {

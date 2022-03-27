@@ -8,6 +8,7 @@ import com.baiganov.fintech.domain.repository.PeopleRepository
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class PeopleRepositoryImpl @Inject constructor(
@@ -15,11 +16,9 @@ class PeopleRepositoryImpl @Inject constructor(
     private val localDataSource: PeopleLocalDataSource
 ) : PeopleRepository {
 
-    override fun getUsers() = localDataSource.getUsers()
-
     override fun searchUser(name: String): Flowable<List<UserEntity>> = localDataSource.searchUsers(
         "$name%"
-    )
+    ).subscribeOn(Schedulers.io())
 
     override fun loadUsers(): Completable {
         return peopleRemoteDataSource.getUsers()
@@ -33,6 +32,7 @@ class PeopleRepositoryImpl @Inject constructor(
             .flatMapCompletable { users ->
                 localDataSource.saveUsers(users)
             }
+            .subscribeOn(Schedulers.io())
     }
 
     private fun getStatus(user: User): Single<UserEntity> {

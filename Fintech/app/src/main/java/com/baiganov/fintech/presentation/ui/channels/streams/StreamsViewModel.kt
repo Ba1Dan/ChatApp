@@ -3,11 +3,10 @@ package com.baiganov.fintech.presentation.ui.channels.streams
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.domain.usecase.channels.CreateStreamUseCase
 import com.baiganov.fintech.domain.usecase.channels.GetStreamsUseCase
 import com.baiganov.fintech.domain.usecase.channels.SearchStreamsUseCase
-import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.presentation.util.NetworkManager
 import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.model.TopicFingerPrint

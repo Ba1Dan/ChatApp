@@ -12,7 +12,7 @@ import com.baiganov.fintech.App
 import com.baiganov.fintech.R
 import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.databinding.FragmentProfileBinding
-import com.baiganov.fintech.presentation.ViewModelFactory
+import com.baiganov.fintech.presentation.util.ViewModelFactory
 import com.baiganov.fintech.presentation.ui.base.BaseFragment
 import com.baiganov.fintech.presentation.util.State
 import javax.inject.Inject

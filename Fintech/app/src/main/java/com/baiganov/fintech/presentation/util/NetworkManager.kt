@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation
+package com.baiganov.fintech.presentation.util
 
 import android.content.Context
 import android.net.ConnectivityManager

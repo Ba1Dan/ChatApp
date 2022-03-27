@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.baiganov.fintech.App
 import com.baiganov.fintech.R
-import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.presentation.util.NetworkManager
 import com.baiganov.fintech.presentation.ui.channels.ChannelsFragment
 import com.baiganov.fintech.presentation.ui.people.PeopleFragment
 import com.baiganov.fintech.presentation.ui.profile.ProfileFragment

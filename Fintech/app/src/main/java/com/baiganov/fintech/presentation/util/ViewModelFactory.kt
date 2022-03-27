@@ -1,4 +1,4 @@
-package com.baiganov.fintech.presentation
+package com.baiganov.fintech.presentation.util
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

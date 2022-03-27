@@ -4,19 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.data.model.User
-import com.baiganov.fintech.domain.repository.ProfileRepository
-import com.baiganov.fintech.presentation.NetworkManager
+import com.baiganov.fintech.domain.usecase.profile.LoadProfileUseCase
+import com.baiganov.fintech.presentation.util.NetworkManager
 import com.baiganov.fintech.presentation.util.State
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(
-    private val repository: ProfileRepository,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val loadProfileUseCase: LoadProfileUseCase
 ) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -35,9 +34,7 @@ class ProfileViewModel @Inject constructor(
 
     private fun loadProfile() {
         if (networkManager.isConnected().value) {
-
-            repository.loadProfile()
-                .subscribeOn(Schedulers.io())
+            loadProfileUseCase.execute()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     _state.value = State.Loading
