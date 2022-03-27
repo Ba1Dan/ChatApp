@@ -5,10 +5,10 @@ import com.baiganov.fintech.data.datasource.PeopleRemoteDataSource
 import com.baiganov.fintech.data.db.entity.UserEntity
 import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.domain.repository.PeopleRepository
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 class PeopleRepositoryImpl @Inject constructor(

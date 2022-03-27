@@ -4,8 +4,8 @@ import com.baiganov.fintech.data.model.FileResponse
 import com.baiganov.fintech.data.model.MessagesResponse
 import com.baiganov.fintech.data.model.Narrow
 import com.baiganov.fintech.data.network.ChatApi
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import okhttp3.MultipartBody

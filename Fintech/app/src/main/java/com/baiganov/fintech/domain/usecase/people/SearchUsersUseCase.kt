@@ -3,7 +3,7 @@ package com.baiganov.fintech.domain.usecase.people
 import com.baiganov.fintech.domain.repository.PeopleRepository
 import com.baiganov.fintech.presentation.model.UserFingerPrint
 import com.baiganov.fintech.presentation.model.UserToUserFingerPrintMapper
-import io.reactivex.Observable
+import io.reactivex.rxjava3.core.Observable
 import javax.inject.Inject
 
 class SearchUsersUseCase @Inject constructor(

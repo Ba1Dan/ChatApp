@@ -8,10 +8,10 @@ import com.baiganov.fintech.data.db.entity.MessageEntity
 import com.baiganov.fintech.data.model.FileResponse
 import com.baiganov.fintech.data.model.Message
 import com.baiganov.fintech.domain.repository.MessageRepository
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody

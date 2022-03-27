@@ -1,13 +1,11 @@
 package com.baiganov.fintech.presentation.ui.channels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.baiganov.fintech.domain.repository.ChannelsRepository
-import com.baiganov.fintech.presentation.util.Event
 import com.baiganov.fintech.presentation.util.State
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
 class ChannelsViewModel @Inject constructor(

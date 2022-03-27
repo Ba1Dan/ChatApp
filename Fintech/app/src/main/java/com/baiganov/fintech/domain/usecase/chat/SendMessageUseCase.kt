@@ -1,9 +1,7 @@
 package com.baiganov.fintech.domain.usecase.chat
 
 import com.baiganov.fintech.domain.repository.MessageRepository
-import com.baiganov.fintech.presentation.ui.chat.ChatViewModel
-import com.baiganov.fintech.presentation.util.State
-import io.reactivex.Completable
+import io.reactivex.rxjava3.core.Completable
 import javax.inject.Inject
 
 class SendMessageUseCase @Inject constructor(

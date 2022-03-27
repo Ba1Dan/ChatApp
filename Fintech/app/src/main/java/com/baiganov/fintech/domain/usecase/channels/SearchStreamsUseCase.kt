@@ -4,7 +4,7 @@ import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.presentation.model.StreamFingerPrint
 import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import javax.inject.Inject
 
 class SearchStreamsUseCase @Inject constructor(private val repository: ChannelsRepository) {

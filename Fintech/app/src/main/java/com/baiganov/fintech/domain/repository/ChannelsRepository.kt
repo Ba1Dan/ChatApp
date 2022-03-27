@@ -1,8 +1,9 @@
 package com.baiganov.fintech.domain.repository
 
 import com.baiganov.fintech.data.db.entity.StreamEntity
-import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+
 
 interface ChannelsRepository {
 

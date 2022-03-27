@@ -1,8 +1,8 @@
 package com.baiganov.fintech.data.network
 
 import com.baiganov.fintech.data.model.*
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import okhttp3.MultipartBody
 import retrofit2.http.*
 

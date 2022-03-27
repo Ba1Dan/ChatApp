@@ -6,7 +6,7 @@ import com.baiganov.fintech.presentation.model.ItemFingerPrint
 import com.baiganov.fintech.presentation.model.MessageFingerPrint
 import com.baiganov.fintech.presentation.ui.chat.recyclerview.DateDividerFingerPrint
 import com.baiganov.fintech.presentation.util.formatDateByDay
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import javax.inject.Inject
 
 class GetMessageUseCase @Inject constructor(private val messageRepository: MessageRepository) {

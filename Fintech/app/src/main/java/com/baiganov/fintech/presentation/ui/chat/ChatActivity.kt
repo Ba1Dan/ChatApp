@@ -177,7 +177,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>(), OnClickMessage, OnResu
     private fun setupText() {
         binding.toolbarChat.title = this.getString(R.string.title_topic_percent, streamTitle)
         topicTitle?.let {
-            binding.toolbarChat.isVisible = false
+            binding.inputTopic.isVisible = false
             binding.tvTopic.isVisible = true
             binding.tvTopic.text = this.getString(R.string.title_topic, topicTitle)
         }

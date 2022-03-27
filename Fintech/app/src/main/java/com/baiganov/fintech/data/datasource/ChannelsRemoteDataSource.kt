@@ -5,8 +5,8 @@ import com.baiganov.fintech.data.model.SubscribedStreamsResponse
 import com.baiganov.fintech.data.model.Subscription
 import com.baiganov.fintech.data.model.TopicsResponse
 import com.baiganov.fintech.data.network.ChatApi
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import javax.inject.Inject

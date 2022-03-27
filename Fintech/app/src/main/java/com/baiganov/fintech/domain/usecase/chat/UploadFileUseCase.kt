@@ -3,7 +3,7 @@ package com.baiganov.fintech.domain.usecase.chat
 import android.net.Uri
 import com.baiganov.fintech.data.model.FileResponse
 import com.baiganov.fintech.domain.repository.MessageRepository
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 class UploadFileUseCase @Inject constructor(private val messageRepository: MessageRepository) {

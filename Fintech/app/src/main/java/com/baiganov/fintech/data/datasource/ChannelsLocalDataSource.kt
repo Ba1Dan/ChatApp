@@ -2,8 +2,8 @@ package com.baiganov.fintech.data.datasource
 
 import com.baiganov.fintech.data.db.dao.StreamsDao
 import com.baiganov.fintech.data.db.entity.StreamEntity
-import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
 import javax.inject.Inject
 
 interface ChannelsLocalDataSource {

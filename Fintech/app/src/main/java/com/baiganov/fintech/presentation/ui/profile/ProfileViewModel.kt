@@ -7,10 +7,10 @@ import com.baiganov.fintech.data.model.User
 import com.baiganov.fintech.domain.usecase.profile.LoadProfileUseCase
 import com.baiganov.fintech.presentation.util.NetworkManager
 import com.baiganov.fintech.presentation.util.State
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(

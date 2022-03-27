@@ -1,8 +1,8 @@
 package com.baiganov.fintech.data.datasource
 
-import com.baiganov.fintech.data.network.ChatApi
 import com.baiganov.fintech.data.model.User
-import io.reactivex.Single
+import com.baiganov.fintech.data.network.ChatApi
+import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 class ProfileRemoteDataSource @Inject constructor(

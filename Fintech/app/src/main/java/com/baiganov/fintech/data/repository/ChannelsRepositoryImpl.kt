@@ -4,13 +4,12 @@ import com.baiganov.fintech.data.datasource.ChannelsLocalDataSource
 import com.baiganov.fintech.data.datasource.ChannelsRemoteDataSource
 import com.baiganov.fintech.data.db.entity.StreamEntity
 import com.baiganov.fintech.data.model.Subscription
-import com.baiganov.fintech.domain.repository.ChannelsRepository
 import com.baiganov.fintech.data.model.TopicsResponse
-import com.baiganov.fintech.presentation.ui.channels.ChannelsPages
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import com.baiganov.fintech.domain.repository.ChannelsRepository
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
 class ChannelsRepositoryImpl @Inject constructor(
